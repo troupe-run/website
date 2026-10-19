@@ -5,12 +5,12 @@ import { spawnSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
 import { runLinkinator, summarise } from './linkinator-lib.mjs';
 import { EXTERNAL_SKIPS } from './external-skips.mjs';
-import { TRACKING_TITLE, decide, exitCode, formatReport, matchTrackingIssues, sitePath } from './linkcheck-external-lib.mjs';
+import { TRACKING_TITLE, boardIssueUrl, decide, exitCode, formatReport, matchTrackingIssues, sitePath } from './linkcheck-external-lib.mjs';
 
 const dir = process.argv[2] ?? 'dist';
 // Retry 429s that send retry-after, and 5xx or no response up to 3 times; give up on a request after 15 s.
 const RETRIES = ['--retry', '--retry-errors', '--retry-errors-count', '3', '--retry-errors-jitter', '3000', '--timeout', '15000'];
-const { GITHUB_ACTIONS, GITHUB_STEP_SUMMARY, GITHUB_SERVER_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID } = process.env;
+const { GITHUB_ACTIONS, GITHUB_OUTPUT, GITHUB_STEP_SUMMARY, GITHUB_SERVER_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID } = process.env;
 const runUrl = GITHUB_RUN_ID ? `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}` : '(local run)';
 
 const run = runLinkinator(dir, EXTERNAL_SKIPS.map((s) => s.pattern), RETRIES);
@@ -46,18 +46,22 @@ if (GITHUB_ACTIONS) {
     // List every open issue and filter in code. `--author` (or `--search`) goes through GitHub's search API, which
     // didn't return a bot-opened issue minutes after it was created, so the second run opened a duplicate.
     const listed = JSON.parse(gh('issue', 'list', '--state', 'open', '--limit', '1000',
-      '--json', 'number,title,author,createdAt,state'));
+      '--json', 'number,title,author,createdAt,state,url'));
     const openIssues = matchTrackingIssues(listed);
     if (openIssues.length > 1) console.warn(`! ${openIssues.length} open "${TRACKING_TITLE}" issues; updating #${openIssues[0].number}, the oldest`);
     const decision = decide({ broken, external, crashed, openIssues });
     const body = formatReport({ broken, external, runUrl, dir, forIssue: true });
-    if (decision.action === 'open') console.log(`Opened ${gh('issue', 'create', '--title', TRACKING_TITLE, '--label', 'bug', '--body', body).trim()}`);
+    let openedUrl = '';
+    if (decision.action === 'open') { openedUrl = gh('issue', 'create', '--title', TRACKING_TITLE, '--label', 'bug', '--body', body).trim(); console.log(`Opened ${openedUrl}`); }
     if (decision.action === 'comment') { gh('issue', 'comment', String(decision.issue.number), '--body', body); console.log(`Commented on #${decision.issue.number}`); }
     if (decision.action === 'close') {
       gh('issue', 'close', String(decision.issue.number), '--comment', `A clean run found no broken external links (${external} checked): ${runUrl}`);
       console.log(`Closed #${decision.issue.number}`);
     }
     if (decision.action === 'none') console.log('Tracking issue: nothing to do');
+    // The board job (links-weekly.yml) adds this issue to the roadmap board. It runs only when this output is set.
+    const issueUrl = boardIssueUrl({ decision, openedUrl });
+    if (issueUrl && GITHUB_OUTPUT) appendFileSync(GITHUB_OUTPUT, `issue-url=${issueUrl}\n`);
   } catch (e) {
     reportFailed = true;
     console.error(`✗ could not update the tracking issue: ${e.message}`);
