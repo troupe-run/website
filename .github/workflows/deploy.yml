@@ -1,19 +1,28 @@
 name: Deploy
+# Publishes main after CI passes on a push, and again whenever troupe-run/troupe's release workflow dispatches it, on
+# every push to troupe's main, so /docs follows troupe (spec: build-and-deploy; versioned-docs design D11). The
+# dispatch takes no inputs: nothing from the sender reaches the build. Only main is built, and github-pages is
+# limited to main (troupe-run/infrastructure), so a dispatch on another ref publishes nothing.
 on:
   workflow_run:
     workflows: [CI]
     types: [completed]
     branches: [main]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   build:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
+    # Every build reads the current main and the current troupe, so a newer one makes a running one redundant.
+    concurrency:
+      group: pages-build
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 0   # Starlight's "Last updated" reads git history
       # withastro/action can't read .nvmrc, and without node-version it builds on its own default.
       - id: node-version
@@ -21,6 +30,8 @@ jobs:
       - uses: withastro/action@v6
         with:
           node-version: ${{ steps.node-version.outputs.version }}
+      # A dispatched build has had no CI run, so a broken link troupe adds stops here, and the live site stays.
+      - run: npm run linkcheck
   deploy:
     needs: build
     runs-on: ubuntu-latest
