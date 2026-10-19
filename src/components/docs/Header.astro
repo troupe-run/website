@@ -2,8 +2,16 @@
 // Replaces Starlight's header with the site header, so docs and blog pages share the landing page's.
 import Search from '@astrojs/starlight/components/Search.astro';
 import SiteHeader from '../sections/Header.astro';
+import VersionPicker from './VersionPicker.astro';
 import { siteSection } from '../../lib/site-section';
+import { locate, type Manifest } from '../../lib/docs-versions';
+import manifestJson from '../../generated/troupe-docs.json';
 // The site's own pages (such as /status/) show the plain wordmark: they're neither "troupe docs" nor "troupe blog".
 const section = siteSection(Astro.locals.starlightRoute.id);
+// Docs pages: the version picker beside "troupe docs" (versioned-docs design D6).
+const at = locate(manifestJson as Manifest, Astro.locals.starlightRoute.id);
 ---
-<SiteHeader section={section === 'site' ? undefined : section} embedded><Search /></SiteHeader>
+<SiteHeader section={section === 'site' ? undefined : section} embedded>
+  {at && <VersionPicker slot="version" version={at.version} path={at.path} />}
+  <Search />
+</SiteHeader>

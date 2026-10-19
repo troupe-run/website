@@ -10,7 +10,8 @@ schema: spec-driven
 #     Write all artifacts in Spanish
 context: |
   This repo is troupe.run: the landing page, the docs at /docs and the blog. It is troupe's public face, not the
-  product. troupe itself lives in troupe-run/troupe, and the org and its development workflow are run from
+  product. The text of /docs lives in troupe-run/troupe's docs/ and is built from there, one version per release
+  (spec: versioned-docs); this repo owns how it looks and everything outside /docs. troupe itself lives in troupe-run/troupe, and the org and its development workflow are run from
   troupe-run/infrastructure. The site exists so that someone landing on it can say in one sentence what troupe
   does, follow the build on GitHub, see where the docs are heading, and fix a docs page in two clicks.
 
@@ -23,7 +24,8 @@ context: |
   - The site's original design is docs/superpowers/specs/2026-10-07-troupe-run-site-design.md, from before this
     repo used OpenSpec. Treat its decisions as current unless an OpenSpec spec has replaced them.
   - What troupe does is decided in troupe-run/troupe (its specs and decisions). The docs describe it and never
-    get ahead of it. A docs page about behaviour cites the troupe spec or decision it describes.
+    get ahead of it. They're written and checked in troupe, next to the code: troupe's docs check holds each page
+    to its sources, and this repo's build holds it to the page contract both repos share.
   - This repo's GitHub settings (rulesets, required checks, labels, Pages, the github-pages environment) and
     troupe.run's DNS are declared in troupe-run/infrastructure. Change them there, by an issue in that repo,
     never on GitHub by hand. The guard's files here are delivered from infrastructure: change them there too.
@@ -45,8 +47,10 @@ context: |
     light and dark, keyboard operable, and no motion under prefers-reduced-motion. Anything that moves on its own
     stops within 5 seconds or on the first interaction (WCAG 2.2.2).
   - Mobile first: usable from 320px wide with no horizontal scroll and a 16px minimum gutter.
-  - Every docs page, written or stub, links to its own source ("Improve this page"). Stubs are real pages marked
-    `status: planned` in frontmatter. The pre-alpha note is driven by frontmatter, never hand-typed.
+  - Every docs page, written or stub, links to its own source in troupe-run/troupe: "Improve this page" on
+    /docs/next/ and the latest release, and "View source" at its tag on an earlier version, which can't be edited
+    (owner, 2026-10-19). Every other page links its source here. Stubs are real pages marked `status: planned` in
+    frontmatter. The pre-alpha note is driven by frontmatter, never hand-typed.
   - Licences: site code is MIT, content is CC BY 4.0, and contributions come in on the same terms. No DCO and no
     CLA here (owner, 2026-10-16, troupe-run/infrastructure#54). The troupe name, mark and characters are
     trademarks of HPS.GD PTY LTD and are licensed under neither.
@@ -63,8 +67,9 @@ context: |
   - User-facing copy says "theatre", never mixed with "project", which appears only to explain what a theatre is.
     Not "repo", "YAML" or "config", unless the technical term is needed.
   - The organisation is "hps.gd" in prose ("a project by hps.gd"); the legal name is HPS.GD PTY LTD.
-  - Landing-page copy and written docs pages are reviewed by the owner as text before they ship. Landing copy lives
-    in src/content/copy/, one file per section, so it can be.
+  - Landing-page copy and the site's own words (the version menu and banners among them) are reviewed by the owner
+    as text before they ship. They live in src/content/copy/, one file per section, so they can be. Docs pages are
+    reviewed in troupe.
 
   Quality bar:
   - Every behaviour has a test that fails when it breaks, and a test's name states exactly what its body checks.

@@ -177,10 +177,14 @@ on `/docs/v0.1/the-company/flows/`, becomes `/docs/v0.1/stagecraft/build-a-flow/
   - The middleware sets `pagination` from the same list, so "Next" and "Previous" stay in the version.
   - It uses Starlight's documented route-data API, and isn't an override.
 - **Version menu:**
-  - It's rendered by the existing `MarkdownContent` override, at the top of every docs page, so the override count
-    stays at six.
-  - It's a `<details>` disclosure whose summary names the version being read. Its entries are plain links, so it
-    needs no script, keyboard use is native, and it stays usable at 320px.
+  - It's in the header, beside "troupe docs", on every docs page (owner, 2026-10-20: "at the top across the whole
+    documentation site", not in the page's content). It's rendered by the existing `Header` override, so the override
+    count stays at six.
+  - Closed, it shows only the version being read ("v0.1"), so it stays small however many versions there are. Open,
+    it's a list that scrolls past 60% of the window's height.
+  - It's a `<details>` disclosure. Its entries are plain links, so changing version needs no script, and keyboard use
+    is native. A small script closes it on Escape, returning focus, or on a click elsewhere. At phone width the list
+    opens leftwards, so it stays in the window at 320px.
   - Each entry links to the same page in that version when the page exists there, and otherwise to that version's
     first sidebar page.
   - The current version's entry is marked with `aria-current="page"`.

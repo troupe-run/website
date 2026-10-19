@@ -21,7 +21,8 @@ for (const p of PAGES) {
   test(`the ${p.name}'s header reads "${p.label ? `troupe ${p.label}` : 'troupe'}" top left`, async ({ page }) => {
     await page.goto(p.path);
     const brand = page.locator('.site-header .brand');
-    await expect(brand).toHaveText(p.label ? `troupe${p.label}` : 'troupe', { useInnerText: false });
+    // The wordmark and section name, not the docs version picker that follows them (versioned-docs design D6).
+    await expect(brand.locator(':scope > a')).toHaveText(p.label ? ['troupe', p.label] : ['troupe'], { useInnerText: false });
     await expect(brand.locator('.section')).toHaveCount(p.label ? 1 : 0);
     if (p.label) await expect(brand.locator('.section')).toHaveAttribute('href', `/${p.label}/`);
   });

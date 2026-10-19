@@ -93,3 +93,9 @@ export function versionNotice(manifest: Manifest, version: Version, path: string
   };
   return { entries, banner };
 }
+
+/** A version's name in the closed picker, where there's little room: "v0.2", "next", "v0.1" or "unreleased". */
+export function shortLabel(version: Version, copy: VersionCopy): string {
+  if (version.role === 'next') return copy.next;
+  return version.version === null ? copy.unreleased : `v${version.version}`;
+}
