@@ -5,6 +5,8 @@ export const TRACKING_TITLE = 'Broken external links';
 // How `gh issue list --json author` names the GITHUB_TOKEN's bot.
 export const WORKFLOW_AUTHOR = 'app/github-actions';
 export const MAX_ROWS = 100;
+// The page a run started by hand adds to the scan to hold its `extra-url`. Its path is the "Found on" in the report.
+export const EXTRA_URL_PAGE = 'extra-url-input';
 
 /**
  * @typedef {{ url: string, status?: number, state?: string, parent?: string }} Link  linkinator's JSON for one link
@@ -43,6 +45,35 @@ export function boardIssueUrl({ decision, openedUrl = '' }) {
   if (decision.action === 'open') return openedUrl;
   if (decision.action === 'comment') return decision.issue?.url ?? '';
   return '';
+}
+
+/**
+ * What's wrong with a run's `extra-url` input, or null when it can be checked. Empty means unset: check the site only.
+ * Anything else that isn't an absolute http(s) URL, or that a skip would hide, is refused rather than ignored.
+ * @param {string | undefined} value
+ * @param {{ pattern: string, reason?: string }[]} skips
+ */
+export function extraUrlProblem(value, skips) {
+  if (!value) return null;
+  const fix = 'Start the run again with an absolute http(s) URL, such as https://troupe.run/definitely-not-here-404, or leave it empty.';
+  let url;
+  try { url = new URL(value); } catch { url = null; }
+  if (!url || !['http:', 'https:'].includes(url.protocol)) {
+    return `extra-url must be an absolute http(s) URL; got ${JSON.stringify(value)}. ${fix}`;
+  }
+  const skip = skips.find((s) => new RegExp(s.pattern).test(value));
+  if (skip) return `extra-url ${JSON.stringify(value)} matches the skip pattern ${skip.pattern}, so checking it would prove nothing. ${fix}`;
+  return null;
+}
+
+const escapeHtml = (s) => s.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
+/**
+ * The page that holds a run's `extra-url`, so linkinator checks it like any link on the site.
+ * @param {string} url
+ */
+export function extraUrlPage(url) {
+  return `<!doctype html>\n<title>extra-url input</title>\n<a href="${escapeHtml(url)}">extra-url</a>\n`;
 }
 
 /**

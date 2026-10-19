@@ -29,23 +29,23 @@
 
 ## 4. `extra-url` (D5)
 
-- [ ] 4.1 Add `extraUrlProblem(value, skips)` to the lib, test first. It returns `null` for `''`, `undefined`, and
+- [x] 4.1 Add `extraUrlProblem(value, skips)` to the lib, test first. It returns `null` for `''`, `undefined`, and
   `https://troupe.run/definitely-not-here-404`. It returns a message naming `extra-url` and the value for
   `troupe.run/x`, `ftp://troupe.run/x`, `/docs/` and `not a url`. For a URL a skip matches, the message names the
   skip's pattern. Test that last case with a skip list passed in, not `EXTERNAL_SKIPS`, which is empty. Verify: the
   tests fail before the function exists and pass after.
-- [ ] 4.2 Add the extra page's writer and remover to the lib, as a pure function that returns the page's HTML. Test
+- [x] 4.2 Add the extra page's writer and remover to the lib, as a pure function that returns the page's HTML. Test
   first that the HTML holds exactly one `<a href>` and that `"`, `&`, `<` and `>` in the URL are escaped. Then wire it
   in `linkcheck-external.mjs`: read `EXTRA_URL`, refuse with `extraUrlProblem` (exit 1 before linkinator, no issue
   touched), write `<dir>/extra-url-input/index.html`, and remove it in a `finally`. Verify: `npm run test:unit` passes.
   Then run these locally:
   - `EXTRA_URL=https://troupe.run/definitely-not-here-404 npm run linkcheck:external` exits 1, lists that URL with 404
-    on `/extra-url-input/`, and leaves no `dist/extra-url-input` behind.
+    on `/extra-url-input`, and leaves no `dist/extra-url-input` behind.
   - `EXTRA_URL=troupe.run/x npm run linkcheck:external` exits 1 with the `extra-url` message and checks no links.
   - With `EXTRA_URL` unset, the stdout and exit code match the 1.1 baseline.
-- [ ] 4.3 Update the header comments in `linkcheck-external.mjs` and `links-weekly.yml` to mention `extra-url` and the
+- [x] 4.3 Update the header comments in `linkcheck-external.mjs` and `links-weekly.yml` to mention `extra-url` and the
   board job. Verify: they describe what the code does, read side by side with it.
-- [ ] 4.4 Commit ("let a run started by hand check one extra URL, to prove the issue path on main").
+- [x] 4.4 Commit ("let a run started by hand check one extra URL, to prove the issue path on main").
 
 ## 5. The `board` job (D1, D2, D3, D4)
 

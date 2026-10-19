@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import {
-  boardIssueUrl, decide, exitCode, formatReport, matchTrackingIssues, sitePath, TRACKING_TITLE, MAX_ROWS,
+  boardIssueUrl, decide, exitCode, extraUrlPage, extraUrlProblem, formatReport, matchTrackingIssues, sitePath,
+  TRACKING_TITLE, MAX_ROWS,
 } from '../../scripts/linkcheck-external-lib.mjs';
 import { summarise } from '../../scripts/linkinator-lib.mjs';
 
@@ -125,4 +126,38 @@ describe('boardIssueUrl', () => {
   });
   it('is empty when the run opened the issue but gh printed no URL', () =>
     expect(boardIssueUrl({ decision: { action: 'open' }, openedUrl: '' })).toBe(''));
+});
+
+describe('extraUrlProblem', () => {
+  it('accepts an empty or missing extra-url, which means check the site only', () => {
+    expect(extraUrlProblem('', [])).toBeNull();
+    expect(extraUrlProblem(undefined, [])).toBeNull();
+  });
+  it('accepts an absolute https URL that no skip matches', () =>
+    expect(extraUrlProblem('https://troupe.run/definitely-not-here-404', [])).toBeNull());
+  it.each(['troupe.run/x', 'ftp://troupe.run/x', '/docs/', 'not a url'])(
+    'refuses %s, naming extra-url and the value', (value) => {
+      const problem = extraUrlProblem(value, []);
+      expect(problem).toContain('extra-url');
+      expect(problem).toContain(JSON.stringify(value));
+      expect(problem).toContain('absolute http(s) URL');
+    });
+  it('refuses a URL a skip pattern matches, naming the pattern', () => {
+    const problem = extraUrlProblem('https://example.com/a', [{ pattern: 'example\\.com', reason: 'test' }]);
+    expect(problem).toContain('extra-url');
+    expect(problem).toContain('example\\.com');
+  });
+});
+
+describe('extraUrlPage', () => {
+  it('holds exactly one link, to the URL', () => {
+    const html = extraUrlPage('https://troupe.run/definitely-not-here-404');
+    expect(html.match(/<a /g)).toHaveLength(1);
+    expect(html).toContain('<a href="https://troupe.run/definitely-not-here-404">');
+  });
+  it('escapes ", &, < and > in the URL so it stays one attribute value', () => {
+    const html = extraUrlPage('https://x.test/?a="b"&c=<d>');
+    expect(html).toContain('href="https://x.test/?a=&quot;b&quot;&amp;c=&lt;d&gt;"');
+    expect(html.match(/<a /g)).toHaveLength(1);
+  });
 });

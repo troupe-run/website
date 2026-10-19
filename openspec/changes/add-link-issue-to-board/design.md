@@ -109,10 +109,17 @@ Then:
 ### D5. `extra-url` is checked as a link on a page added to the scan
 
 The workflow declares `workflow_dispatch.inputs.extra-url` (string, optional, default empty), and passes it to the
-check as `EXTRA_URL` through `env:`. When it's set, `linkcheck-external.mjs` writes one page, `<dir>/extra-url-input/index.html`,
-containing a single link to it, runs linkinator as now, and removes the page afterwards (in a `finally`, so a local run
-leaves `dist` as it found it). The URL then goes through the same retries, skips, counting, report and issue as every
-other link, and the "Found on" column shows `/extra-url-input/`, which says where it came from.
+check as `EXTRA_URL` through `env:`. When it's set, `linkcheck-external.mjs` writes one page,
+`<dir>/extra-url-input/index.html`, containing a single link to it. It checks that page with a second linkinator run,
+with the same skips and retries, and merges that run's links into the site's result. Then it removes the page (in a
+`finally`, so a local run leaves `dist` as it found it). The URL then goes through the same counting, report and issue
+as every other link, and the "Found on" column shows `/extra-url-input`, which says where it came from.
+
+The second run was found during apply. Two things rule out a single run. linkinator only reaches pages linked from the
+site's `index.html`, so a page nothing links to is never checked. And passing both paths to one run (`linkinator dist
+dist/extra-url-input/index.html`) breaks how it resolves the site's own local links: it checked 19 links instead of 127,
+and reported every local asset as broken. The second run starts from the local page, not from the URL, so it doesn't
+have the problems of the first alternative below.
 
 The page is written only into the scan directory of a workflow that never deploys. `deploy.yml` builds its own `dist`.
 
