@@ -8,7 +8,7 @@ export const MAX_ROWS = 100;
 
 /**
  * @typedef {{ url: string, status?: number, state?: string, parent?: string }} Link  linkinator's JSON for one link
- * @typedef {{ number: number, title: string, createdAt: string, state?: string, author?: { login: string } }} Issue
+ * @typedef {{ number: number, title: string, createdAt: string, state?: string, url?: string, author?: { login: string } }} Issue
  */
 
 /**
@@ -32,6 +32,17 @@ export function decide({ broken, external, crashed, openIssues }) {
   const [issue] = openIssues;
   if (broken.length) return issue ? { action: 'comment', issue } : { action: 'open' };
   return issue ? { action: 'close', issue } : { action: 'none' };
+}
+
+/**
+ * The issue the board job adds to the roadmap board: the one this run opened (the URL `gh issue create` printed) or
+ * commented on. Empty for every other run, which leaves the board alone.
+ * @param {{ decision: { action: string, issue?: Issue }, openedUrl?: string }} input
+ */
+export function boardIssueUrl({ decision, openedUrl = '' }) {
+  if (decision.action === 'open') return openedUrl;
+  if (decision.action === 'comment') return decision.issue?.url ?? '';
+  return '';
 }
 
 /**

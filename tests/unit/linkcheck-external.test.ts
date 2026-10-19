@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import {
-  decide, exitCode, formatReport, matchTrackingIssues, sitePath, TRACKING_TITLE, MAX_ROWS,
+  boardIssueUrl, decide, exitCode, formatReport, matchTrackingIssues, sitePath, TRACKING_TITLE, MAX_ROWS,
 } from '../../scripts/linkcheck-external-lib.mjs';
 import { summarise } from '../../scripts/linkinator-lib.mjs';
 
@@ -111,4 +111,18 @@ describe('formatReport', () => {
   it('says how many links were checked when none is broken', () => {
     expect(formatReport({ broken: [], external: 75, runUrl: RUN })).toBe(`No broken external links: 75 checked.\n\nRun: ${RUN}`);
   });
+});
+
+describe('boardIssueUrl', () => {
+  const URL18 = 'https://github.com/troupe-run/website/issues/18';
+  it('is the URL gh printed when the run opened the issue', () =>
+    expect(boardIssueUrl({ decision: { action: 'open' }, openedUrl: URL18 })).toBe(URL18));
+  it('is the matched issue\'s url when the run commented on it', () =>
+    expect(boardIssueUrl({ decision: { action: 'comment', issue: issue(18, '2026-10-19T00:00:00Z', { url: URL18 }) } })).toBe(URL18));
+  it('is empty when the run closed the issue or had nothing to do', () => {
+    expect(boardIssueUrl({ decision: { action: 'close', issue: issue(18, '2026-10-19T00:00:00Z', { url: URL18 }) } })).toBe('');
+    expect(boardIssueUrl({ decision: { action: 'none' } })).toBe('');
+  });
+  it('is empty when the run opened the issue but gh printed no URL', () =>
+    expect(boardIssueUrl({ decision: { action: 'open' }, openedUrl: '' })).toBe(''));
 });

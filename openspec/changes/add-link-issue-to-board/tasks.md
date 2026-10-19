@@ -18,14 +18,14 @@
 
 ## 3. `links` hands over the issue's URL (D3)
 
-- [ ] 3.1 Add `boardIssueUrl({ decision, openedUrl })` to `scripts/linkcheck-external-lib.mjs`, test first. Cases:
+- [x] 3.1 Add `boardIssueUrl({ decision, openedUrl })` to `scripts/linkcheck-external-lib.mjs`, test first. Cases:
   `open` gives `openedUrl`; `comment` gives `decision.issue.url`; `close` and `none` give `''`; `open` with an empty
   `openedUrl` gives `''`. Verify: the tests fail before the function exists and pass after.
-- [ ] 3.2 In `scripts/linkcheck-external.mjs`, add `url` to the `gh issue list --json` fields. Keep the trimmed URL
+- [x] 3.2 In `scripts/linkcheck-external.mjs`, add `url` to the `gh issue list --json` fields. Keep the trimmed URL
   that `gh issue create` prints. After the issue step, when `GITHUB_OUTPUT` is set and `boardIssueUrl` isn't empty,
   append `issue-url=<url>`. A failure there sets `reportFailed`. Add `url` to the `Issue` typedef. Verify: `npm run
   test:unit` passes. A local run with `GITHUB_ACTIONS` unset gives the same stdout and exit code as the 1.1 baseline.
-- [ ] 3.3 Commit ("hand the tracking issue's URL to the next job").
+- [x] 3.3 Commit ("hand the tracking issue's URL to the next job").
 
 ## 4. `extra-url` (D5)
 
