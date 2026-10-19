@@ -217,7 +217,7 @@
 
 ## 10. troupe's notice job (D12), in troupe-run/troupe
 
-- [ ] 10.1 In a troupe worktree, on a branch named after a new troupe OpenSpec change `website-docs-notice` that cites
+- [x] 10.1 In a troupe worktree, on a branch named after a new troupe OpenSpec change `website-docs-notice` that cites
   troupe-run/website#23, propose and apply the `notify-website` job in `.github/workflows/release.yml`:
   - `needs: release-please`, `if: ${{ !cancelled() }}`;
   - `environment: docs`, `permissions: {}`, no checkout;
@@ -227,12 +227,14 @@
     pre-alpha note (D15).
   If troupe's guard asks for an issue in troupe, open one on the roadmap board. Verify: troupe's `scripts/check.py`
   passes, and the commits are signed off.
+  Done 2026-10-20: troupe's change `website-docs-notice` (55f6d82 proposal, 1c065c2 job and house scenario), both commits signed off. actionlint is clean and troupe's `scripts/check.py` passed (2011 tests). It cites troupe-run/website#23, and troupe's guard asked for no troupe issue.
 - [ ] 10.2 Open troupe's PR, saying it merges after this repository's PR is deployed. Verify: its CI passes. Don't merge
   it yet.
 
 ## 11. Integration
 
-- [ ] 11.1 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes. Save the output to the scratchpad.
+- [x] 11.1 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes. Save the output to the scratchpad.
+  Done 2026-10-20: all 11 gates passed, with 223 e2e tests across both projects. The output is saved at /private/tmp/claude-502/-Users-martin-Projects-troupe-website-docs-from-troupe/00fbfdeb-a938-4d36-bc32-5598435aa48a/scratchpad/final-check-saved.log.
 - [ ] 11.2 Open this repository's PR with `Closes #23`, linking troupe's PR and the merge order. Verify: CI's `test` and
   `guard` pass.
 
