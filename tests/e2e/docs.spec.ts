@@ -1,43 +1,46 @@
 import { test, expect } from './fixtures';
-import { readdirSync, statSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { parse } from 'yaml';
 
-const ROOT = 'src/content/docs/docs';
-const EDIT_BASE = 'https://github.com/troupe-run/website/edit/main/';
-function mdFiles(dir: string): string[] {
-  return readdirSync(dir).flatMap((n) => {
-    const p = join(dir, n);
-    return statSync(p).isDirectory() ? mdFiles(p) : p.endsWith('.md') ? [p] : [];
-  });
-}
-const pages = mdFiles(ROOT).map((file) => ({
-  file,
-  url: '/' + file.replace('src/content/docs/', '').replace(/\.md$/, '') + '/',
-  status: /^status:\s*written/m.test(readFileSync(file, 'utf8')) ? 'written' : 'planned',
-}));
+// The real build: /docs from troupe-run/troupe, as `npm run docs:sync` fetched it (spec: versioned-docs). The
+// versions themselves (next, archived, the menu's other entries) are tested on the fixture build, in versions.spec.ts.
+interface Page { path: string; title: string }
+const manifest: { versions: { role: string; base: string; dir: string; ref: string; pages: Page[] }[] } =
+  JSON.parse(readFileSync('src/generated/troupe-docs.json', 'utf8'));
+const current = manifest.versions.find((v) => v.role === 'current')!;
+const url = (p: Page) => `${current.base}${p.path.replace(/\.md$/, '')}/`;
+const front = (p: Page) =>
+  parse(/^---\n([\s\S]*?)\n---\n/.exec(readFileSync(`src/content/docs/docs/${current.dir ? `${current.dir}/` : ''}${p.path}`, 'utf8'))![1]);
+const EDIT = 'https://github.com/troupe-run/troupe/edit/main/docs/';
 
-test('the docs tree has 31 pages: 6 written, 25 planned', () => {
-  expect(pages).toHaveLength(31);
-  expect(pages.filter((p) => p.status === 'written')).toHaveLength(6);
+test("the current version has troupe's pages, and none of the website's old ones", () => {
+  expect(current.pages.length).toBeGreaterThan(20);
+  const paths = current.pages.map((p) => p.path);
+  expect(paths).not.toContain('programme/status-and-roadmap.md');
+  expect(paths).not.toContain('backstage/contributing.md');
 });
 
-for (const p of pages) {
-  test(`${p.url} has an "Improve this page" link to ${p.file}`, async ({ page }) => {
-    await page.goto(p.url);
-    await expect(page.getByRole('link', { name: 'Improve this page' })).toHaveAttribute('href', EDIT_BASE + p.file);
+for (const p of current.pages) {
+  test(`${url(p)} is built, is in the sidebar, and its "Improve this page" opens docs/${p.path} on troupe's main`, async ({ page }) => {
+    await page.goto(url(p));
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.title);
+    const sidebar = await page.locator('.sidebar-content a').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+    expect(sidebar).toContain(url(p));
+    await expect(page.getByRole('link', { name: 'Improve this page' })).toHaveAttribute('href', EDIT + p.path);
   });
 }
-
-test('every docs page appears in the sidebar', async ({ page }) => {
-  await page.goto('/docs/programme/what-is-troupe/');
-  const hrefs = await page.locator('nav[aria-label="Main"] a, .sidebar-content a').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
-  for (const p of pages) expect(hrefs, p.url).toContain(p.url);
-});
 
 test('sidebar shows the six section labels in order', async ({ page }) => {
   await page.goto('/docs/programme/what-is-troupe/');
   const labels = await page.locator('.sidebar-content .top-level > li > details > summary .large').allInnerTexts();
   expect(labels).toEqual(['Programme', 'Opening night', 'The company', 'Stagecraft', 'Prompt book', 'Backstage']);
+});
+
+test('the sidebar ends Programme with Status and roadmap, and Backstage with the org\'s contributing guide', async ({ page }) => {
+  await page.goto('/docs/programme/what-is-troupe/');
+  const sections = page.locator('.sidebar-content .top-level > li');
+  await expect(sections.first().locator('a').last()).toHaveAttribute('href', '/status/');
+  await expect(sections.last().locator('a').last()).toHaveAttribute('href', 'https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md');
 });
 
 test('sidebar section labels use the display face in --tomato-text (light)', async ({ page }) => {
@@ -48,31 +51,43 @@ test('sidebar section labels use the display face in --tomato-text (light)', asy
   expect(await label.evaluate((e) => getComputedStyle(e).color)).toBe('rgb(206, 61, 33)');
 });
 
-test('a stub shows the Planned note with a "Help write this page" link to its own source', async ({ page }) => {
-  await page.goto('/docs/the-company/roles-and-actors/');
-  const note = page.locator('aside[data-doc-note="planned"]');
-  await expect(note).toContainText('Planned: not written yet.');
-  await expect(note.getByRole('link', { name: 'Help write this page' }))
-    .toHaveAttribute('href', EDIT_BASE + 'src/content/docs/docs/the-company/roles-and-actors.md');
-});
-
-test('a written pre-release page shows the pre-alpha note and no Planned note', async ({ page }) => {
-  await page.goto('/docs/programme/what-is-troupe/');
+test('a page with prerelease: true shows the pre-alpha note and no Planned note', async ({ page }) => {
+  const p = current.pages.find((x) => front(x).status === 'written' && front(x).prerelease === true)!;
+  await page.goto(url(p));
   await expect(page.locator('aside[data-doc-note="prerelease"]')).toContainText('Pre-alpha: this page describes intended behaviour.');
   await expect(page.locator('aside[data-doc-note="planned"]')).toHaveCount(0);
 });
 
-test('a written page shows a "Last updated" date', async ({ page }) => {
-  await page.goto('/docs/programme/what-is-troupe/');
-  await expect(page.getByText('Last updated:')).toBeVisible();
-});
-
-test('a written page with prerelease: false shows no status note', async ({ page }) => {
-  await page.goto('/docs/backstage/licensing/');
+test('a page with prerelease: false shows no status note', async ({ page }) => {
+  const p = current.pages.find((x) => front(x).status === 'written' && front(x).prerelease === false)!;
+  await page.goto(url(p));
   await expect(page.locator('aside[data-doc-note]')).toHaveCount(0);
 });
 
-test('/docs/ redirects to What is troupe?', async ({ page }) => {
+test("a page shows \"Last updated\" with the date of troupe's last commit to it", async ({ page }) => {
+  const p = current.pages.find((x) => front(x).lastUpdated)!;
+  await page.goto(url(p));
+  const date = new Date(front(p).lastUpdated);
+  await expect(page.locator('time')).toHaveAttribute('datetime', date.toISOString());
+});
+
+test("every link from one docs page to another's heading lands on that heading", () => {
+  const broken: string[] = [];
+  let checked = 0;
+  for (const p of current.pages) {
+    const html = readFileSync(`dist${url(p)}index.html`, 'utf8');
+    const content = /<div class="sl-markdown-content">([\s\S]*?)<\/main>/.exec(html)?.[1] ?? '';
+    for (const [, target, anchor] of content.matchAll(/href="(\/docs\/[^"#]+)#([^"]+)"/g)) {
+      checked++;
+      const file = `dist${target}index.html`;
+      if (!existsSync(file) || !readFileSync(file, 'utf8').includes(`id="${anchor}"`)) broken.push(`${url(p)} → ${target}#${anchor}`);
+    }
+  }
+  expect(checked, 'no anchor links found: the content selector is out of date').toBeGreaterThan(0);
+  expect(broken).toEqual([]);
+});
+
+test('/docs/ redirects to the first page', async ({ page }) => {
   await page.goto('/docs/');
   await expect(page).toHaveURL(/\/docs\/programme\/what-is-troupe\/$/);
 });

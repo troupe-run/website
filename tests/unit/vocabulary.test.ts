@@ -1,12 +1,19 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 // The glossary is the single source of each term's meaning; the brand guide holds each term's status
-// (troupe-run/troupe#15, spec: vocabulary). When the docs move to troupe (#23), GLOSSARY changes here.
-const GLOSSARY = 'src/content/docs/docs/prompt-book/glossary.md';
+// (troupe-run/troupe#15, spec: vocabulary). The glossary is troupe's docs/prompt-book/glossary.md on main, read as
+// `npm run docs:sync` fetched it (troupe-run/website#23). troupe's own docs check holds the docs pages to the rules
+// for "TBC" and "project"; this one holds the brand guide, the landing copy and the site's own pages.
+const MANIFEST = 'src/generated/troupe-docs.json';
+if (!existsSync(MANIFEST)) throw new Error(`${MANIFEST} is missing: run npm run docs:sync first, which fetches troupe's docs`);
+const GLOSSARY: string = JSON.parse(readFileSync(MANIFEST, 'utf8')).glossary;
 const BRAND_GUIDE = 'docs/brand-guide.md';
-const HOUSE_PAGE = 'src/content/docs/docs/the-company/the-house.md';
+const GLOSSARY_SOURCE = 'https://github.com/troupe-run/troupe/blob/main/docs/prompt-book/glossary.md';
+
+/** The site's own pages: every Starlight page outside the blog and the docs fetched from troupe. */
+const SITE_PAGES = readdirSync('src/content/docs').filter((n) => n.endsWith('.md')).map((n) => `src/content/docs/${n}`);
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((n) => {
@@ -64,10 +71,15 @@ describe('the glossary and the brand guide list the same terms', () => {
     expect(vocabulary().header).toEqual(['Term', 'Status']);
   });
 
-  it("the brand guide's §6 links to the glossary's source and its published page", () => {
+  it("the brand guide's §6 links to the glossary's source in troupe and its published page", () => {
     const s6 = section(readFileSync(BRAND_GUIDE, 'utf8'), '6.');
-    expect(s6).toContain(`](../${GLOSSARY})`);
+    expect(s6).toContain(`](${GLOSSARY_SOURCE})`);
     expect(s6).toContain('https://troupe.run/docs/prompt-book/glossary/');
+  });
+
+  it("the brand guide's §6 writes each term plainly, with no code font, as troupe's glossary does", () => {
+    const raw = section(readFileSync(BRAND_GUIDE, 'utf8'), '6.').split('\n').filter((l) => l.startsWith('| ') && !/^\| (Term|---)/.test(l));
+    expect(raw.filter((l) => l.split('|')[1].includes('`'))).toEqual([]);
   });
 
   it("the brand guide's §6 rejects part and house rules", () => {
@@ -88,8 +100,8 @@ describe('the glossary and the brand guide list the same terms', () => {
 });
 
 describe('"the house" is an agreed name', () => {
-  it('the glossary, the house page and the brand guide say neither "TBC" nor "isn\'t final"', () => {
-    const found = [GLOSSARY, HOUSE_PAGE, BRAND_GUIDE].flatMap((f) =>
+  it('the brand guide, the landing copy and the site\'s own pages say neither "TBC" nor "isn\'t final"', () => {
+    const found = [BRAND_GUIDE, ...files('src/content/copy'), ...SITE_PAGES].flatMap((f) =>
       readFileSync(f, 'utf8')
         .split('\n')
         .map((l, i) => ({ f, line: i + 1, l }))
@@ -104,37 +116,22 @@ describe('"the house" is an agreed name', () => {
   });
 });
 
-// Every place the docs and landing copy say "project", with why it isn't a theatre (spec: vocabulary). `text` is a
-// fragment of the line, so an edit elsewhere in the file doesn't break the match. A new "project" fails until it's
-// recorded here. The blog isn't scanned: its posts are dated and talk about other projects (owner, 2026-10-19).
-const SCANNED = ['src/content/docs/docs', 'src/content/copy'];
+// Every place the landing copy and the site's own pages say "project", with why it isn't a theatre (spec:
+// vocabulary). `text` is a fragment of the line, so an edit elsewhere in the file doesn't break the match. A new
+// "project" fails until it's recorded here. The blog isn't scanned: its posts are dated and talk about other projects
+// (owner, 2026-10-19). The docs pages aren't either: troupe's docs check records theirs.
+const SCANNED = ['src/content/copy', ...SITE_PAGES];
 const PROJECT_USES: { file: string; text: string; reason: string }[] = [
-  { file: GLOSSARY, text: 'A project directory with troupe config', reason: 'explains what a theatre is' },
-  {
-    file: 'src/content/docs/docs/programme/what-is-troupe.md',
-    text: 'the project directory troupe works in',
-    reason: 'explains what a theatre is',
-  },
-  {
-    file: 'src/content/docs/docs/programme/principles.md',
-    text: 'A theatre is your project directory.',
-    reason: 'explains what a theatre is',
-  },
   {
     file: 'src/content/copy/principles.md',
     text: 'A theatre is your project directory:',
     reason: 'explains what a theatre is, the first time the landing page says it',
   },
   { file: 'src/content/copy/footer.md', text: 'a project by hps.gd', reason: 'troupe itself, the fixed attribution' },
-  {
-    file: 'src/content/docs/docs/backstage/contributing.md',
-    text: "under the project's licence",
-    reason: 'troupe itself',
-  },
 ];
 
 describe('site copy says "theatre" for a theatre', () => {
-  const scanned = SCANNED.flatMap((d) => files(d));
+  const scanned = SCANNED.flatMap((d) => (statSync(d).isDirectory() ? files(d) : [d]));
   const uses = scanned.flatMap((f) =>
     readFileSync(f, 'utf8')
       .split('\n')
@@ -143,13 +140,13 @@ describe('site copy says "theatre" for a theatre', () => {
   );
   const recorded = (f: string, l: string) => PROJECT_USES.some((u) => u.file === f && l.includes(u.text));
 
-  it('the scan reads the docs and landing copy, and no blog post', () => {
-    expect(scanned).toContain(GLOSSARY);
+  it("the scan reads the landing copy and the site's own pages, and no blog post or page fetched from troupe", () => {
     expect(scanned).toContain('src/content/copy/principles.md');
-    expect(scanned.filter((f) => f.startsWith('src/content/docs/blog/'))).toEqual([]);
+    expect(scanned).toContain('src/content/docs/status.md');
+    expect(scanned.filter((f) => f.startsWith('src/content/docs/blog/') || f.startsWith('src/content/docs/docs/'))).toEqual([]);
   });
 
-  it('every "project" in the docs and landing copy is recorded with a reason', () => {
+  it('every "project" in the landing copy and the site\'s own pages is recorded with a reason', () => {
     expect(
       uses.filter(({ f, l }) => !recorded(f, l)).map(({ f, line, l }) => `${f}:${line}: ${l.trim()}`),
       'Where "project" means a theatre, say "theatre" (brand guide §7). Otherwise add the line to PROJECT_USES in ' +

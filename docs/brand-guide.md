@@ -169,8 +169,9 @@ would pass as text in dark mode unchanged, but gets a lighter `-text` shade too,
 Every sentence should still say what troupe does to someone who skips the headings.
 
 **Product vocabulary.** What each term means is in the
-[glossary](../src/content/docs/docs/prompt-book/glossary.md) (published at
-<https://troupe.run/docs/prompt-book/glossary/>). It's the single source, so this guide doesn't repeat the meanings.
+[glossary](https://github.com/troupe-run/troupe/blob/main/docs/prompt-book/glossary.md), in troupe's user docs
+(published at <https://troupe.run/docs/prompt-book/glossary/>). It's the single source, so this guide doesn't repeat
+the meanings.
 This table holds each term's status, and the words we don't use. Terms such as "theatre", "actor" and "role" are
 product nouns: body copy uses them as plainly as any other word. The rule above is about stage devices, not these.
 
@@ -179,7 +180,7 @@ product nouns: body copy uses them as plainly as any other word. The rule above 
 | theatre | In use |
 | role | In use |
 | actor | In use |
-| `system` | Decided 2026-10-11: the actor kind for troupe acting by itself |
+| system | Decided 2026-10-11: the actor kind for troupe acting by itself |
 | cast | Reserved |
 | performance | In use |
 | rehearsal | Reserved, 2026-10-19: ahead of the feature that builds it |

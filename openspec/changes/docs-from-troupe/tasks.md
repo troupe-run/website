@@ -2,20 +2,30 @@
 
 ## 1. Prove Starlight's per-page fields and route data (design Context, Risks)
 
-- [ ] 1.1 On a scratch branch that isn't committed, give one existing page front matter with `editUrl` (a troupe URL),
+- [x] 1.1 On a scratch branch that isn't committed, give one existing page front matter with `editUrl` (a troupe URL),
   `editUrl: false`, `lastUpdated: 2026-01-02` and `pagefind: false`, in turn. Verify, by `npm run build` and the built
   HTML: the edit link's href changes and then disappears, "Last updated" shows 2 January 2026, and the page is missing
   from `dist/pagefind/` when `pagefind: false` is set. Record the result in this task.
-- [ ] 1.2 In the same scratch tree, replace `route.sidebar` and `route.pagination` from route middleware for one route.
+  Result, 2026-10-19 (Starlight 0.42.5, Astro 7.3.6): `editUrl: <troupe URL>` made the page's "Improve this page"
+  href that URL; `editUrl: false` left no edit link (0 matches); `lastUpdated: 2026-01-02` rendered
+  `<time datetime="2026-01-02T00:00:00.000Z">Jan 2, 2026</time>`; `pagefind: false` dropped `data-pagefind-body` from
+  the page, so Pagefind skips it, while a normal page keeps it.
+- [x] 1.2 In the same scratch tree, replace `route.sidebar` and `route.pagination` from route middleware for one route.
   Verify: the built page shows the replaced sidebar and "Next" link, and `astro check` passes. Record the result in this
   task. If 1.1 or 1.2 fails, stop and tell the owner: it's the design spec's 6.4 revisit trigger.
-- [ ] 1.3 Check whether `redirects` in a static Astro build can point at an external URL (`https://github.com/...`).
+  Result, 2026-10-19: middleware that replaced `route.sidebar` and `route.pagination` for
+  `docs/backstage/licensing` rendered the replaced group, link and "Next" link in the built page; `astro check`
+  reported 0 errors.
+- [x] 1.3 Check whether `redirects` in a static Astro build can point at an external URL (`https://github.com/...`).
   Verify: the built `dist/` holds a redirect page for it. Record which form D10 will use. Then
   `git restore` the scratch edits, and verify that `git status` is clean.
+  Result, 2026-10-19: `redirects: { '/spike-ext': 'https://github.com/…/CONTRIBUTING.md' }` built
+  `dist/spike-ext/index.html` with a meta refresh, a canonical link and a fallback link to the URL. D10 uses `redirects`
+  directly; no hand-made page is needed. Scratch edits restored with `git restore`; `git status` was clean.
 
 ## 2. The sync library: versions, contract and layout (D2, D3, D4)
 
-- [ ] 2.1 Write `tests/unit/troupe-versions.test.ts` for `chooseVersions` first:
+- [x] 2.1 Write `tests/unit/troupe-versions.test.ts` for `chooseVersions` first:
   - no tags;
   - one tag;
   - patches of the latest minor and of an earlier one;
@@ -24,22 +34,27 @@
   - `troupe-v1.0.0-rc.1` and `troupe-v1.2` refused, naming the tag.
   Then implement it in `scripts/troupe-docs-lib.mjs`. Verify: the tests failed before the implementation and pass after
   it.
-- [ ] 2.2 Port troupe's front-matter reader (`userdocs.py`'s `parse` and `problems`) to the library. Copy its cases
+- [x] 2.2 Port troupe's front-matter reader (`userdocs.py`'s `parse` and `problems`) to the library. Copy its cases
   from troupe's `packages/troupe/tests/` as JS unit tests: quoting, reserved words, numbers, a duplicate key, an unknown
   key, a written page without `prerelease`, and a planned page with a body. Verify: each case gives the same result as
   in troupe, and each error names the page, the key and the fix.
-- [ ] 2.3 Add the contract drift test. It reads `FRONT_MATTER_KEYS` from troupe's `main` (the synced clone) and
+  Done 2026-10-19: 22 cases in `tests/unit/troupe-front-matter.test.ts`, each troupe's input and message, pass.
+- [x] 2.3 Add the contract drift test. It reads `FRONT_MATTER_KEYS` from troupe's `main` (the synced clone) and
   compares it with the library's key set, and asserts that the site-only keys the sync writes are exactly `editUrl`,
   `lastUpdated` and `pagefind`. Verify: the test passes, and fails naming the key when a key is added on one side only
   (tried by hand, then restored).
-- [ ] 2.4 Add the layout check: only `.md` pages directly inside the six sections. Verify: unit tests for `.mdx`, a
+  Done 2026-10-19: `tests/unit/troupe-contract.test.ts` reads troupe main's `userdocs.py`. Its key test failed naming `order` when that key was added to the site's set only, and the schema test failed naming it when it was added to `content.config.ts` only (both restored). It also runs troupe's own reader against the port on troupe's 29 pages and 433 generated ones. The first run found 90 messages that quoted values differently (JSON, not Python's `repr`), now fixed.
+- [x] 2.4 Add the layout check: only `.md` pages directly inside the six sections. Verify: unit tests for `.mdx`, a
   nested page, a seventh section and a stray file each fail naming the version and the path.
-- [ ] 2.5 Add the source: a bare partial clone in `.cache/troupe.git`, fetched on each run, or `TROUPE_DOCS`, with
+  Done 2026-10-19: 9 tests in `tests/unit/troupe-layout.test.ts` pass.
+- [x] 2.5 Add the source: a bare clone in `.cache/troupe.git`, fetched on each run (a partial clone was measured at 22 s
+  to read `main`'s pages, against 2.5 s for a full clone, design D2), or `TROUPE_DOCS`, with
   `main` from its working tree. Verify, with unit tests against a temporary repository:
   - an unset `TROUPE_DOCS` uses the clone;
   - an empty value, or a folder with no `docs/`, is refused, naming the variable and value;
   - a failed fetch is refused, naming the remote and saying to set `TROUPE_DOCS`, and the stale cache isn't used.
-- [ ] 2.6 Write each version's pages into `src/content/docs/docs/` (root, `next/`, `vX.Y/`) with:
+  Done 2026-10-19: 11 tests in `tests/unit/troupe-source.test.ts` pass, against throwaway repositories.
+- [x] 2.6 Write each version's pages into `src/content/docs/docs/` (root, `next/`, `vX.Y/`) with:
   - the generated-file comment;
   - JSON-quoted front matter;
   - `editUrl` per D7;
@@ -48,25 +63,29 @@
   Also write a manifest of versions and their pages to `src/generated/troupe-docs.json`. Add both, and `.cache/`, to
   `.gitignore`. Verify: unit tests on a temporary repository check every field for a current, a next and an archived
   page, and for a page that's gone from `main`.
+  Done 2026-10-19: 12 tests in `tests/unit/troupe-sync.test.ts` pass. Pages are read back with the `yaml` package, as Astro would read them.
 - Commits: groups 2 and 3 land together, once the site builds from troupe and `scripts/check.py` passes (3.5).
 
 ## 3. Build /docs from troupe (D1, D2, D5)
 
-- [ ] 3.1 Add the integration to `astro.config.mjs`: run the sync in `astro:config:setup`, and add the version
+- [x] 3.1 Add the integration to `astro.config.mjs`: run the sync in `astro:config:setup`, and add the version
   redirects. Add `npm run docs:sync`. Verify: `npm run docs:sync` writes the 29 pages and the manifest, and `astro dev`,
   `astro check` and `astro build` each run it.
-- [ ] 3.2 Write the remark link plugin, with unit tests first:
+  Done 2026-10-19: `npm run docs:sync` wrote 29 pages and the manifest. `astro dev`, `astro check` and `astro build` each logged `[troupe-docs] /docs/ from main, 29 pages`, and `/docs/` redirects to `/docs/programme/what-is-troupe/`. The website's own pages had to be removed first (3.3's `git rm`), because the sync refuses to clear a folder it didn't write.
+- [x] 3.2 Write the remark link plugin, with unit tests first:
   - a sibling link, a parent-section link and an anchor;
   - a link in an archived version;
   - a link in inline code and in a code block, left unchanged;
   - an absolute URL, left unchanged;
   - a link escaping `docs/`, refused with page and link.
   Verify: the tests failed first, then pass.
-- [ ] 3.3 Remove the website's 29 copied pages and `backstage/contributing.md` with `git rm`. Replace the sidebar config
+  Done 2026-10-19: 17 tests in `tests/unit/troupe-links.test.ts` pass, the pipeline ones through Astro's Sätteri processor. With the plugin off, the three that depend on it failed. Astro 7's default processor is Sätteri, not remark, so this is a Sätteri mdast plugin added to the processor's own list, as Starlight adds its plugins. `@astrojs/markdown-satteri` is now a direct dependency, at the 0.4.3 Astro already pins, because the config imports it.
+- [x] 3.3 Remove the website's 29 copied pages and `backstage/contributing.md` with `git rm`. Replace the sidebar config
   with `src/lib/docs-nav.ts`, holding today's labels and order (wired in 4.1). Verify: `npm run build` passes against
   troupe's `main`, `dist/docs/` has the 29 pages, and `npm run linkcheck` passes. Following one anchor link per section
   in the built HTML lands on an existing `id`.
-- [ ] 3.4 Rewrite `tests/e2e/docs.spec.ts` for the real build:
+  Done 2026-10-19: `npm run build` passes against troupe's main, `dist/docs/` has 29 pages, and `npm run linkcheck` passes. troupe's pages have 6 cross-page anchor links, in three sections (opening-night, prompt-book, the-company), and every one lands on an existing `id`. The other three sections have none, so "one per section" isn't possible yet. 3.4 makes this a permanent test over every anchor link. The website's copies went with `git rm`, and Status and roadmap with `git mv` to `src/content/docs/status.md` (5.1).
+- [x] 3.4 Rewrite `tests/e2e/docs.spec.ts` for the real build:
   - every page in the manifest exists and appears in the sidebar;
   - each has "Improve this page" linking to `troupe-run/troupe/edit/main/docs/<path>`;
   - "Last updated" shows;
@@ -74,15 +93,18 @@
   - `/docs/` redirects;
   - the glossary has no horizontal scroll at 320px.
   Check `tests/e2e/a11y.spec.ts`'s page list still names pages that exist. Verify: `npm run test:e2e` passes.
-- [ ] 3.5 Run `uv run scripts/check.py`. Verify: every gate passes. Commit groups 2 and 3.
+  Done 2026-10-20: `npx playwright test` passed, 182 tests. `a11y.spec.ts` swaps the old stub page, which no longer exists in troupe's docs, for the glossary and the CLI reference. The CLI reference showed two real issues the website's pages never had. (1) Code inside a link failed contrast (4.04:1 light, 4.49:1 dark), so `starlight.css` drops the code background inside links, which the owner sees in 4.4. (2) Expressive Code makes a scrolling block focusable from a script about 250 ms after load, so the axe test now waits for it, and fails if it never comes.
+- [x] 3.5 Run `uv run scripts/check.py`. Verify: every gate passes. Commit groups 2 and 3.
+  Done 2026-10-20: `uv run scripts/check.py`, all gates passed. Committed with 4.1, 7.1 and 7.2, which this commit needs: the vocabulary tests read the glossary from troupe. `scripts/tests/test_check.py` now ignores URLs when it looks for skipped files, since the org's CONTRIBUTING.md URL isn't this repository's file.
 
 ## 4. Sidebars, the version menu, banners, edit links and search (D6, D7, D8)
 
-- [ ] 4.1 Build each route's sidebar and pagination from its version in route middleware:
+- [x] 4.1 Build each route's sidebar and pagination from its version in route middleware:
   - listed pages in order, then unlisted ones by title;
   - Programme ends with "Status and roadmap", and Backstage ends with "Contributing".
   Verify, with unit tests of the sidebar builder: an unlisted page is appended, a listed page a version lacks is
   dropped, and every link stays in the version.
+  Done 2026-10-20, ahead of 3.4 since 3.4's tests read the sidebar: 12 tests in `tests/unit/docs-versions.test.ts` pass. On the real build, `/docs/the-company/flows/` shows the six sections in order and 29 links in its version, marks itself current, ends Programme and Backstage with the two kept links, and links Previous and Next to its neighbours.
 - [ ] 4.2 Add `src/content/copy/docs-versions.md` (a `versions` copy section) with the menu label and the archived and
   next banners. Verify: `astro check` passes on the schema. Show the text to the owner, and record their approval or
   edits here before ticking.
@@ -132,13 +154,15 @@
 
 ## 7. Vocabulary and the brand guide (D13)
 
-- [ ] 7.1 Point `tests/unit/vocabulary.test.ts`'s `GLOSSARY` at the manifest's `main` glossary, failing with "run npm
+- [x] 7.1 Point `tests/unit/vocabulary.test.ts`'s `GLOSSARY` at the manifest's `main` glossary, failing with "run npm
   run docs:sync" when it's missing. Drop the house page and glossary "TBC" checks and the docs pages from the "project"
   scan, and scan `src/content/copy/` and `src/content/docs/status.md`. Verify: the test file's names say exactly what
   each test checks, and the tests fail before 7.2 only on §6's link and `system` row.
-- [ ] 7.2 Update the brand guide's §6: link the glossary at
+  Done 2026-10-20: GLOSSARY comes from the manifest, and the test fails saying to run `npm run docs:sync` when it's missing. The TBC check covers the brand guide, the landing copy and `status.md`, and the "project" scan covers the landing copy and `status.md`. The four docs-page records went to troupe. Added a test that §6 writes each term plainly, since the table reader strips backticks and nothing else would catch `system` in code font. Against the brand guide at HEAD, exactly two tests fail: the §6 link and the plain-term test.
+- [x] 7.2 Update the brand guide's §6: link the glossary at
   `https://github.com/troupe-run/troupe/blob/main/docs/prompt-book/glossary.md`, and make the `system` row plain. Verify:
   `npm run test:unit` passes.
+  Done 2026-10-20: §6 links the glossary in troupe, and its system row is plain. `npx vitest run tests/unit/vocabulary.test.ts`: 13 passed.
 - [ ] 7.3 Record the build times of `npm run build` and `npm run build:fixture`, from a fresh clone cache and a warm
   one, in this task. Verify: the numbers are recorded.
 - [ ] 7.4 Run `uv run scripts/check.py` and commit. Verify: every gate passes.
