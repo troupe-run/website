@@ -78,7 +78,7 @@
 - [x] 6.2 Run it again on the branch with `extra-url` empty. Verify: the run is green and the issue is closed with a
   link to the run. Then add that issue to the board, set it to Done, and comment that it was this change's branch
   test. Check it with `gh issue view <n> --json projectItems`.
-- [ ] 6.3 Open the pull request (`Closes #18`, body via `--body-file`). Verify: CI's `test` job passes.
+- [x] 6.3 Open the pull request (`Closes #18`, body via `--body-file`). Verify: CI's `test` job passes.
 
 ## Workflow follow-up
 
