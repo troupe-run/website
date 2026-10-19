@@ -1,19 +1,47 @@
 // Weekly external link check over a built site. A broken link fails the run, writes the job summary, and opens
-// or updates one tracking issue; a clean run closes it. Outside GitHub Actions it only prints what it would do.
-// The decisions are in linkcheck-external-lib.mjs; this file runs linkinator and gh.
+// or updates one tracking issue; a clean run closes it. When it opens or comments on the issue, it hands the issue's
+// URL to the workflow's board job as the `issue-url` output. EXTRA_URL, set by a run started by hand, adds one more
+// URL to check, so the issue path can be proved without breaking the site. Outside GitHub Actions it only prints what
+// it would do. The decisions are in linkcheck-external-lib.mjs; this file runs linkinator and gh.
 import { spawnSync } from 'node:child_process';
-import { appendFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { runLinkinator, summarise } from './linkinator-lib.mjs';
 import { EXTERNAL_SKIPS } from './external-skips.mjs';
-import { TRACKING_TITLE, boardIssueUrl, decide, exitCode, formatReport, matchTrackingIssues, sitePath } from './linkcheck-external-lib.mjs';
+import {
+  EXTRA_URL_PAGE, TRACKING_TITLE, boardIssueUrl, decide, exitCode, extraUrlPage, extraUrlProblem, formatReport,
+  matchTrackingIssues, sitePath,
+} from './linkcheck-external-lib.mjs';
 
 const dir = process.argv[2] ?? 'dist';
 // Retry 429s that send retry-after, and 5xx or no response up to 3 times; give up on a request after 15 s.
 const RETRIES = ['--retry', '--retry-errors', '--retry-errors-count', '3', '--retry-errors-jitter', '3000', '--timeout', '15000'];
-const { GITHUB_ACTIONS, GITHUB_OUTPUT, GITHUB_STEP_SUMMARY, GITHUB_SERVER_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID } = process.env;
+const { EXTRA_URL, GITHUB_ACTIONS, GITHUB_OUTPUT, GITHUB_STEP_SUMMARY, GITHUB_SERVER_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID } = process.env;
 const runUrl = GITHUB_RUN_ID ? `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}` : '(local run)';
 
-const run = runLinkinator(dir, EXTERNAL_SKIPS.map((s) => s.pattern), RETRIES);
+const skips = EXTERNAL_SKIPS.map((s) => s.pattern);
+const extraProblem = extraUrlProblem(EXTRA_URL, EXTERNAL_SKIPS);
+if (extraProblem) {
+  console.error(`✗ ${extraProblem}`);
+  if (GITHUB_STEP_SUMMARY) appendFileSync(GITHUB_STEP_SUMMARY, `## External links\n\nNot run: ${extraProblem}\n\nRun: ${runUrl}\n`);
+  process.exit(1);
+}
+
+const run = runLinkinator(dir, skips, RETRIES);
+if (EXTRA_URL && !run.error) {
+  // linkinator only reaches pages linked from the site's index, and two paths break its local links, so the page
+  // holding extra-url gets a run of its own, with the same skips and retries, merged into the site's result.
+  const page = join(dir, EXTRA_URL_PAGE);
+  try {
+    mkdirSync(page, { recursive: true });
+    writeFileSync(join(page, 'index.html'), extraUrlPage(EXTRA_URL));
+    const extra = runLinkinator(page, skips, RETRIES);
+    if (extra.error) Object.assign(run, { result: undefined }, extra);
+    else run.result.links = [...run.result.links, ...extra.result.links];
+  } finally {
+    rmSync(page, { recursive: true, force: true });
+  }
+}
 const crashed = Boolean(run.error);
 const summarised = crashed ? { broken: [], external: 0 } : summarise(run.result);
 // Broken local paths are CI's internal check's job; this check and its issue are about external links only.

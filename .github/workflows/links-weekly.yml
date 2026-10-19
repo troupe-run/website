@@ -1,6 +1,7 @@
 name: External links (weekly)
 # A broken external link fails this run and opens or updates one "Broken external links" issue; a clean run
 # closes it. Scheduled (and by hand) only, never on pull requests, so other sites' outages never block a merge.
+# A run started by hand can name one extra URL to check (extra-url), to prove the issue path without breaking the site.
 on:
   schedule:
     - cron: '17 3 * * 1'
