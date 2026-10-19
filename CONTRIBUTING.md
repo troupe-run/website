@@ -1,12 +1,17 @@
 # Contributing to troupe.run
 
-Thanks for helping. This repo is the troupe.run website and docs. It has its own guide, so the org-wide one in
+Thanks for helping. This repo is the troupe.run website: the landing page, the blog, Status and roadmap, and the
+design that `/docs` is rendered in. The text of `/docs` lives in [troupe-run/troupe](https://github.com/troupe-run/troupe)'s
+`docs/`, so it changes with troupe itself. This repo has its own guide, so the org-wide one in
 [troupe-run/.github](https://github.com/troupe-run/.github) doesn't apply here: in particular, there's no sign-off.
 
-## Fixing or improving a docs page
+## Fixing or improving a page
 
-Every docs page has an **Improve this page** link that opens its source here. If you don't have write access,
-GitHub makes a fork and a pull request for you.
+- **A docs page** (`/docs/…`): its **Improve this page** link opens its source in troupe-run/troupe, where the org's
+  guide applies, sign-off included. Each earlier release's pages (`/docs/v0.1/…`) link **View source** at their tag
+  instead: they can't change, so a fix goes to the current page.
+- **Any other page** (the blog, Status and roadmap): its **Improve this page** link opens its source here. If you
+  don't have write access, GitHub makes a fork and a pull request for you.
 
 Your pull request's `guard` check will fail, and that's expected. The check wants every change to arrive through
 the workflow below, on a branch named after an OpenSpec change, and GitHub's editor can't do that. A maintainer
@@ -18,17 +23,27 @@ anything else.
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/), which runs the check (`brew install uv` on a Mac).
 - Node 22 or later (the version in `.nvmrc`), then `npm ci`, which installs exactly what `package-lock.json` lists.
+- git, and a network connection: every build fetches troupe-run/troupe for `/docs` (below).
 
 ## Running it locally
 
 - `npm run dev` serves the site at http://localhost:4321.
+- Every Astro command (`dev`, `check`, `build`) first fetches troupe-run/troupe into `.cache/` and writes `/docs`'s
+  pages into `src/content/docs/docs/`, one folder per version. Both are git-ignored and rewritten on each run, so an
+  edit there is lost: edit the page in troupe. `npm run docs:sync` does just that step.
+  - To preview troupe edits you haven't pushed, or to work offline, set `TROUPE_DOCS` to your troupe checkout:
+    `TROUPE_DOCS=../troupe npm run dev`. Its working tree is `main`, and its tags are the releases.
 - `uv run scripts/check.py` runs every check CI runs, in the same order: `npm ci`, Playwright's browser,
-  `astro check`, the unit tests, the build, the brand-asset check, the internal link check and the end-to-end tests.
-  It stops at the first failure and says which one. `npm ci` reinstalls `node_modules`, so a dev server that's
-  running at the time may need a restart.
+  `astro check`, the unit tests, the build, the fixture build, the brand-asset check, the internal link check of
+  both builds and the end-to-end tests. It stops at the first failure and says which one. `npm ci` reinstalls
+  `node_modules`, so a dev server that's running at the time may need a restart.
+- The fixture build (`npm run build:fixture`) builds the site into `dist-fixture/` against a throwaway troupe with
+  releases, made from `tests/fixtures/troupe-docs/`, so `/docs/next/`, earlier versions and the version menu are
+  tested before troupe has a release. It's never published.
 - `npm run test:unit` and `npm run test:e2e` run the tests on their own. The e2e suite builds the site and serves it
   on a port that's free at the time (`E2E_PORT` chooses one), so it never reuses your dev server or another
-  worktree's. `npm run preview` serves a build on 4321 for you.
+  worktree's. It serves `dist-fixture/` on a second port (`E2E_FIXTURE_PORT`), so run `npm run build:fixture` first.
+  `npm run preview` serves a build on 4321 for you.
 - Brand images are rendered from `brand/`. If you change anything there, run `npm run assets:render` and commit
   the results. The check makes sure they match.
 

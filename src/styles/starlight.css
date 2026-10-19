@@ -36,6 +36,9 @@
 }
 .doc-note--planned { border-left-color: var(--sunflower); background: color-mix(in srgb, var(--sunflower) 14%, var(--bg)); }
 .doc-note p { margin: 0; }
+/* The notes sit outside Starlight's content styles, so their links (the version banner's, "Help write this page")
+   take the note's colour and keep the underline. */
+.doc-note a { color: inherit; text-decoration: underline; }
 .doc-note p + p { margin-top: 6px; }
 /* Code inside a link: the accent colour on Starlight's inline-code background is under 4.5:1 (4.04 light, 4.49
    dark), so a linked code span drops the background and reads as the link it is (4.62 and 7.71 on the page). */

@@ -1,7 +1,8 @@
 ---
 import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+import { Icon } from '@astrojs/starlight/components';
 import BlogMarkdownContent from 'starlight-blog/overrides/MarkdownContent.astro';
-import VersionMenu from './VersionMenu.astro';
+import VersionBanner from './VersionBanner.astro';
 import { getCopy } from '../../lib/copy';
 import { locate, sourceUrl, type Manifest } from '../../lib/docs-versions';
 import manifestJson from '../../generated/troupe-docs.json';
@@ -14,7 +15,7 @@ const { status, prerelease, purpose } = entry.data;
 const source = at && !editUrl ? sourceUrl(at.version, at.path) : undefined;
 const { viewSource } = await getCopy('versions');
 ---
-{at && <VersionMenu version={at.version} path={at.path} />}
+{at && <VersionBanner version={at.version} path={at.path} />}
 {isDoc && status === 'planned' && (
   <aside class="doc-note doc-note--planned" data-doc-note="planned">
     <p><strong>Planned: not written yet.</strong> {purpose}</p>
@@ -27,4 +28,12 @@ const { viewSource } = await getCopy('versions');
   </aside>
 )}
 {isPost ? <BlogMarkdownContent><slot /></BlogMarkdownContent> : <Default><slot /></Default>}
-{source && <p class="view-source"><a href={source}>{viewSource}</a></p>}
+{source && (
+  <p class="view-source"><a href={source} class="sl-flex print:hidden"><Icon name="github" size="1.2em" />{viewSource}</a></p>
+)}
+<style>
+  /* As Starlight's "Improve this page", which this stands in for where a page can't be edited. */
+  .view-source { margin-top: 2rem; }
+  .view-source a { gap: 0.5rem; align-items: center; text-decoration: none; color: var(--sl-color-gray-3); }
+  .view-source a:hover { color: var(--sl-color-white); }
+</style>

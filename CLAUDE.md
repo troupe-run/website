@@ -1,7 +1,9 @@
 # troupe.run
 
 This repository is the troupe.run website: the landing page, the docs at /docs and the blog. troupe itself lives in
-troupe-run/troupe. See [openspec/config.yaml](openspec/config.yaml) for the constraints every change respects, and
+troupe-run/troupe, and so does the text of /docs (`docs/` there), which every build fetches and renders one version per
+release. Change a docs page in troupe, never in `src/content/docs/docs/`, which is generated. See
+[openspec/config.yaml](openspec/config.yaml) for the constraints every change respects, and
 [CONTRIBUTING.md](CONTRIBUTING.md) for setting up.
 
 ## How work happens here

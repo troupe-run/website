@@ -1,0 +1,18 @@
+---
+// On an archived or next docs page, the banner saying which troupe it describes and linking the latest release
+// (spec: versioned-docs; design D6). The version picker itself is in the header (VersionPicker.astro).
+import { getCopy } from '../../lib/copy';
+import { versionNotice, type Manifest, type Version } from '../../lib/docs-versions';
+import manifestJson from '../../generated/troupe-docs.json';
+interface Props { version: Version; path: string }
+const { version, path } = Astro.props;
+const copy = await getCopy('versions');
+const { banner } = versionNotice(manifestJson as Manifest, version, path);
+const fill = (text: string) => text.replace('{version}', `v${version.version}`).replace('{latest}', banner?.latest ?? '');
+---
+{banner && (
+  <aside class="doc-note doc-note--version" data-doc-note={banner.kind}>
+    <p>{fill(banner.kind === 'archived' ? copy.archived : copy.nextBanner)}</p>
+    <p><a href={banner.href}>{fill(banner.samePage ? copy.samePage : copy.startPage)}</a></p>
+  </aside>
+)}

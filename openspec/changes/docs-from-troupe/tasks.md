@@ -105,18 +105,20 @@
   Verify, with unit tests of the sidebar builder: an unlisted page is appended, a listed page a version lacks is
   dropped, and every link stays in the version.
   Done 2026-10-20, ahead of 3.4 since 3.4's tests read the sidebar: 12 tests in `tests/unit/docs-versions.test.ts` pass. On the real build, `/docs/the-company/flows/` shows the six sections in order and 29 links in its version, marks itself current, ends Programme and Backstage with the two kept links, and links Previous and Next to its neighbours.
-- [ ] 4.2 Add `src/content/copy/versions.md` (a `versions` copy section) with the menu label and the archived and
+- [x] 4.2 Add `src/content/copy/versions.md` (a `versions` copy section) with the menu label and the archived and
   next banners. Verify: `astro check` passes on the schema. Show the text to the owner, and record their approval or
   edits here before ticking.
+  Owner, 2026-10-20: wording approved as written ("Wording is fine").
 - [x] 4.3 Render the version menu and banners in the `MarkdownContent` override (no new override). The menu is a
   `<details>` of links, each to the same page in that version or its first page, with `aria-current` on the version
   being read. At the end of a page with no edit link, render "View source" to the page at its version's tag (D7).
   Verify: unit tests of the "same page or first page" function and of the source URL, and on the real build, the menu
   shows one "unreleased" entry, no banner and no "View source".
   Done 2026-10-20: `VersionMenu.astro`, rendered by the existing `MarkdownContent` override, so the override count stays at six. 9 new unit tests (label, versionNotice, sourceUrl) pass. On the real build, the menu has one "unreleased" entry, with no banner and no View source. On the fixture, the menu, banners and View source match D6 and D7.
-- [ ] 4.4 Build and screenshot one archived page, one next page and one current page, at 320px and desktop, in light and
+- [x] 4.4 Build and screenshot one archived page, one next page and one current page, at 320px and desktop, in light and
   dark, from the fixture build (6.2). Show the owner. Verify: no horizontal scroll at 320px, and the owner's approval is
   recorded here before ticking.
+  Owner, 2026-10-20, after the first screenshots: the menu goes at the top of the whole docs site, showing only the current version until opened, not in the content (design D6). After the second set, at 320px and desktop, light and dark, closed and open: "Header looks good". The screenshots also caught the open list overflowing at 320px, now tested, and unstyled links in the notes.
 
 ## 5. The pages the website keeps (D10)
 
@@ -171,9 +173,11 @@
   `https://github.com/troupe-run/troupe/blob/main/docs/prompt-book/glossary.md`, and make the `system` row plain. Verify:
   `npm run test:unit` passes.
   Done 2026-10-20: §6 links the glossary in troupe, and its system row is plain. `npx vitest run tests/unit/vocabulary.test.ts`: 13 passed.
-- [ ] 7.3 Record the build times of `npm run build` and `npm run build:fixture`, from a fresh clone cache and a warm
+- [x] 7.3 Record the build times of `npm run build` and `npm run build:fixture`, from a fresh clone cache and a warm
   one, in this task. Verify: the numbers are recorded.
-- [ ] 7.4 Run `uv run scripts/check.py` and commit. Verify: every gate passes.
+  Done 2026-10-20, on the owner's Mac: `npm run build` took 4.8 s with a fresh clone cache (clone included) and 4.0 s warm. `npm run build:fixture` took 3.7 s, and `npm run docs:sync` alone 2.0 s warm. No cache of rendered output is needed (D3).
+- [x] 7.4 Run `uv run scripts/check.py` and commit. Verify: every gate passes.
+  Done 2026-10-20: 7.1 to 7.3 landed in b5f2639. This commit carries 7.3's record, after all gates passed (223 e2e tests).
 
 ## 8. The deploy starts on troupe's notice (D11)
 
@@ -191,12 +195,14 @@
 
 ## 9. The repository says where the docs live (D14)
 
-- [ ] 9.1 Update CLAUDE.md, README.md and CONTRIBUTING.md: `/docs` is edited in troupe-run/troupe's `docs/`, and
+- [x] 9.1 Update CLAUDE.md, README.md and CONTRIBUTING.md: `/docs` is edited in troupe-run/troupe's `docs/`, and
   `TROUPE_DOCS` previews local edits. Update `openspec/config.yaml`'s context lines on docs ownership, and on edit links: every docs page links to its own
   source, by "Improve this page" on `next` and the latest release, and by "View source" at the tag otherwise.
   Verify: `openspec validate docs-from-troupe --strict` passes, and `grep -rn 'src/content/docs/docs'` outside
   `openspec/changes/archive/` and `docs/superpowers/` finds only the generated-folder references.
-- [ ] 9.2 Commit. Verify: the guard's commit hook passes.
+  Done 2026-10-20: `openspec validate docs-from-troupe --strict` passes. Outside the archive and the dated design, `grep` finds `src/content/docs/docs` only where the generated folder is meant: the docs that say not to edit it, `.gitignore`, the link plugin and the tests.
+- [x] 9.2 Commit. Verify: the guard's commit hook passes.
+  Done 2026-10-20: committed with the header picker (owner, 4.4). The guard's hook ran the check.
 
 ## 10. troupe's notice job (D12), in troupe-run/troupe
 

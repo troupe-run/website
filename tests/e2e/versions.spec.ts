@@ -39,9 +39,17 @@ test.describe('which troupe each URL serves', () => {
 });
 
 test.describe('the version menu', () => {
+  test("sits in the header, beside \"troupe docs\", and shows only the version being read until it's opened", async ({ page }) => {
+    await page.goto('/docs/v0.1/the-company/theatres/');
+    await expect(page.locator('header [data-version-menu]')).toHaveCount(1);
+    await expect(page.locator('.sl-markdown-content [data-version-menu]')).toHaveCount(0);
+    await expect(menu(page).locator('summary')).toHaveText('v0.1');
+    await expect(menu(page).locator('summary')).toHaveAttribute('aria-label', 'Version: v0.1');
+    await expect(menu(page).getByRole('link').first()).toBeHidden();
+  });
+
   test('names the version being read, and lists next, the latest release and v0.1, newest first', async ({ page }) => {
     await page.goto('/docs/v0.1/the-company/theatres/');
-    await expect(menu(page).locator('summary')).toHaveText('Version: v0.1');
     await menu(page).locator('summary').click();
     await expect(menu(page).getByRole('link')).toHaveText(['next (unreleased)', 'v0.2 (latest)', 'v0.1']);
     await expect(menu(page).getByRole('link', { name: 'v0.1' })).toHaveAttribute('aria-current', 'page');
@@ -71,13 +79,31 @@ test.describe('the version menu', () => {
     await expect(page).toHaveURL(/\/docs\/next\/the-company\/theatres\/$/);
   });
 
-  test('at 320px, open, causes no page-level horizontal scroll', async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 800 });
+  test('closes on Escape, returning focus to the picker, and on a click elsewhere', async ({ page }) => {
     await page.goto('/docs/v0.1/the-company/theatres/');
-    await menu(page).locator('summary').click();
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-    expect(overflow).toBeLessThanOrEqual(0);
+    const summary = menu(page).locator('summary');
+    await summary.click();
+    await expect(menu(page)).toHaveAttribute('open', '');
+    await page.keyboard.press('Escape');
+    await expect(menu(page)).not.toHaveAttribute('open', '');
+    await expect(summary).toBeFocused();
+    await summary.click();
+    await page.locator('h1').click();
+    await expect(menu(page)).not.toHaveAttribute('open', '');
   });
+
+  for (const width of [320, 1280]) {
+    test(`at ${width}px, open, fits in the window and causes no page-level horizontal scroll`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/docs/v0.1/the-company/theatres/');
+      await menu(page).locator('summary').click();
+      const box = (await menu(page).locator('ul').boundingBox())!;
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(width);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow).toBeLessThanOrEqual(0);
+    });
+  }
 });
 
 test.describe('banners', () => {

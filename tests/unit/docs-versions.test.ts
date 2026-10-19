@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { locate, sidebar, pagination, samePageIn, label, versionNotice, sourceUrl, type Manifest, type Version } from '../../src/lib/docs-versions';
+import { locate, sidebar, pagination, samePageIn, label, shortLabel, versionNotice, sourceUrl, type Manifest, type Version } from '../../src/lib/docs-versions';
 import { ordered, firstPage } from '../../src/lib/docs-nav';
 
 // Each version's sidebar, pagination and menu links come from that version's own pages (spec: versioned-docs;
@@ -123,5 +123,14 @@ describe('sourceUrl', () => {
   it("links the page's source at its version's tag", () => {
     expect(sourceUrl({ ...archived, ref: 'troupe-v0.1.1' }, 'stagecraft/build-a-flow.md'))
       .toBe('https://github.com/troupe-run/troupe/blob/troupe-v0.1.1/docs/stagecraft/build-a-flow.md');
+  });
+});
+
+describe('shortLabel', () => {
+  const copy = { latest: 'latest', unreleased: 'unreleased', next: 'next' };
+  it.each([
+    [current, 'v0.2'], [archived, 'v0.1'], [manifest.versions[0], 'next'], [{ ...current, version: null, ref: 'main' }, 'unreleased'],
+  ] as [Version, string][])('names a %s version briefly, for the closed picker', (version, expected) => {
+    expect(shortLabel(version, copy)).toBe(expected);
   });
 });

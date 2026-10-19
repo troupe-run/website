@@ -17,6 +17,7 @@ const Tag = embedded ? 'div' : 'header';
     <span class="brand">
       <a class="home" href="/" aria-label="troupe home"><Mark wordmark height={20} /></a>
       {section && <a class="section" href={`/${section}/`}>{section}</a>}
+      {Astro.slots.has('version') && <slot name="version" />}
     </span>
     {Astro.slots.has('default') && <div class="extra"><slot /></div>}
     <nav aria-label="Site">

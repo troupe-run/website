@@ -1,0 +1,54 @@
+---
+// The docs version picker, in the header beside "troupe docs" on every docs page (spec: versioned-docs; design D6;
+// owner, 2026-10-20). Closed, it shows the version being read; open, a list to change it, which scrolls when there
+// are many. Plain links in a <details>, so it works without JavaScript and from the keyboard; the script only closes
+// it on Escape or a click elsewhere.
+import { getCopy } from '../../lib/copy';
+import { label, shortLabel, versionNotice, type Manifest, type Version } from '../../lib/docs-versions';
+import manifestJson from '../../generated/troupe-docs.json';
+interface Props { version: Version; path: string }
+const { version, path } = Astro.props;
+const copy = await getCopy('versions');
+const { entries } = versionNotice(manifestJson as Manifest, version, path);
+---
+<details class="version-picker" data-version-menu>
+  <summary aria-label={`${copy.menu}: ${label(version, copy)}`}>
+    <span class="current">{shortLabel(version, copy)}</span>
+    <svg aria-hidden="true" viewBox="0 0 16 16" width="12" height="12"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.75" /></svg>
+  </summary>
+  <ul>
+    {entries.map((e) => (
+      <li><a href={e.href} aria-current={e.current ? 'page' : undefined}>{label(e.version, copy)}</a></li>
+    ))}
+  </ul>
+</details>
+<script>
+  for (const picker of document.querySelectorAll<HTMLDetailsElement>('[data-version-menu]')) {
+    picker.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !picker.open) return;
+      picker.open = false;
+      picker.querySelector('summary')?.focus();
+    });
+    document.addEventListener('click', (e) => { if (!picker.contains(e.target as Node)) picker.open = false; });
+  }
+</script>
+<style>
+  .version-picker { position: relative; font-family: var(--font-body); font-size: 14px; letter-spacing: 0; }
+  summary {
+    display: inline-flex; align-items: center; gap: 4px; cursor: pointer; list-style: none;
+    padding: 2px 8px; border: 1px solid var(--soft); border-radius: 999px; color: var(--ink); font-weight: 600;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover, summary:focus-visible { border-color: var(--tomato-text); }
+  details[open] svg { transform: rotate(180deg); }
+  ul {
+    position: absolute; top: calc(100% + 6px); left: 0; z-index: 100; min-width: 12rem; max-height: 60vh;
+    overflow-y: auto; margin: 0; padding: 6px; list-style: none;
+    background: var(--surface); border: 1px solid var(--soft); border-radius: 8px;
+  }
+  a { display: block; padding: 6px 10px; border-radius: 6px; color: var(--ink); text-decoration: none; white-space: nowrap; }
+  a:hover, a:focus-visible { background: var(--sl-color-gray-6); }
+  a[aria-current='page'] { color: var(--tomato-text); font-weight: 600; }
+  /* At phone width the picker sits near the right edge, beside the menu button, so the list opens leftwards. */
+  @media (max-width: 50rem) { ul { left: auto; right: 0; } }
+</style>
