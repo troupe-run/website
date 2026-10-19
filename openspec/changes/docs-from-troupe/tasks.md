@@ -186,7 +186,8 @@
   Done 2026-10-20: 8 tests in `tests/unit/deploy-workflow.test.ts`. On today's `deploy.yml`, 5 failed (dispatch, build condition, checkout ref, concurrency, link check) and 3 passed (still runs after CI, github-pages only, no fixture), which are the parts that don't change.
 - [ ] 8.2 Change `deploy.yml` to match. Verify: the tests pass, `workflow-node-version.test.ts` still passes, and
   `actionlint` (or `gh workflow view` after push) reports no syntax error.
-- [ ] 8.3 Run `uv run scripts/check.py` and commit. Verify: every gate passes.
+- [x] 8.3 Run `uv run scripts/check.py` and commit. Verify: every gate passes.
+  Done 2026-10-20: committed after the guard's check passed. 8.2's syntax check runs once the branch is pushed.
 
 ## 9. The repository says where the docs live (D14)
 
