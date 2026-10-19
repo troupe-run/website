@@ -5,7 +5,7 @@ import { isSatteriProcessor } from '@astrojs/markdown-satteri';
 import { fileURLToPath } from 'node:url';
 import { sync } from './scripts/troupe-docs-lib.mjs';
 import { troupeLinks } from './scripts/troupe-links.mjs';
-import { firstPage, pageUrl } from './src/lib/docs-nav.ts';
+import { CONTRIBUTING, firstPage, pageUrl } from './src/lib/docs-nav.ts';
 
 // Writes /docs's pages from troupe-run/troupe before Astro reads content, for every command (dev, check, build,
 // sync), redirects each version's root to its first page, and rewrites the pages' .md links to the site's URLs
@@ -14,7 +14,9 @@ function troupeDocs() {
   return {
     name: 'troupe-docs',
     hooks: {
-      'astro:config:setup': ({ config, updateConfig, logger }) => {
+      'astro:config:setup': ({ command, config, updateConfig, logger }) => {
+        // Preview serves a finished build, so it mustn't rewrite the pages another command may be building from.
+        if (command === 'preview') return;
         const root = fileURLToPath(new URL('.', import.meta.url));
         const manifest = sync({ root });
         const redirects = {};
@@ -23,6 +25,9 @@ function troupeDocs() {
           if (first) redirects[v.base.slice(0, -1)] = pageUrl(v.base, first.path);
           logger.info(`${v.base} from ${v.ref}, ${v.pages.length} pages`);
         }
+        // The pages the website keeps moved out of /docs (design D10). troupe's "What is troupe?" links the first.
+        redirects['/docs/programme/status-and-roadmap'] = '/status/';
+        redirects['/docs/backstage/contributing'] = CONTRIBUTING;
         updateConfig({ redirects });
         // Added to the processor's own list, as Starlight adds its plugins, so neither replaces the other.
         const { processor } = config.markdown;

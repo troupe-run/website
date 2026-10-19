@@ -7,6 +7,7 @@ const PAGES = [
   ['licensing (tables)', '/docs/backstage/licensing/'],
   ['glossary (a wide table)', '/docs/prompt-book/glossary/'],
   ['CLI reference (code and generated tables)', '/docs/prompt-book/cli/'],
+  ['status and roadmap', '/status/'],
   ['blog index', '/blog/'],
   ['blog post', '/blog/2026-10-10-methodology-bake-off/'],
 ] as const;

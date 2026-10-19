@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createServer } from 'node:net';
-import { e2ePort, previewCommand } from '../e2e/port';
+import { e2ePort, previewCommand, fixturePreviewCommand } from '../e2e/port';
 
 function listensOn(port: number): Promise<boolean> {
   return new Promise((resolve) => {
@@ -30,6 +30,26 @@ describe('e2ePort', () => {
       );
     });
   }
+});
+
+describe('e2ePort for the fixture server', () => {
+  it('reads and writes E2E_FIXTURE_PORT, and never picks the main port', () => {
+    const env: Record<string, string | undefined> = {};
+    const main = e2ePort(env);
+    const fixture = e2ePort(env, 'E2E_FIXTURE_PORT', main);
+    expect(fixture).not.toBe(main);
+    expect(env.E2E_FIXTURE_PORT).toBe(String(fixture));
+  });
+
+  it('refuses a malformed E2E_FIXTURE_PORT, naming it', () => {
+    expect(() => e2ePort({ E2E_FIXTURE_PORT: 'abc' }, 'E2E_FIXTURE_PORT')).toThrow(/^E2E_FIXTURE_PORT is "abc"/);
+  });
+});
+
+describe('fixturePreviewCommand', () => {
+  it('serves dist-fixture/ without building it', () => {
+    expect(fixturePreviewCommand(4340)).toBe('astro preview --outDir dist-fixture --port 4340 --ignore-lock');
+  });
 });
 
 describe('previewCommand', () => {

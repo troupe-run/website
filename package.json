@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "docs:sync": "node scripts/troupe-docs.mjs",
     "build": "astro build",
+    "build:fixture": "node scripts/troupe-fixture.mjs",
     "preview": "astro preview --port 4321",
     "check": "astro check",
     "test:unit": "vitest run",

@@ -63,12 +63,12 @@ describe("troupe's page contract", () => {
     expect(FRONT_MATTER_KEYS).toEqual(theirs);
   });
 
-  it("adds only the site's keys to a page: editUrl, lastUpdated and pagefind", () => {
+  it("adds only the site's keys to a page: slug, editUrl, lastUpdated and pagefind", () => {
     const front = { title: 'T', description: 'D.', status: 'written', prerelease: false };
-    const text = renderPage({ ref: 'troupe-v0.1.0' }, { path: 'programme/t.md', front, body: 'B', editUrl: false, date: '2026-01-01T00:00:00Z', pagefind: false });
+    const text = renderPage({ ref: 'troupe-v0.1.0', dir: 'v0.1' }, { path: 'programme/t.md', front, body: 'B', editUrl: false, date: '2026-01-01T00:00:00Z', pagefind: false });
     const keys = [...text.split('\n---\n')[0].matchAll(/^(\w+):/gm)].map(([, k]) => k);
     expect(keys.filter((k) => !(k in FRONT_MATTER_KEYS))).toEqual(SITE_KEYS);
-    expect(SITE_KEYS).toEqual(['editUrl', 'lastUpdated', 'pagefind']);
+    expect(SITE_KEYS).toEqual(['slug', 'editUrl', 'lastUpdated', 'pagefind']);
   });
 
   it("the content schema adds to Starlight's exactly troupe's keys that Starlight lacks: status, prerelease, purpose", () => {

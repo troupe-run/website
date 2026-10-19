@@ -52,8 +52,12 @@ def gates(env: Mapping[str, str] = os.environ) -> list[tuple[str, list[str]]]:
         ("astro check", [npm, "run", "check"]),
         ("unit tests", [npm, "run", "test:unit"]),
         ("build", [npm, "run", "build"]),
+        # The site again, against a throwaway troupe with releases, so the versions are tested before troupe has
+        # one (spec: quality-check). It's never published.
+        ("fixture build", [npm, "run", "build:fixture"]),
         ("assets verify", [npm, "run", "assets:verify"]),
         ("link check", [npm, "run", "linkcheck"]),
+        ("fixture link check", [npm, "run", "linkcheck", "--", "dist-fixture"]),
         ("e2e tests", [npm, "run", "test:e2e"]),
     ]
 

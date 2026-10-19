@@ -37,6 +37,14 @@ const copySchema = z.discriminatedUnion('section', [
     title: z.string(), body: z.string(), cta: cta.extend({ href: z.string().url() }),
   }),
   z.object({
+    section: z.literal('versions'),
+    menu: z.string(), latest: z.string(), unreleased: z.string(), next: z.string(),
+    archived: z.string().includes('{version}').includes('{latest}'),
+    nextBanner: z.string().includes('{latest}'),
+    samePage: z.string().includes('{latest}'), startPage: z.string().includes('{latest}'),
+    viewSource: z.string(),
+  }),
+  z.object({
     section: z.literal('footer'),
     attribution: z.string(), copyright: z.string(),
     links: z.array(link),

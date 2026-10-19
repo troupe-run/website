@@ -1,0 +1,39 @@
+---
+// The version menu and, on an archived or next page, the banner saying which troupe it describes (spec:
+// versioned-docs; design D6). Plain links in a <details>, so it works without JavaScript and from the keyboard.
+// Rendered by the MarkdownContent override, so it isn't an override of its own.
+import { getCopy } from '../../lib/copy';
+import { label, versionNotice, type Manifest, type Version } from '../../lib/docs-versions';
+import manifestJson from '../../generated/troupe-docs.json';
+interface Props { version: Version; path: string }
+const { version, path } = Astro.props;
+const copy = await getCopy('versions');
+const { entries, banner } = versionNotice(manifestJson as Manifest, version, path);
+const fill = (text: string) => text.replace('{version}', `v${version.version}`).replace('{latest}', banner?.latest ?? '');
+---
+<nav class="version-menu" aria-label="Docs version" data-version-menu>
+  <details>
+    <summary>{copy.menu}: <span class="current">{label(version, copy)}</span></summary>
+    <ul>
+      {entries.map((e) => (
+        <li><a href={e.href} aria-current={e.current ? 'page' : undefined}>{label(e.version, copy)}</a></li>
+      ))}
+    </ul>
+  </details>
+</nav>
+{banner && (
+  <aside class="doc-note doc-note--version" data-doc-note={banner.kind}>
+    <p>{fill(banner.kind === 'archived' ? copy.archived : copy.nextBanner)}</p>
+    <p><a href={banner.href}>{fill(banner.samePage ? copy.samePage : copy.startPage)}</a></p>
+  </aside>
+)}
+<style>
+  .version-menu { margin-bottom: 1rem; font-size: var(--sl-text-sm); }
+  summary { cursor: pointer; color: var(--muted); width: fit-content; }
+  summary:hover, summary:focus-visible { color: var(--ink); }
+  .current { color: var(--ink); font-weight: 600; }
+  ul { list-style: none; margin: .5rem 0 0; padding: .5rem 0 .5rem .75rem; border-left: 2px solid var(--line); }
+  li + li { margin-top: .25rem; }
+  a { color: var(--ink); }
+  a[aria-current='page'] { color: var(--tomato-text); font-weight: 600; }
+</style>

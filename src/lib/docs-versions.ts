@@ -67,3 +67,29 @@ export function samePageIn(version: Version, path: string): string {
 /** The latest release's version (or main's, before the first release): the one at /docs/. */
 export const latest = (manifest: Manifest) => manifest.versions.find((v) => v.role === 'current')!;
 
+
+/** The words the menu and banners use (src/content/copy/versions.md). */
+export interface VersionCopy { latest: string; unreleased: string; next: string }
+
+/** A version's name in the menu: "v0.2 (latest)", "next (unreleased)", "v0.1", or "unreleased" before any release. */
+export function label(version: Version, copy: VersionCopy): string {
+  if (version.role === 'next') return `${copy.next} (${copy.unreleased})`;
+  if (version.version === null) return copy.unreleased;
+  return version.role === 'current' ? `v${version.version} (${copy.latest})` : `v${version.version}`;
+}
+
+/** The page's source at its version's ref, for pages with no edit link (design D7). */
+export const sourceUrl = (version: Version, path: string) => `https://github.com/troupe-run/troupe/blob/${version.ref}/docs/${path}`;
+
+/** What a docs page shows about its version: the menu's entries, and the banner for an archived or next page. */
+export function versionNotice(manifest: Manifest, version: Version, path: string) {
+  const top = latest(manifest);
+  const entries = manifest.versions.map((v) => ({ version: v, href: samePageIn(v, path), current: v === version }));
+  const banner = version.role === 'current' ? undefined : {
+    kind: version.role,
+    latest: `v${top.version}`,
+    href: samePageIn(top, path),
+    samePage: top.pages.some((p) => p.path === path),
+  };
+  return { entries, banner };
+}
