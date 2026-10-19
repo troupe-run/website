@@ -51,11 +51,12 @@ test('sidebar section labels use the display face in --tomato-text (light)', asy
   expect(await label.evaluate((e) => getComputedStyle(e).color)).toBe('rgb(206, 61, 33)');
 });
 
-test('a page with prerelease: true shows the pre-alpha note and no Planned note', async ({ page }) => {
+test('a page with prerelease: true shows no pre-alpha note (owner, 2026-10-20) and no Planned note', async ({ page }) => {
   const p = current.pages.find((x) => front(x).status === 'written' && front(x).prerelease === true)!;
   await page.goto(url(p));
-  await expect(page.locator('aside[data-doc-note="prerelease"]')).toContainText('Pre-alpha: this page describes intended behaviour.');
-  await expect(page.locator('aside[data-doc-note="planned"]')).toHaveCount(0);
+  // The note's own sentence: troupe's text may say "pre-alpha" itself, as What is troupe? does.
+  await expect(page.getByText('Pre-alpha: this page describes intended behaviour.')).toHaveCount(0);
+  await expect(page.locator('aside[data-doc-note]')).toHaveCount(0);
 });
 
 test('a page with prerelease: false shows no status note', async ({ page }) => {

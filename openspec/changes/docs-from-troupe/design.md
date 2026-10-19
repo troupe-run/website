@@ -321,6 +321,18 @@ In troupe-run/troupe's `.github/workflows/release.yml`, a job `notify-website`:
 - **The site design spec** (`docs/superpowers/specs/…`) is a dated record. This change's specs replace its `/docs`
   source decision, so it isn't edited.
 
+### D15. No pre-alpha note (owner, 2026-10-20)
+
+`MarkdownContent` stops rendering "Pre-alpha: this page describes intended behaviour". The owner: "We're not driving
+any traffic yet and won't until there's something real, by which time that won't be needed."
+- `prerelease` stays in the page contract. troupe's docs check still requires it on every written page, so troupe's
+  pages keep recording which ones describe unbuilt behaviour, and the note could come back with no page edit.
+- The "Planned: not written yet" note stays, since a planned page has no body to say so.
+- Two places relied on the note and change with it:
+  - troupe's `user-docs` spec scenario "A page about the house" ("the site shows that the page describes intended
+    behaviour") changes in troupe's PR (D12);
+  - `openspec/config.yaml`'s context, which said the note is driven by front matter.
+
 ## Risks / Trade-offs
 
 - **[A troupe push breaks the website's build or checks]** Every website CI run builds against troupe's live `main`.

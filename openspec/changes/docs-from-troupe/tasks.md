@@ -120,6 +120,11 @@
   recorded here before ticking.
   Owner, 2026-10-20, after the first screenshots: the menu goes at the top of the whole docs site, showing only the current version until opened, not in the content (design D6). After the second set, at 320px and desktop, light and dark, closed and open: "Header looks good". The screenshots also caught the open list overflowing at 320px, now tested, and unstyled links in the notes.
 
+- [x] 4.5 Stop rendering the pre-alpha note in `MarkdownContent` (D15). Keep the planned note and the `prerelease` key.
+  Verify: the e2e test that a `prerelease: true` page shows no pre-alpha note passes, and failed before the change.
+  The contract tests still pass.
+  Done 2026-10-20: the e2e test failed while the note was rendered and passes now. It looks for the note's exact sentence, because troupe's own text says "pre-alpha". `prerelease` stays in `content.config.ts`, and the contract tests are unchanged.
+
 ## 5. The pages the website keeps (D10)
 
 - [x] 5.1 Add `src/content/docs/status.md` with today's Status and roadmap text, unchanged. Make `siteSection()` answer
@@ -188,8 +193,9 @@
   - a link check step runs after the build and before the deploy job.
   Verify: they fail on today's file.
   Done 2026-10-20: 8 tests in `tests/unit/deploy-workflow.test.ts`. On today's `deploy.yml`, 5 failed (dispatch, build condition, checkout ref, concurrency, link check) and 3 passed (still runs after CI, github-pages only, no fixture), which are the parts that don't change.
-- [ ] 8.2 Change `deploy.yml` to match. Verify: the tests pass, `workflow-node-version.test.ts` still passes, and
+- [x] 8.2 Change `deploy.yml` to match. Verify: the tests pass, `workflow-node-version.test.ts` still passes, and
   `actionlint` (or `gh workflow view` after push) reports no syntax error.
+  Done 2026-10-20: `tests/unit/deploy-workflow.test.ts` (8) and `workflow-node-version.test.ts` pass. actionlint 1.7.12 (`uvx --from actionlint-py actionlint`) reports nothing for `deploy.yml`, and the pushed branch's `guard` run passed.
 - [x] 8.3 Run `uv run scripts/check.py` and commit. Verify: every gate passes.
   Done 2026-10-20: committed after the guard's check passed. 8.2's syntax check runs once the branch is pushed.
 
@@ -204,6 +210,11 @@
 - [x] 9.2 Commit. Verify: the guard's commit hook passes.
   Done 2026-10-20: committed with the header picker (owner, 4.4). The guard's hook ran the check.
 
+- [x] 9.3 Update `openspec/config.yaml`'s context line on the pre-alpha note (D15). Verify: `grep -n "pre-alpha note"
+  openspec/config.yaml` finds only the line saying there's none, and `openspec validate docs-from-troupe --strict`
+  passes.
+  Done 2026-10-20: `grep -n "pre-alpha note" openspec/config.yaml` finds only the line saying there's none, and `openspec validate docs-from-troupe --strict` passes.
+
 ## 10. troupe's notice job (D12), in troupe-run/troupe
 
 - [ ] 10.1 In a troupe worktree, on a branch named after a new troupe OpenSpec change `website-docs-notice` that cites
@@ -212,6 +223,8 @@
   - `environment: docs`, `permissions: {}`, no checkout;
   - the pinned token action with `repositories: website` and `permission-actions: write`;
   - `gh workflow run deploy.yml -R troupe-run/website --ref main`.
+  - The same change updates troupe's `user-docs` spec scenario "A page about the house", which relied on the site's
+    pre-alpha note (D15).
   If troupe's guard asks for an issue in troupe, open one on the roadmap board. Verify: troupe's `scripts/check.py`
   passes, and the commits are signed off.
 - [ ] 10.2 Open troupe's PR, saying it merges after this repository's PR is deployed. Verify: its CI passes. Don't merge
