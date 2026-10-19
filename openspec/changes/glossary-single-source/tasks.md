@@ -53,14 +53,15 @@
 - [x] 4.4 Narrow `scripts/check-paths.toml`'s skip from `docs/**` to `docs/superpowers/**` (D5), because the new test
   reads the brand guide. Found when the guard refused 4.5's first try. Verify: `python3 -m unittest discover -s
   scripts/tests` passes.
-- [ ] 4.5 Commit the test, glossary, house page, brand guide, config and copy together ("feat(docs): the glossary is
+- [x] 4.5 Commit the test, glossary, house page, brand guide, config and copy together ("feat(docs): the glossary is
   the single source of troupe's vocabulary", body naming troupe-run/troupe#15 and #22). They go in one commit because
   the test passes only when all of them agree. Verify: `uv run scripts/check.py` passes before the commit, and `git
   status` is clean after it.
 
 ## 5. Integration
 
-- [ ] 5.1 Run `uv run scripts/check.py`. Verify: it passes, and its output is saved to the scratchpad.
+- [x] 5.1 Run `uv run scripts/check.py`. Verify: it passes, and its output is saved to the scratchpad.
+  The guard ran it for 67bb5f1: every gate passed in 47s (unit tests, build, link check, 182 e2e tests).
 
 ## Workflow follow-up
 
