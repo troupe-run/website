@@ -10,7 +10,9 @@ const { entry, editUrl } = Astro.locals.starlightRoute;
 const isPost = entry.id.startsWith('blog/');
 const at = locate(manifestJson as Manifest, entry.id);
 const isDoc = at !== undefined;
-const { status, prerelease, purpose } = entry.data;
+// No pre-alpha note (owner, 2026-10-20; versioned-docs design D15): `prerelease` stays in the page contract as a
+// record, and only planned pages, which have no text to say so, get a note.
+const { status, purpose } = entry.data;
 // A page that can't be edited (an archived version, or a release page gone from main) links its source at its tag.
 const source = at && !editUrl ? sourceUrl(at.version, at.path) : undefined;
 const { viewSource } = await getCopy('versions');
@@ -20,11 +22,6 @@ const { viewSource } = await getCopy('versions');
   <aside class="doc-note doc-note--planned" data-doc-note="planned">
     <p><strong>Planned: not written yet.</strong> {purpose}</p>
     {editUrl && <p><a href={editUrl.href}>Help write this page</a></p>}
-  </aside>
-)}
-{isDoc && status === 'written' && prerelease && (
-  <aside class="doc-note" data-doc-note="prerelease">
-    <p>Pre-alpha: this page describes intended behaviour.</p>
   </aside>
 )}
 {isPost ? <BlogMarkdownContent><slot /></BlogMarkdownContent> : <Default><slot /></Default>}

@@ -198,6 +198,20 @@ version, the page and the fix.
 - **WHEN** a page's description is `yes`, unquoted
 - **THEN** the build fails, naming the page and `description`, and saying to quote the value
 
+### Requirement: Docs pages show no pre-alpha note
+The site SHALL NOT add a pre-alpha note to a docs page, whatever its `prerelease` field says (owner, 2026-10-20: nobody
+is sent to the docs until there's something real, and by then the note isn't needed). The site SHALL still accept
+`prerelease` as part of troupe's page contract, so the record of which pages describe unbuilt behaviour stays in
+troupe's pages. A planned page SHALL still show its "Planned: not written yet" note.
+
+#### Scenario: A page about unbuilt behaviour
+- **WHEN** a reader opens a page whose front matter sets `prerelease: true`
+- **THEN** the page shows no pre-alpha note, and the build accepted the field
+
+#### Scenario: A planned page
+- **WHEN** a reader opens a page with `status: planned`
+- **THEN** it shows "Planned: not written yet" and its purpose
+
 ### Requirement: Only Markdown pages in the six sections are accepted
 Every file under a version's `docs/` SHALL be a `.md` page directly inside one of `programme/`, `opening-night/`,
 `the-company/`, `stagecraft/`, `prompt-book/` or `backstage/`. Any other file SHALL stop the build, naming the version

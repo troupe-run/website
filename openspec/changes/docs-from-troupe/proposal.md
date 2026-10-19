@@ -56,7 +56,12 @@ lands, the site still serves its own copies, and an edit to those would be lost,
    Tags don't change, so an archived page has nothing to edit. An archived page has a **"View source"** link instead,
    to the page at its tag, which always exists. Every docs page still links to its own source: an edit link where it
    can be edited, and a link to the source otherwise. `openspec/config.yaml` says so.
-3. **The check also builds the site against a fixture troupe repository with tags** (design D9). It's made fresh in a
+3. **The version picker goes in the header**, beside "troupe docs", showing only the version being read until it's
+   opened (2026-10-20, design D6).
+4. **The pre-alpha note is dropped** (2026-10-20, design D15): nobody is sent to the docs until there's something real,
+   and by then it isn't needed. `prerelease` stays in troupe's page contract as a record. troupe's spec scenario that
+   relies on the note changes in troupe's PR.
+5. **The check also builds the site against a fixture troupe repository with tags** (design D9). It's made fresh in a
    temporary folder on each run, has no remote, and is never published: the deploy builds only from
    troupe-run/troupe. Until troupe releases, this is the only build with `/docs/next/` and archived versions.
 

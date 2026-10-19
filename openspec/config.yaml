@@ -50,7 +50,8 @@ context: |
   - Every docs page, written or stub, links to its own source in troupe-run/troupe: "Improve this page" on
     /docs/next/ and the latest release, and "View source" at its tag on an earlier version, which can't be edited
     (owner, 2026-10-19). Every other page links its source here. Stubs are real pages marked `status: planned` in
-    frontmatter. The pre-alpha note is driven by frontmatter, never hand-typed.
+    frontmatter. There's no pre-alpha note on docs pages (owner, 2026-10-20): their `prerelease` field records which
+    describe unbuilt behaviour, and each page says so in its own words.
   - Licences: site code is MIT, content is CC BY 4.0, and contributions come in on the same terms. No DCO and no
     CLA here (owner, 2026-10-16, troupe-run/infrastructure#54). The troupe name, mark and characters are
     trademarks of HPS.GD PTY LTD and are licensed under neither.
