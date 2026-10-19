@@ -7,6 +7,7 @@ uv run --no-project python -m unittest discover -s scripts/tests
 import contextlib
 import io
 import os
+import re
 import stat
 import subprocess
 import sys
@@ -243,7 +244,8 @@ class CheckPaths(unittest.TestCase):
     def test_no_gate_source_names_a_skipped_file(self) -> None:
         # The guard skips the check for a commit that stages only these, so a gate that read one
         # could break unchecked until CI (design D5). Directory entries are also matched by their
-        # prefix (`openspec/`); docs/ only by its files, since the site's routes say /docs/.
+        # prefix (`openspec/`); docs/ only by its files, since the site's routes say /docs/. URLs
+        # are left out: a link to another repository's CONTRIBUTING.md isn't this one's file.
         needles = set()
         for entry in declaration()["skip"]["paths"]:
             needles.update(skipped_files(entry))
@@ -253,7 +255,7 @@ class CheckPaths(unittest.TestCase):
             f"{source.relative_to(ROOT)} names {needle}"
             for source in GATE_SOURCES
             if source.is_file()
-            for text in [source.read_text(errors="ignore")]
+            for text in [re.sub(r"https?://\S+", "", source.read_text(errors="ignore"))]
             for needle in sorted(needles)
             if needle in text
         ]

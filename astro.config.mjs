@@ -1,12 +1,43 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightBlog from 'starlight-blog';
+import { isSatteriProcessor } from '@astrojs/markdown-satteri';
+import { fileURLToPath } from 'node:url';
+import { sync } from './scripts/troupe-docs-lib.mjs';
+import { troupeLinks } from './scripts/troupe-links.mjs';
+import { firstPage, pageUrl } from './src/lib/docs-nav.ts';
+
+// Writes /docs's pages from troupe-run/troupe before Astro reads content, for every command (dev, check, build,
+// sync), redirects each version's root to its first page, and rewrites the pages' .md links to the site's URLs
+// (spec: versioned-docs; design D2, D5, D6).
+function troupeDocs() {
+  return {
+    name: 'troupe-docs',
+    hooks: {
+      'astro:config:setup': ({ config, updateConfig, logger }) => {
+        const root = fileURLToPath(new URL('.', import.meta.url));
+        const manifest = sync({ root });
+        const redirects = {};
+        for (const v of manifest.versions) {
+          const first = firstPage(v.pages);
+          if (first) redirects[v.base.slice(0, -1)] = pageUrl(v.base, first.path);
+          logger.info(`${v.base} from ${v.ref}, ${v.pages.length} pages`);
+        }
+        updateConfig({ redirects });
+        // Added to the processor's own list, as Starlight adds its plugins, so neither replaces the other.
+        const { processor } = config.markdown;
+        if (!isSatteriProcessor(processor)) throw new Error(`troupe-docs needs the Sätteri Markdown processor, not ${processor.name}`);
+        processor.options.mdastPlugins.push(troupeLinks(fileURLToPath(new URL('src/content/docs/docs/', import.meta.url))));
+      },
+    },
+  };
+}
 
 export default defineConfig({
   site: 'https://troupe.run',
   trailingSlash: 'always',
-  redirects: { '/docs': '/docs/programme/what-is-troupe/' },
   integrations: [
+    troupeDocs(),
     starlight({
       title: 'troupe docs',
       editLink: { baseUrl: 'https://github.com/troupe-run/website/edit/main/' },
@@ -37,51 +68,7 @@ export default defineConfig({
         ThemeProvider: './src/components/docs/ThemeProvider.astro',
         ThemeSelect: './src/components/docs/ThemeSelect.astro',
       },
-      sidebar: [
-        { label: 'Programme', items: [
-          { slug: 'docs/programme/what-is-troupe' },
-          { slug: 'docs/programme/status-and-roadmap' },
-          { slug: 'docs/programme/principles' },
-        ] },
-        { label: 'Opening night', items: [
-          { slug: 'docs/opening-night/install' },
-          { slug: 'docs/opening-night/first-theatre' },
-          { slug: 'docs/opening-night/first-performance' },
-        ] },
-        { label: 'The company', items: [
-          { slug: 'docs/the-company/theatres' },
-          { slug: 'docs/the-company/roles-and-actors' },
-          { slug: 'docs/the-company/performances-and-runs' },
-          { slug: 'docs/the-company/flows' },
-          { slug: 'docs/the-company/gates-and-decisions' },
-          { slug: 'docs/the-company/escalation' },
-          { slug: 'docs/the-company/notes' },
-          { slug: 'docs/the-company/lineage' },
-          { slug: 'docs/the-company/guests' },
-          { slug: 'docs/the-company/the-house' },
-        ] },
-        { label: 'Stagecraft', items: [
-          { slug: 'docs/stagecraft/configure-roles' },
-          { slug: 'docs/stagecraft/route-decisions' },
-          { slug: 'docs/stagecraft/build-a-flow' },
-          { slug: 'docs/stagecraft/bring-your-own-agent' },
-          { slug: 'docs/stagecraft/hand-edit-config' },
-          { slug: 'docs/stagecraft/write-a-guest' },
-          { slug: 'docs/stagecraft/read-the-lineage' },
-        ] },
-        { label: 'Prompt book', items: [
-          { slug: 'docs/prompt-book/cli' },
-          { slug: 'docs/prompt-book/config-schema' },
-          { slug: 'docs/prompt-book/events' },
-          { slug: 'docs/prompt-book/guest-manifest' },
-          { slug: 'docs/prompt-book/glossary' },
-        ] },
-        { label: 'Backstage', items: [
-          { slug: 'docs/backstage/contributing' },
-          { slug: 'docs/backstage/licensing' },
-          { slug: 'docs/backstage/changelog' },
-        ] },
-      ],
+      // The docs sidebar is built per version from src/lib/docs-nav.ts, in src/route-middleware.ts (design D6).
     }),
   ],
 });

@@ -81,9 +81,11 @@ redirects (D6). The logic is in `scripts/troupe-docs-lib.mjs`, so unit tests can
 `npm run docs:sync` runs it by hand.
 
 Where the pages come from:
-- **By default, from troupe-run/troupe on GitHub.** A bare, partial clone (`--filter=blob:none`) is kept in the
-  git-ignored `.cache/troupe.git` and fetched on every run, tags included. Each version's files are read from its ref
-  with `git`, with no checkout.
+- **By default, from troupe-run/troupe on GitHub.** A bare clone is kept in the git-ignored `.cache/troupe.git` and
+  fetched on every run, tags included. Each version's files are read from its ref with `git`, with no checkout.
+  - A partial clone (`--filter=blob:none`) was measured and dropped (2026-10-19): it fetched each blob on its first
+    read, so reading `main`'s 29 pages took 22 s.
+  - A full bare clone of troupe took 2.5 s and 4 MB, and every read after it is local.
 - **`TROUPE_DOCS=<path>`, from a local troupe checkout.**
   - `main`'s pages come from that checkout's working tree, so a writer can preview unpushed edits.
   - The tags come from that checkout's refs.
@@ -330,8 +332,9 @@ In troupe-run/troupe's `.github/workflows/release.yml`, a job `notify-website`:
   revisit trigger.
 - **[A fix to a released page shows only in `/docs/next/` until the next release]** → That's Read the Docs' trade-off,
   and the edit link opens `main`, so the writer sees where it lands. Not mitigated further.
-- **[A fresh clone's first build is slower]** → Partial clone with no blobs, then only `docs/` files are read. Task 7.3
-  records the time.
+- **[A fresh clone's first build is slower]** → A full bare clone of troupe was 2.5 s and 4 MB (2026-10-19). Later runs
+  only fetch. If troupe's history grows large, a shallow or partial clone with a batched blob fetch is the next step.
+  Task 7.3 records the time.
 - **[The dispatch credential is misused]** → The token can only start workflows in website. The deploy takes no inputs,
   builds only `main`, and deploys only through `github-pages`.
 

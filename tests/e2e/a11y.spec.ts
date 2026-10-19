@@ -4,8 +4,9 @@ import AxeBuilder from '@axe-core/playwright';
 const PAGES = [
   ['landing page', '/'],
   ['written docs page', '/docs/programme/what-is-troupe/'],
-  ['stub docs page', '/docs/the-company/roles-and-actors/'],
   ['licensing (tables)', '/docs/backstage/licensing/'],
+  ['glossary (a wide table)', '/docs/prompt-book/glossary/'],
+  ['CLI reference (code and generated tables)', '/docs/prompt-book/cli/'],
   ['blog index', '/blog/'],
   ['blog post', '/blog/2026-10-10-methodology-bake-off/'],
 ] as const;
@@ -16,6 +17,10 @@ for (const theme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
       await page.goto(path);
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+      // Expressive Code makes a code block that scrolls sideways focusable from a script, about 250ms after load. Wait
+      // for it, so axe sees the page a reader gets; if the script never runs, this times out and the test fails.
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll('.expressive-code pre')].every((p) => p.scrollWidth <= p.clientWidth || p.hasAttribute('tabindex')));
       const results = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
         .analyze();
