@@ -19,7 +19,7 @@ See proposal.md for why. The current state:
   | `copy/principles.md:7`, landing title "Local-first, everything in your project" | a theatre | theatre |
   | `copy/footer.md:3`, "a project by hps.gd" | troupe itself | stays (the attribution the config fixes) |
   | `backstage/contributing.md:27`, "the project's licence" | troupe itself | stays |
-  | `blog/2026-10-10-methodology-bake-off.md:16`, `:183` | the bake-off arms' own projects | stays (dated post) |
+  | `blog/2026-10-10-methodology-bake-off.md:16`, `:183` | the bake-off arms' own projects | stays (the blog isn't scanned, D5) |
 
 - "TBC" for the house is in the house page's title and purpose, the glossary, and the brand guide's §6 and §10.
 - troupe's own specs use "stage" (the `stages` capability, lineage's `stage` field). "system" as an actor kind and
@@ -156,10 +156,17 @@ Vitest, reading files from the repo root like `token-discipline.test.ts`. Paths 
 - **Decided terms present.** stage, rehearsal, `system` and cue have glossary rows (a named test of its own, so a
   later edit that drops one fails by name, not only as a set difference).
 - **"project" record.** A list in the test of `{ file, text, reason }`, where `text` is a fragment of the line. Every
-  line under `src/content/` matching `/\bprojects?\b/i` must match a record by file and fragment, and every record must
+  line under `src/content/docs/docs/` (the docs) and `src/content/copy/` (the landing copy) matching `/\bprojects?\b/i` must match a record by file and fragment, and every record must
   match at least one line. Fragments, not line numbers, so an unrelated edit above doesn't break it. The failure names
-  the file, line number and line. The test's name says what it checks: that each "project" is recorded with a reason,
+  the file, line number and line, and says how to fix it: say "theatre", or record the line with its reason.
+  The blog (`src/content/docs/blog/`) isn't scanned: its posts are dated and talk about other projects freely, so
+  checking them would be friction with no gain (owner, 2026-10-19, after a side review). The test's name says what it checks: that each "project" is recorded with a reason,
   not that each one is correct. Whether a recorded use is right is the reviewer's call.
+
+The test reads `docs/brand-guide.md`, which `scripts/check-paths.toml` listed under `docs/**` as read by no gate. A
+commit touching only the guide would then skip the check that guards it, and `scripts/tests/test_check.py` refuses
+that. The skip narrows to `docs/superpowers/**` (the dated design and plan), so a brand guide change runs the full
+check. Found when the guard refused the first commit.
 
 Alternative: a lint rule or a remark plugin. Rejected: a unit test runs in the existing `check.py` and CI step with no
 new dependency, and the content is a handful of files.

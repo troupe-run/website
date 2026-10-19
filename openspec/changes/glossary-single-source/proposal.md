@@ -27,12 +27,13 @@ ahead here first, and the glossary file moves with the docs later.
   "Project" appears only to explain what a theatre is. "Not repo, YAML or config" stays.
 - **Brand guide §10:** the open point on "the house" and "house rules" is removed.
 - **Site copy:** body text that says "project" for a theatre says "theatre". That's three docs lines and one landing
-  principle. Each "project" that stays (troupe as a project, a dated blog post) is listed with its reason.
+  principle. Each "project" that stays in the docs and landing copy (troupe as a project) is listed with its reason.
+  The blog isn't checked: its posts are dated.
 - **"The house" page:** its title and purpose drop "name TBC" and "The name isn't final".
 - **`openspec/config.yaml` context:** the two lines that repeat the old rules ("mark 'the house' as TBC", "say
   project") are updated to match the guide, so the next change isn't planned against them.
 - **Drift guards:** unit tests that fail when the brand guide's §6 holds a term the glossary doesn't define, when the
-  guide carries meanings again, or when a new "project" appears in site copy without a reviewed reason.
+  guide carries meanings again, or when a new "project" appears in the docs or landing copy without a reviewed reason.
 
 ## Capabilities
 

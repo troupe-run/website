@@ -153,9 +153,9 @@ test('the cast band does not animate: its shapes are not hero characters and not
   await expect(page.locator('#the-cast [data-cast]')).toHaveCount(0);
 });
 
-test('the landing page says "project", not repo, YAML or config, except in the local-first principle’s "Config, history and decisions" line', async ({ page }) => {
+test('the landing page says neither repo, YAML nor config, except in the local-first principle’s "its config, history and decisions" line', async ({ page }) => {
   await page.goto('/');
-  const text = (await page.locator('main').innerText()).replace('Config, history and decisions live in git', '');
+  const text = (await page.locator('main').innerText()).replace('its config, history and decisions live in git', '');
   expect(text).not.toMatch(/\b(repo|YAML|config)\b/i);
 });
 test('the how-it-works heading reads "A season, not a single show."', async ({ page }) => {

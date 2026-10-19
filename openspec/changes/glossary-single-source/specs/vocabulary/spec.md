@@ -60,13 +60,19 @@ open point about its name.
 - **THEN** "the house" has status agreed, and §10 has no open point on "the house" or "house rules"
 
 ### Requirement: Site copy says "theatre", not "project", for a theatre
-Body copy, headings and landing copy SHALL call a theatre "theatre", never "project". "Project" SHALL appear only to
-explain what a theatre is, or where it means something other than a theatre (troupe itself as a project, or a dated
-blog post's own projects). Every "project" that stays SHALL be recorded with its reason.
+Docs pages and landing copy SHALL call a theatre "theatre", never "project". "Project" SHALL appear there only to
+explain what a theatre is, or where it means something other than a theatre (troupe itself as a project). Every
+"project" that stays SHALL be recorded with its reason. Blog posts are dated and written about many projects, so the
+record doesn't cover them (owner, 2026-10-19).
 
 #### Scenario: A new "project" in site copy
-- **WHEN** a file under `src/content/` gains the word "project" or "projects" at a place not recorded with a reason
-- **THEN** the check fails and names the file and the line
+- **WHEN** a docs page or a landing copy file gains the word "project" or "projects" at a place not recorded with a
+  reason
+- **THEN** the check fails, names the file and the line, and says how to fix it
+
+#### Scenario: A blog post says "project"
+- **WHEN** a blog post says "project" or "projects"
+- **THEN** the check doesn't fail
 
 #### Scenario: A recorded "project" that has gone
 - **WHEN** a recorded place no longer says "project"

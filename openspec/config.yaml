@@ -58,8 +58,10 @@ context: |
   - Voice: dry and precise, with a thread of warm wry humour (at most one wry line per section). Short sentences;
     every claim is something a reader can check. No hype words, no exclamation marks.
   - Theatre in headings and visuals, plain words in body copy, one stage device per section. Use the product
-    vocabulary with the brand guide's exact meanings, and mark unagreed terms ("the house") as TBC.
-  - User-facing copy says "project", not "repo", "YAML" or "config", unless the technical term is needed.
+    vocabulary with the glossary's meanings (the single source) and the brand guide's statuses, and mark unagreed
+    terms as provisional, as the brand guide's §6 says.
+  - User-facing copy says "theatre", never mixed with "project", which appears only to explain what a theatre is.
+    Not "repo", "YAML" or "config", unless the technical term is needed.
   - The organisation is "hps.gd" in prose ("a project by hps.gd"); the legal name is HPS.GD PTY LTD.
   - Landing-page copy and written docs pages are reviewed by the owner as text before they ship. Landing copy lives
     in src/content/copy/, one file per section, so it can be.
