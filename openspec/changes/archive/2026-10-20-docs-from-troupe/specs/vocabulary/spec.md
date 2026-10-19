@@ -66,11 +66,11 @@ troupe-run/troupe's docs check.
 - **THEN** the check fails, naming the file and the line
 
 ### Requirement: Site copy says "theatre", not "project", for a theatre
-The landing copy and the site's own pages (`/status/`, and any page of this repository outside `/docs` and the blog)
-SHALL call a theatre "theatre", never "project". "Project" SHALL appear there only to explain what a theatre is, or
+The landing copy and the site's own pages (outside `/docs` and the blog) SHALL call a theatre "theatre", never
+"project". "Project" SHALL appear there only to explain what a theatre is, or
 where it means something other than a theatre (troupe itself as a project). Every "project" that stays SHALL be recorded
 with its reason. Blog posts are dated and written about many projects, so the record doesn't cover them (owner,
-2026-10-19). The docs pages are held to this by troupe-run/troupe's docs check.
+2026-10-19).
 
 #### Scenario: A new "project" in site copy
 - **WHEN** a landing copy file or one of the site's own pages gains the word "project" or "projects" at a place not
