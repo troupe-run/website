@@ -70,12 +70,12 @@
 
 ## 6. Branch run (integration)
 
-- [ ] 6.1 Tell the owner this opens a real issue, then go ahead. Push the branch and run `gh workflow run
+- [x] 6.1 Tell the owner this opens a real issue, then go ahead. Push the branch and run `gh workflow run
   links-weekly.yml --ref add-link-issue-to-board -f extra-url=https://troupe.run/definitely-not-here-404`. Verify, from
   the run and `gh issue view <n> --json projectItems`: `links` opened the tracking issue and its output holds the
   issue's URL; `board` was refused the `board` environment (the branch policy, which infrastructure didn't probe);
   the run is failed; and the issue isn't on the board.
-- [ ] 6.2 Run it again on the branch with `extra-url` empty. Verify: the run is green and the issue is closed with a
+- [x] 6.2 Run it again on the branch with `extra-url` empty. Verify: the run is green and the issue is closed with a
   link to the run. Then add that issue to the board, set it to Done, and comment that it was this change's branch
   test. Check it with `gh issue view <n> --json projectItems`.
 - [ ] 6.3 Open the pull request (`Closes #18`, body via `--body-file`). Verify: CI's `test` job passes.
