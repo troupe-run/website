@@ -136,13 +136,15 @@ For each version:
   test reads `FRONT_MATTER_KEYS` from troupe's `main` and compares it with the port's key set, so a key added in troupe
   fails here, naming it.
 - **The page is written back with its five fields** as JSON-quoted YAML, plus the fields only the site sets:
+  - `slug`: the page's URL path (`docs/v0.1/the-company/flows`). Astro slugs an id from the file's path, which drops
+    the dot in `v0.1` (found by the first fixture build, 2026-10-20), so each page names its own;
   - `editUrl`, as D7 says;
   - `lastUpdated`: the date of the newest commit that touched the file at that ref. A page with uncommitted changes in
     a `TROUPE_DOCS` checkout gets none.
   - `pagefind: false` for `next` and `archived` pages, as D8 says;
   - nothing else.
 - **The content schema keeps the site's three extra keys** (`status`, `prerelease`, `purpose`). A test asserts that the
-  keys the sync passes through are exactly troupe's set, and the site-only keys are exactly those three. Adding a key in
+  keys the sync passes through are exactly troupe's set, and the site-only keys are exactly those four. Adding a key in
   one place without the other then fails.
 
 ### D5. Links between pages are rewritten to the site's URLs, at build time
@@ -188,7 +190,7 @@ on `/docs/v0.1/the-company/flows/`, becomes `/docs/v0.1/stagecraft/build-a-flow/
   - **Next:** "Unreleased: these docs describe troupe's main, ahead of vA.B." It links in the same way.
   - **Unreleased current** (no release yet): no banner. The menu already says "unreleased", and the pre-alpha note
     already marks unbuilt behaviour.
-- **The menu's and banners' words live in `src/content/copy/docs-versions.md`** (a new `versions` copy section), so the
+- **The menu's and banners' words live in `src/content/copy/versions.md`** (a new `versions` copy section), so the
   owner reviews them as text, as the landing copy is reviewed.
 - **Redirects:**
   - `/docs/next/` and each `/docs/vX.Y/` redirect to their version's first page, as `/docs/` does today.

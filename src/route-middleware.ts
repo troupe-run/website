@@ -16,14 +16,17 @@ export const onRequest = defineRouteMiddleware(async (context, next) => {
     route.pagination = pagination(at.version, at.path);
     return;
   }
-  // Blog pages: no left-hand sidebar, no empty "On this page" column (the index and tag pages have no headings),
-  // and the tab title and og:site_name say "troupe blog" rather than the Starlight-wide "troupe docs".
-  if (siteSection(route.id) !== 'blog') return;
+  // Blog pages and the site's own pages (/status/): no left-hand sidebar, no empty "On this page" column (the blog's
+  // index and tag pages have no headings), and the tab title and og:site_name say "troupe blog" or "troupe" rather
+  // than the Starlight-wide "troupe docs".
+  const section = siteSection(route.id);
+  if (section === 'docs') return;
   route.hasSidebar = false;
   // Starlight always lists the page top ("Overview"); with nothing else, the column would sit empty.
   if (route.toc && route.toc.items.length <= 1) route.toc = undefined;
+  const name = section === 'blog' ? 'troupe blog' : 'troupe';
   for (const entry of route.head) {
-    if (entry.tag === 'title' && entry.content) entry.content = entry.content.replace(/troupe docs$/, 'troupe blog');
-    if (entry.tag === 'meta' && entry.attrs?.property === 'og:site_name') entry.attrs.content = 'troupe blog';
+    if (entry.tag === 'title' && entry.content) entry.content = entry.content.replace(/troupe docs$/, name);
+    if (entry.tag === 'meta' && entry.attrs?.property === 'og:site_name') entry.attrs.content = name;
   }
 });

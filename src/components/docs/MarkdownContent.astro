@@ -1,11 +1,20 @@
 ---
 import Default from '@astrojs/starlight/components/MarkdownContent.astro';
 import BlogMarkdownContent from 'starlight-blog/overrides/MarkdownContent.astro';
+import VersionMenu from './VersionMenu.astro';
+import { getCopy } from '../../lib/copy';
+import { locate, sourceUrl, type Manifest } from '../../lib/docs-versions';
+import manifestJson from '../../generated/troupe-docs.json';
 const { entry, editUrl } = Astro.locals.starlightRoute;
 const isPost = entry.id.startsWith('blog/');
-const isDoc = entry.id.startsWith('docs/');
+const at = locate(manifestJson as Manifest, entry.id);
+const isDoc = at !== undefined;
 const { status, prerelease, purpose } = entry.data;
+// A page that can't be edited (an archived version, or a release page gone from main) links its source at its tag.
+const source = at && !editUrl ? sourceUrl(at.version, at.path) : undefined;
+const { viewSource } = await getCopy('versions');
 ---
+{at && <VersionMenu version={at.version} path={at.path} />}
 {isDoc && status === 'planned' && (
   <aside class="doc-note doc-note--planned" data-doc-note="planned">
     <p><strong>Planned: not written yet.</strong> {purpose}</p>
@@ -18,3 +27,4 @@ const { status, prerelease, purpose } = entry.data;
   </aside>
 )}
 {isPost ? <BlogMarkdownContent><slot /></BlogMarkdownContent> : <Default><slot /></Default>}
+{source && <p class="view-source"><a href={source}>{viewSource}</a></p>}

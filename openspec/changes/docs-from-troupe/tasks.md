@@ -40,8 +40,8 @@
   in troupe, and each error names the page, the key and the fix.
   Done 2026-10-19: 22 cases in `tests/unit/troupe-front-matter.test.ts`, each troupe's input and message, pass.
 - [x] 2.3 Add the contract drift test. It reads `FRONT_MATTER_KEYS` from troupe's `main` (the synced clone) and
-  compares it with the library's key set, and asserts that the site-only keys the sync writes are exactly `editUrl`,
-  `lastUpdated` and `pagefind`. Verify: the test passes, and fails naming the key when a key is added on one side only
+  compares it with the library's key set, and asserts that the site-only keys the sync writes are exactly `slug`,
+  `editUrl`, `lastUpdated` and `pagefind` (`slug` added 2026-10-20, design D4). Verify: the test passes, and fails naming the key when a key is added on one side only
   (tried by hand, then restored).
   Done 2026-10-19: `tests/unit/troupe-contract.test.ts` reads troupe main's `userdocs.py`. Its key test failed naming `order` when that key was added to the site's set only, and the schema test failed naming it when it was added to `content.config.ts` only (both restored). It also runs troupe's own reader against the port on troupe's 29 pages and 433 generated ones. The first run found 90 messages that quoted values differently (JSON, not Python's `repr`), now fixed.
 - [x] 2.4 Add the layout check: only `.md` pages directly inside the six sections. Verify: unit tests for `.mdx`, a
@@ -105,37 +105,42 @@
   Verify, with unit tests of the sidebar builder: an unlisted page is appended, a listed page a version lacks is
   dropped, and every link stays in the version.
   Done 2026-10-20, ahead of 3.4 since 3.4's tests read the sidebar: 12 tests in `tests/unit/docs-versions.test.ts` pass. On the real build, `/docs/the-company/flows/` shows the six sections in order and 29 links in its version, marks itself current, ends Programme and Backstage with the two kept links, and links Previous and Next to its neighbours.
-- [ ] 4.2 Add `src/content/copy/docs-versions.md` (a `versions` copy section) with the menu label and the archived and
+- [ ] 4.2 Add `src/content/copy/versions.md` (a `versions` copy section) with the menu label and the archived and
   next banners. Verify: `astro check` passes on the schema. Show the text to the owner, and record their approval or
   edits here before ticking.
-- [ ] 4.3 Render the version menu and banners in the `MarkdownContent` override (no new override). The menu is a
+- [x] 4.3 Render the version menu and banners in the `MarkdownContent` override (no new override). The menu is a
   `<details>` of links, each to the same page in that version or its first page, with `aria-current` on the version
   being read. At the end of a page with no edit link, render "View source" to the page at its version's tag (D7).
   Verify: unit tests of the "same page or first page" function and of the source URL, and on the real build, the menu
   shows one "unreleased" entry, no banner and no "View source".
+  Done 2026-10-20: `VersionMenu.astro`, rendered by the existing `MarkdownContent` override, so the override count stays at six. 9 new unit tests (label, versionNotice, sourceUrl) pass. On the real build, the menu has one "unreleased" entry, with no banner and no View source. On the fixture, the menu, banners and View source match D6 and D7.
 - [ ] 4.4 Build and screenshot one archived page, one next page and one current page, at 320px and desktop, in light and
   dark, from the fixture build (6.2). Show the owner. Verify: no horizontal scroll at 320px, and the owner's approval is
   recorded here before ticking.
 
 ## 5. The pages the website keeps (D10)
 
-- [ ] 5.1 Add `src/content/docs/status.md` with today's Status and roadmap text, unchanged. Make `siteSection()` answer
+- [x] 5.1 Add `src/content/docs/status.md` with today's Status and roadmap text, unchanged. Make `siteSection()` answer
   `site` for it, and the middleware drop its sidebar. Verify: unit tests for `siteSection`, and an e2e test that
   `/status/` has the site header, no sidebar, no version menu, and an "Improve this page" link to this repository.
-- [ ] 5.2 Add the redirects, in the form 1.3 found: `/docs/programme/status-and-roadmap/` to `/status/`, and
+  Done 2026-10-20: `status.md` is the old page, moved with `git mv` and its text unchanged. `siteSection` answers `site` for it (6 unit tests). Starlight's 404 stays `docs`, as before. `tests/e2e/status.spec.ts`: `/status/` has the plain wordmark, no sidebar, the tab title "Status and roadmap | troupe", and an edit link to this repository. Added to the axe pages.
+- [x] 5.2 Add the redirects, in the form 1.3 found: `/docs/programme/status-and-roadmap/` to `/status/`, and
   `/docs/backstage/contributing/` to the org's CONTRIBUTING.md. Verify: an e2e test for each lands at its target.
   `npm run linkcheck` passes.
+  Done 2026-10-20: both redirects come from `redirects` (1.3), and both e2e tests pass. GitHub is stubbed in the external one, so the test reaches no external host. `npm run linkcheck` passes.
 
 ## 6. The fixture build (D9)
 
-- [ ] 6.1 Write `tests/fixtures/troupe-docs/` (a short history of a few pages in three sections, with one page added,
+- [x] 6.1 Write `tests/fixtures/troupe-docs/` (a short history of a few pages in three sections, with one page added,
   one removed and one renamed between versions) and `scripts/troupe-fixture.mjs`. The script makes a temporary
   repository from it, with tags `troupe-v0.1.0`, `troupe-v0.1.1` and `troupe-v0.2.0` and commits after them. Verify, with
   a unit test: the repository has those tags, has no remote, and is deleted afterwards, also when the build fails.
-- [ ] 6.2 Add `npm run build:fixture` (into `dist-fixture/`, git-ignored). Add it to `scripts/check.py` after the build,
+  Done 2026-10-20: `tests/fixtures/troupe-docs/` holds four steps (troupe-v0.1.0, v0.1.1, v0.2.0, main), with a page removed (old-guide), one renamed (build-a-flow to design-a-flow), a planned page added (roles-and-actors), and a main-only page the sidebar order doesn't name (new-guide). 3 tests in `tests/unit/troupe-fixture.test.ts` pass: the tags, commits after the last one, no remote, and the repository deleted after a passing and a failing build.
+- [x] 6.2 Add `npm run build:fixture` (into `dist-fixture/`, git-ignored). Add it to `scripts/check.py` after the build,
   run the link check on both outputs, and update `scripts/tests/` for the new gate order. Verify: `uv run
   scripts/check.py`'s own tests pass, and the gate list matches the `quality-check` spec's order.
-- [ ] 6.3 Add the Playwright project `versions`, with its own preview server on `dist-fixture/` and its own free port,
+  Done 2026-10-20: `npm run build:fixture` built `/docs/next/` from main (6 pages), `/docs/` from troupe-v0.2.0 (5) and `/docs/v0.1/` from troupe-v0.1.1 (5). `check.py` gained "fixture build" and "fixture link check", in the quality-check spec's order, and its own tests pass. The first fixture build showed Astro's slugs drop the dot in `v0.1` (`/docs/v01/`), so each page now carries a `slug` (design D4). `astro preview` no longer syncs, so a preview can't rewrite pages under another build.
+- [x] 6.3 Add the Playwright project `versions`, with its own preview server on `dist-fixture/` and its own free port,
   and write `tests/e2e/versions.spec.ts`:
   - `/docs/` is v0.2, `/docs/v0.1/` comes from v0.1.1, and `/docs/next/` is `main`;
   - the menu lists and links;
@@ -148,9 +153,12 @@
   - search results on current only;
   - axe in light and dark.
   Verify: each test fails when its feature is disabled by hand (record which), then passes.
-- [ ] 6.4 Add a unit test that `deploy.yml` never runs `build:fixture` or sets `TROUPE_DOCS`. Verify: it passes, and
+  Done 2026-10-20: 32 tests in `tests/e2e/versions.spec.ts` pass on the `versions` project, which serves `dist-fixture/` on E2E_FIXTURE_PORT without building it. Five features were disabled together (indexing every version, archived pages editable, menu entries always the first page, sidebar links under /docs/, banners off), the fixture rebuilt, and 9 tests failed: both search tests, the archived edit/source test, two menu tests, the v0.1 sidebar test and the three banner tests. All restored and rebuilt: 32 passed. Search is checked through Pagefind's own API, because Starlight 0.42's search box is Pagefind's web component.
+- [x] 6.4 Add a unit test that `deploy.yml` never runs `build:fixture` or sets `TROUPE_DOCS`. Verify: it passes, and
   fails when either is added (tried, then restored).
-- [ ] 6.5 Run `uv run scripts/check.py`, and commit groups 4 to 6. Verify: every gate passes.
+  Done 2026-10-20: the last test in `tests/unit/deploy-workflow.test.ts` passes. It failed when a `npm run build:fixture` step was added, and again when `TROUPE_DOCS` was set on a step, and both edits were restored.
+- [x] 6.5 Run `uv run scripts/check.py`, and commit groups 4 to 6. Verify: every gate passes.
+  Done 2026-10-20: all 11 gates passed, and e2e ran 188 chromium and 32 versions tests. `tsconfig.json` now excludes `dist-fixture`, as it excludes `dist`. 4.2 and 4.4 wait on the owner, and the copy can change after this commit.
 
 ## 7. Vocabulary and the brand guide (D13)
 
@@ -169,12 +177,13 @@
 
 ## 8. The deploy starts on troupe's notice (D11)
 
-- [ ] 8.1 Write unit tests for `deploy.yml` first:
+- [x] 8.1 Write unit tests for `deploy.yml` first:
   - `workflow_dispatch` has no inputs;
   - the build job runs only on a successful `workflow_run` push, or a dispatch on `refs/heads/main`;
   - the build job's concurrency cancels in progress and the deploy job's doesn't;
   - a link check step runs after the build and before the deploy job.
   Verify: they fail on today's file.
+  Done 2026-10-20: 8 tests in `tests/unit/deploy-workflow.test.ts`. On today's `deploy.yml`, 5 failed (dispatch, build condition, checkout ref, concurrency, link check) and 3 passed (still runs after CI, github-pages only, no fixture), which are the parts that don't change.
 - [ ] 8.2 Change `deploy.yml` to match. Verify: the tests pass, `workflow-node-version.test.ts` still passes, and
   `actionlint` (or `gh workflow view` after push) reports no syntax error.
 - [ ] 8.3 Run `uv run scripts/check.py` and commit. Verify: every gate passes.

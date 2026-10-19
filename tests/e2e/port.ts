@@ -3,18 +3,20 @@ import { execFileSync } from 'node:child_process';
 // The e2e suite's port, resolved once per run (design D11). Every commit runs the suite, so two worktrees running it
 // at once is ordinary: each run takes a port that's free when it starts. Playwright loads its config again in each
 // worker; writing the port back to E2E_PORT, which the workers inherit, gives them all the same one.
-export function e2ePort(env: Record<string, string | undefined> = process.env): number {
-  const set = env.E2E_PORT;
+// The fixture build's server has its own, E2E_FIXTURE_PORT, chosen the same way (versioned-docs design D9).
+export function e2ePort(env: Record<string, string | undefined> = process.env, name = 'E2E_PORT', avoid?: number): number {
+  const set = env[name];
   if (set === undefined) {
-    const port = freePort();
-    env.E2E_PORT = String(port);
+    let port = freePort();
+    while (port === avoid) port = freePort();
+    env[name] = String(port);
     return port;
   }
   // Set but malformed is an error, never a fall-through to a free port.
   const port = /^\d+$/.test(set) ? Number(set) : NaN;
   if (!(port >= 1024 && port <= 65535)) {
     throw new Error(
-      `E2E_PORT is ${JSON.stringify(set)}, which isn't a port from 1024 to 65535. ` +
+      `${name} is ${JSON.stringify(set)}, which isn't a port from 1024 to 65535. ` +
         'Fix: set it to one, or unset it to use a free port.',
     );
   }
@@ -35,4 +37,10 @@ function freePort(): number {
 // and Playwright would see its process exit (design D11).
 export function previewCommand(port: number): string {
   return `npm run build && astro preview --port ${port} --ignore-lock`;
+}
+
+/** Serves the fixture build (npm run build:fixture) without building: a build here would sync troupe's pages into
+ *  the folder the real build is reading at the same time. */
+export function fixturePreviewCommand(port: number): string {
+  return `astro preview --outDir dist-fixture --port ${port} --ignore-lock`;
 }

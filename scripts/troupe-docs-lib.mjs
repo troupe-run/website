@@ -294,10 +294,10 @@ export function openSource(env, { cacheDir, remote = TROUPE_REMOTE }) {
 }
 
 // Writing the pages (design D4, D7, D8). Each page keeps troupe's five fields and gains only the site's own:
-// editUrl, lastUpdated and pagefind. The manifest tells the sidebar, the version menu and the tests what was built.
+// slug, editUrl, lastUpdated and pagefind. The manifest tells the sidebar, the version menu and the tests what was built.
 
 /** The keys the sync adds to a troupe page. Nothing else is added (checked by a test). */
-export const SITE_KEYS = ['editUrl', 'lastUpdated', 'pagefind'];
+export const SITE_KEYS = ['slug', 'editUrl', 'lastUpdated', 'pagefind'];
 const EDIT = 'https://github.com/troupe-run/troupe/edit/main/docs/';
 const MARKER = '.troupe-docs';
 
@@ -335,6 +335,8 @@ const yaml = (key, value) => `${key}: ${typeof value === 'string' ? JSON.stringi
 /** One page as Starlight reads it: troupe's fields, the site's, and a comment saying where to edit it. */
 export function renderPage(version, page) {
   const lines = Object.entries(page.front).map(([k, v]) => yaml(k, v));
+  // Astro slugs a page's id from its path, which drops the dot in v0.1, so each page names its own URL path.
+  lines.push(yaml('slug', `docs/${version.dir ? `${version.dir}/` : ''}${page.path.slice(0, -'.md'.length)}`));
   lines.push(yaml('editUrl', page.editUrl));
   // Unquoted, so YAML reads it as a date, which Starlight's schema needs.
   if (page.date) lines.push(`lastUpdated: ${page.date}`);

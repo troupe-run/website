@@ -27,8 +27,10 @@ LABELS = [
     "astro check",
     "unit tests",
     "build",
+    "fixture build",
     "assets verify",
     "link check",
+    "fixture link check",
     "e2e tests",
 ]
 
@@ -68,7 +70,9 @@ class Gates(unittest.TestCase):
         self.assertEqual(commands["unit tests"], [npm, "run", "test:unit"])
         self.assertEqual(commands["build"], [npm, "run", "build"])
         self.assertEqual(commands["assets verify"], [npm, "run", "assets:verify"])
+        self.assertEqual(commands["fixture build"], [npm, "run", "build:fixture"])
         self.assertEqual(commands["link check"], [npm, "run", "linkcheck"])
+        self.assertEqual(commands["fixture link check"], [npm, "run", "linkcheck", "--", "dist-fixture"])
         self.assertEqual(commands["e2e tests"], [npm, "run", "test:e2e"])
 
     def test_chromium_s_os_packages_are_installed_only_when_ci_is_set(self) -> None:

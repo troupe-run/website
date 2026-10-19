@@ -41,11 +41,11 @@ describe('sync', () => {
     expect(existsSync(join(root, 'src/content/docs/docs/v0.2'))).toBe(false);
   });
 
-  it("keeps troupe's fields as they were, and adds only editUrl, lastUpdated and pagefind", () => {
+  it("keeps troupe's fields as they were, and adds only slug, editUrl, lastUpdated and pagefind", () => {
     const root = site();
     sync({ env: {}, root, remote: troupe().path });
     const { front, body } = docs(root, 'next/programme/a.md');
-    expect(Object.keys(front)).toEqual(['title', 'description', 'status', 'prerelease', 'editUrl', 'lastUpdated', 'pagefind']);
+    expect(Object.keys(front)).toEqual(['title', 'description', 'status', 'prerelease', 'slug', 'editUrl', 'lastUpdated', 'pagefind']);
     expect(front).toMatchObject({ title: 'A', description: 'About A.', status: 'written', prerelease: false });
     expect(body).toContain("A's text.");
   });
@@ -71,6 +71,14 @@ describe('sync', () => {
     const { front } = docs(root, 'next/stagecraft/added.md');
     expect(front.editUrl).toBe(`${EDIT}stagecraft/added.md`);
     expect(front.pagefind).toBe(false);
+  });
+
+  it("names each page's URL path in its slug, keeping the dot in v0.1, which Astro's own slugs drop", () => {
+    const root = site();
+    sync({ env: {}, root, remote: troupe().path });
+    expect(docs(root, 'v0.1/programme/gone.md').front.slug).toBe('docs/v0.1/programme/gone');
+    expect(docs(root, 'next/stagecraft/added.md').front.slug).toBe('docs/next/stagecraft/added');
+    expect(docs(root, 'programme/a.md').front.slug).toBe('docs/programme/a');
   });
 
   it('a page of an archived version: no edit link, and out of search', () => {

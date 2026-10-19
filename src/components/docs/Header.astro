@@ -3,5 +3,7 @@
 import Search from '@astrojs/starlight/components/Search.astro';
 import SiteHeader from '../sections/Header.astro';
 import { siteSection } from '../../lib/site-section';
+// The site's own pages (such as /status/) show the plain wordmark: they're neither "troupe docs" nor "troupe blog".
+const section = siteSection(Astro.locals.starlightRoute.id);
 ---
-<SiteHeader section={siteSection(Astro.locals.starlightRoute.id)} embedded><Search /></SiteHeader>
+<SiteHeader section={section === 'site' ? undefined : section} embedded><Search /></SiteHeader>
