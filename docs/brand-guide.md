@@ -168,20 +168,34 @@ would pass as text in dark mode unchanged, but gets a lighter `-text` shade too,
 **The rule: theatre in headings and visuals, plain words in body copy.** One stage device per section.
 Every sentence should still say what troupe does to someone who skips the headings.
 
-**Product vocabulary.** Use these terms with their exact meanings:
+**Product vocabulary.** What each term means is in the
+[glossary](../src/content/docs/docs/prompt-book/glossary.md) (published at
+<https://troupe.run/docs/prompt-book/glossary/>). It's the single source, so this guide doesn't repeat the meanings.
+This table holds each term's status, and the words we don't use. Terms such as "theatre", "actor" and "role" are
+product nouns: body copy uses them as plainly as any other word. The rule above is about stage devices, not these.
 
-| Term | Meaning | Status |
-|---|---|---|
-| theatre | A project: a directory with troupe config | In use |
-| role | A job in your process (product owner, engineer, reviewer) | In use |
-| actor | Whoever holds a role: an agent or a person | In use |
-| performance | One run of your process | In use |
-| cast | The actors assigned to a performance | Reserved |
-| notes | What's learned from a run and fed into the next | Landing-page term, 2026-10-07 |
-| guest | An installable pack | Decided "for now" |
-| the house | The daemon | Suggested, not agreed. Mark it "TBC" where it appears |
-| house rules | Effect policy | Suggested, not agreed |
-| ~~repertoire~~, ~~rep~~, ~~company~~ (as a product noun) | — | Rejected |
+| Term | Status |
+|---|---|
+| theatre | In use |
+| role | In use |
+| actor | In use |
+| `system` | Decided 2026-10-11: the actor kind for troupe acting by itself |
+| cast | Reserved |
+| performance | In use |
+| rehearsal | Reserved, 2026-10-19: ahead of the feature that builds it |
+| stage | In use, 2026-10-19 |
+| notes | Landing-page term, 2026-10-07 |
+| gate | In use |
+| escalation | In use |
+| cue | Provisional, 2026-10-11 |
+| lineage | In use |
+| guest | Decided "for now" |
+| the house | Agreed, 2026-10-19 |
+| repertoire | Rejected: long and easy to get wrong |
+| rep | Rejected: long and easy to get wrong |
+| company (as a product noun) | Rejected: clashes with a SaaS tenant |
+| part | Rejected, 2026-10-19: "role" is clearer, and the two were never told apart |
+| house rules | Rejected, 2026-10-19: say "policy". Policy can be set at house level too, so "house rules" would read as that level only |
 
 - **Docs section labels** may be theatrical: Programme, Opening night, The company, Stagecraft, Prompt book,
   Backstage. Page titles are always plain ("Install", "Roles and actors").
@@ -201,8 +215,10 @@ check.
   - allow one wry line per section at most;
   - write principles in the present tense, as what troupe does, with no commitments caveat. "Install: coming"
     is the landing page's pre-alpha signal (owner review, 2026-10-08).
-  - say "project", not "repo", "YAML" or "config", in user-facing copy, except where the technical term is
-    genuinely necessary (owner review, 2026-10-08);
+  - say "theatre" for a theatre, in headings and body copy alike, never mixed with "project". "Project" appears
+    only to explain what a theatre is ("a theatre is a project directory with troupe config"). Say what it is in
+    plain words, not "repo", "YAML" or "config", except where the technical term is genuinely necessary (owner
+    review, 2026-10-08; "theatre" decided 2026-10-19, troupe-run/troupe#15);
 - **Don't:**
   - use hype ("revolutionise", "supercharge", "10x", "the future of");
   - borrow authority (logo walls, "trusted by");
@@ -241,4 +257,3 @@ The source SVGs live in this repo under `brand/`. The built copies the site serv
 ## 10. Open points
 
 - **Problem section (resolved 2026-10-10):** the standalone section restated How it works in the negative and its text was too small. Each How-it-works step now names the problem it fixes inside its own sentence ("…, so the work isn't stuck behind one agent at a time"). A separate "Instead of" label read as mashed together (owner).
-- **"The house" and "house rules":** not yet agreed as names.

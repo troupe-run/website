@@ -18,7 +18,8 @@ by an agent or a person, and your process runs through them: specify, build, tes
   issues, the docs, the relevant standard) and brings a decision brief to whoever holds that role.
 - **Everything is recorded.** Every decision carries its lineage: who made it, human or agent, what it was
   based on, who approved it, and where its results went.
-- **It lives in your project.** Everything is kept in git, on your machine. There is no hosted service.
+- **It lives in your theatre**, the project directory troupe works in. Everything is kept in git, on your machine.
+  There is no hosted service.
 
 ## Where it is now
 

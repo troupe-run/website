@@ -3,10 +3,11 @@
 # website's own; it isn't delivered. Changing it runs the full check. CI ignores it and always runs the full check.
 version = 1
 
-# No gate reads these: OpenSpec's changes and specs, the coding agent's skills and commands, the brand guide and the
-# original design (Starlight's docs are src/content/docs/, not docs/), and the contributor docs. Nothing enforces that
-# as troupe's guard_pytest does, so scripts/tests/test_check.py fails if a gate's source names one (design D5).
+# No gate reads these: OpenSpec's changes and specs, the coding agent's skills and commands, the original design
+# (Starlight's docs are src/content/docs/, not docs/), and the contributor docs. Nothing enforces that as troupe's
+# guard_pytest does, so scripts/tests/test_check.py fails if a gate's source names one (design D5). The brand guide
+# isn't skipped: tests/unit/vocabulary.test.ts reads it (spec: vocabulary).
 [skip]
-paths = ["openspec/**", ".claude/**", "docs/**", "CLAUDE.md", "CONTRIBUTING.md", "README.md"]
+paths = ["openspec/**", ".claude/**", "docs/superpowers/**", "CLAUDE.md", "CONTRIBUTING.md", "README.md"]
 
 # No scopes: the guard's tag check has no adapter for this site's JavaScript test runners.

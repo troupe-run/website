@@ -1,6 +1,6 @@
 ---
-title: The house (daemon, name TBC)
+title: The house (daemon)
 description: The local daemon.
 status: planned
-purpose: The local daemon that runs your theatres. The name isn't final.
+purpose: The long-lived local process that runs your theatres.
 ---

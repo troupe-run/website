@@ -6,9 +6,10 @@ status: written
 
 The ideas troupe is built on.
 
-## Local-first, everything in your project
+## Local-first, everything in your theatre
 
-Config, history and decisions live in git, on your machine. troupe doesn't need a hosted service to work.
+A theatre is your project directory. Its config, history and decisions live in git, on your machine. troupe
+doesn't need a hosted service to work.
 
 ## Work that branches
 
@@ -21,7 +22,7 @@ happens to be watching.
 
 ## Escalation that does its homework
 
-Before an agent asks anyone, it runs the research steps your project defines: check the issues, read the docs,
+Before an agent asks anyone, it runs the research steps your theatre defines: check the issues, read the docs,
 look up the relevant standard. Then it brings a decision brief, not a bare question.
 
 ## Lineage for every decision
