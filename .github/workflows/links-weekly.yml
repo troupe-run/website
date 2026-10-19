@@ -2,16 +2,27 @@ name: External links (weekly)
 # A broken external link fails this run and opens or updates one "Broken external links" issue; a clean run
 # closes it. Scheduled (and by hand) only, never on pull requests, so other sites' outages never block a merge.
 # A run started by hand can name one extra URL to check (extra-url), to prove the issue path without breaking the site.
+# When links opens or comments on the issue, the board job puts it on the troupe roadmap board (project 1). Only the
+# board job can read the board App's key, and it runs no code from this repository or npm (troupe-run/website#18).
 on:
   schedule:
     - cron: '17 3 * * 1'
   workflow_dispatch:
-permissions:
-  contents: read
-  issues: write
+    inputs:
+      extra-url:
+        description: 'One more URL to check, as if a page linked to it. For proving the issue path; leave empty for a normal run.'
+        type: string
+        required: false
+        default: ''
+permissions: {}
 jobs:
   links:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    outputs:
+      issue-url: ${{ steps.check.outputs.issue-url }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -20,6 +31,33 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npm run linkcheck:external
+      - id: check
+        run: npm run linkcheck:external
         env:
           GH_TOKEN: ${{ github.token }}
+          EXTRA_URL: ${{ inputs.extra-url }}
+  board:
+    # links fails whenever it finds a broken link, so this runs on any outcome but cancelled, when it handed over a URL.
+    needs: links
+    if: ${{ !cancelled() && needs.links.outputs.issue-url != '' }}
+    runs-on: ubuntu-latest
+    environment: board
+    permissions: {}
+    steps:
+      - uses: actions/create-github-app-token@v3
+        id: token
+        with:
+          client-id: ${{ vars.BOARD_APP_CLIENT_ID }}
+          private-key: ${{ secrets.BOARD_APP_PRIVATE_KEY }}
+          owner: troupe-run
+          permission-organization-projects: write
+      - env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          ISSUE_URL: ${{ needs.links.outputs.issue-url }}
+        run: |
+          # links runs third-party code, so what it hands over is checked before it's used.
+          if [[ ! "$ISSUE_URL" =~ ^https://github\.com/troupe-run/website/issues/[0-9]+$ ]]; then
+            printf '::error::issue-url from the links job is not an issue in troupe-run/website: %q\n' "$ISSUE_URL"
+            exit 1
+          fi
+          gh project item-add 1 --owner troupe-run --url "$ISSUE_URL"
