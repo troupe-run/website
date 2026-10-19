@@ -57,7 +57,7 @@ const status = (l) => (l.status ? String(l.status) : 'no response');
 
 /**
  * The Markdown for the job summary, the issue body and its comments, so the three always agree. `forIssue` adds how
- * the issue closes and the note about the roadmap board.
+ * the issue closes.
  * @param {{ broken: Link[], external: number, runUrl: string, dir?: string, forIssue?: boolean }} input
  */
 export function formatReport({ broken, external, runUrl, dir = 'dist', forIssue = false }) {
@@ -73,6 +73,5 @@ export function formatReport({ broken, external, runUrl, dir = 'dist', forIssue 
   lines.push('', `Run: ${runUrl}`);
   if (!forIssue) return lines.join('\n');
   lines.push('', 'This issue is kept by the weekly external link check (`.github/workflows/links-weekly.yml`). It closes itself after a clean run; to close it sooner, fix the links and run the workflow by hand.');
-  lines.push('', 'Whoever triages this adds it to the troupe roadmap board by hand: the workflow cannot write to org projects yet.');
   return lines.join('\n');
 }

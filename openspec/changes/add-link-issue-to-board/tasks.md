@@ -2,19 +2,19 @@
 
 ## 1. Baseline
 
-- [ ] 1.1 Before touching anything, run `npm ci && npm run build && npm run linkcheck:external` on this branch and save
+- [x] 1.1 Before touching anything, run `npm ci && npm run build && npm run linkcheck:external` on this branch and save
   its stdout and exit code to the scratchpad. This is the "no `extra-url`" behaviour, which must not change. Verify:
   the file is saved, and it holds the external link count and exit code.
 
 ## 2. The issue body loses its hand-add line (D6)
 
-- [ ] 2.1 Turn the test around first. Rename `adds how the issue closes and the roadmap-board note only for the issue`
+- [x] 2.1 Turn the test around first. Rename `adds how the issue closes and the roadmap-board note only for the issue`
   to `adds how the issue closes, and no hand-add note, only for the issue`. Check that the closing note is there and
   that the text doesn't mention adding it to the board by hand. Verify: `npm run test:unit` fails on that test, and
   only that one.
-- [ ] 2.2 Remove the line from `formatReport`, and update its doc comment, which mentions "the note about the roadmap
+- [x] 2.2 Remove the line from `formatReport`, and update its doc comment, which mentions "the note about the roadmap
   board". Verify: `npm run test:unit` passes.
-- [ ] 2.3 Commit ("drop the hand-add line: the weekly check puts its issue on the board itself").
+- [x] 2.3 Commit ("drop the hand-add line: the weekly check puts its issue on the board itself").
 
 ## 3. `links` hands over the issue's URL (D3)
 

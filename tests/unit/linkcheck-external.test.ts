@@ -89,11 +89,11 @@ describe('formatReport', () => {
     expect(md).toContain(`Run: ${RUN}`);
   });
 
-  it('adds how the issue closes and the roadmap-board note only for the issue', () => {
+  it('adds how the issue closes, and no hand-add note, only for the issue', () => {
     expect(formatReport({ broken, external: 3, runUrl: RUN })).not.toContain('closes itself');
     const md = formatReport({ broken, external: 3, runUrl: RUN, forIssue: true });
     expect(md).toContain('closes itself after a clean run');
-    expect(md).toContain('troupe roadmap board by hand');
+    expect(md).not.toMatch(/by hand.*board|board.*by hand/i);
   });
 
   it('escapes a | in a URL so it does not split the table row', () => {
