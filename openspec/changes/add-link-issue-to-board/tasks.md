@@ -49,23 +49,23 @@
 
 ## 5. The `board` job (D1, D2, D3, D4)
 
-- [ ] 5.1 Write `tests/unit/links-weekly-board.test.ts` first, parsing `.github/workflows/links-weekly.yml` with
+- [x] 5.1 Write `tests/unit/links-weekly-board.test.ts` first, parsing `.github/workflows/links-weekly.yml` with
   `yaml`, as `workflow-node-version.test.ts` does. Give it one test per D7 check, each named for exactly what it
   checks. For example: "the board job needs links and runs only when links handed over an issue URL and the run
   wasn't cancelled", "only the board job uses an environment or mentions BOARD_APP_PRIVATE_KEY", and "the board job
   has no checkout, setup or npm step and an empty permissions map". Verify: the new tests fail against the current
   workflow.
-- [ ] 5.2 Change `links-weekly.yml`. The workflow level becomes `permissions: {}`. `links` gets `permissions:
+- [x] 5.2 Change `links-weekly.yml`. The workflow level becomes `permissions: {}`. `links` gets `permissions:
   contents: read, issues: write`, its check step gets an `id` and `EXTRA_URL: ${{ inputs.extra-url }}` in `env`, and
   the job gets `outputs.issue-url`. `workflow_dispatch` gets the optional `extra-url` input, with a description that
   says it's for proving the issue path. Add the `board` job as in D1 to D4. Its run step checks `ISSUE_URL` against
   `^https://github\.com/troupe-run/website/issues/[0-9]+$` and fails naming the value. Then it runs `gh project
   item-add 1 --owner troupe-run --url "$ISSUE_URL"`. Verify: `npm run test:unit` passes, and the 5.1 tests now pass.
-- [ ] 5.3 Test the shape check by itself. Run the board step's shell snippet locally with
+- [x] 5.3 Test the shape check by itself. Run the board step's shell snippet locally with
   `ISSUE_URL=https://github.com/troupe-run/website/issues/18`, with `https://github.com/troupe-run/troupe/issues/1`, and
   with `https://github.com/troupe-run/website/issues/1;echo` (replace `gh` with `echo` for this). Verify: the first
   reaches the `gh` line, and the other two fail naming the value.
-- [ ] 5.4 `uv run scripts/check.py` passes. Commit ("put the weekly check's issue on the roadmap board from a job that
+- [x] 5.4 `uv run scripts/check.py` passes. Commit ("put the weekly check's issue on the roadmap board from a job that
   runs no site code").
 
 ## 6. Branch run (integration)
