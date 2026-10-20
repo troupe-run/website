@@ -44,6 +44,16 @@ describe('sidebar', () => {
   it('shows the six sections in the site order, leaving out a section with no pages and no kept link', () => {
     expect(sidebar(archived, '').map((g) => g.label)).toEqual(['Programme', 'Stagecraft', 'Backstage']);
   });
+
+  const currentLabels = (groups: ReturnType<typeof sidebar>) => groups.flatMap((g) => g.entries).filter((e) => e.isCurrent).map((e) => e.label);
+
+  it('on /status/, marks Status and roadmap current and nothing else (troupe-run/website#28)', () => {
+    expect(currentLabels(sidebar(current, '/status/'))).toEqual(['Status and roadmap']);
+  });
+
+  it('on a docs page, marks only that page current, and neither kept link', () => {
+    expect(currentLabels(sidebar(current, 'programme/what-is-troupe.md'))).toEqual(['what-is-troupe']);
+  });
 });
 
 describe('pagination', () => {

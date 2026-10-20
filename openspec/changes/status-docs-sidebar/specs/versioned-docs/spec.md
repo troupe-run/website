@@ -17,8 +17,8 @@ Backstage section with a link to the org's CONTRIBUTING.md at
 
 ### Requirement: Status and roadmap is the site's own page at /status/
 Status and roadmap SHALL be a page of this repository at `/status/`, outside `/docs` and in no version, with the site
-header and no version menu. It SHALL show the sidebar of the version at `/docs/`, with "Status and roadmap" marked as
-the current page. `/docs/programme/status-and-roadmap/` SHALL redirect to `/status/`.
+header reading "troupe docs" and no version menu. It SHALL show the sidebar of the version at `/docs/`, with "Status
+and roadmap" marked as the current page. `/docs/programme/status-and-roadmap/` SHALL redirect to `/status/`.
 
 #### Scenario: The old URL
 - **WHEN** a reader follows troupe's link to `https://troupe.run/docs/programme/status-and-roadmap/`
@@ -26,8 +26,8 @@ the current page. `/docs/programme/status-and-roadmap/` SHALL redirect to `/stat
 
 #### Scenario: The page itself
 - **WHEN** a reader opens `/status/`
-- **THEN** it shows Status and roadmap, with an "Improve this page" link to its source in troupe-run/website, and no
-  version menu
+- **THEN** it shows Status and roadmap, with "troupe docs" in the header and "Status and roadmap | troupe docs" as the
+  tab title, an "Improve this page" link to its source in troupe-run/website, and no version menu
 
 #### Scenario: The sidebar on /status/
 - **WHEN** a reader opens `/status/`

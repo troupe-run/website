@@ -4,6 +4,8 @@ const BLOG_POST = '/blog/2026-10-10-methodology-bake-off/';
 const PAGES = [
   { name: 'landing page', path: '/', label: null },
   { name: 'docs page', path: '/docs/programme/what-is-troupe/', label: 'docs' },
+  // Linked from the docs sidebar, so it reads as part of the docs (troupe-run/website#28).
+  { name: 'status page', path: '/status/', label: 'docs' },
   { name: 'blog index', path: '/blog/', label: 'blog' },
   { name: 'blog post', path: BLOG_POST, label: 'blog' },
 ] as const;
@@ -28,7 +30,7 @@ for (const p of PAGES) {
   });
 }
 
-for (const path of ['/docs/programme/what-is-troupe/', '/blog/']) {
+for (const path of ['/docs/programme/what-is-troupe/', '/status/', '/blog/']) {
   test(`on ${path} "troupe" and the section name share a baseline`, async ({ page }) => {
     await page.goto(path);
     const baseline = (sel: string) => page.locator(sel).evaluate((el) => {
@@ -118,6 +120,12 @@ test('at 1280px the mobile-menu copy of the site links is hidden, so the page ha
 test('the blog index has no empty "On this page" column', async ({ page }) => {
   await page.goto('/blog/');
   await expect(page.locator('html')).not.toHaveAttribute('data-has-toc');
+});
+
+// "Previous" and "Next" stay in the page's own section (troupe-run/website#28).
+test('the blog post has no "Previous" or "Next" link into /docs', async ({ page }) => {
+  await page.goto(BLOG_POST);
+  await expect(page.locator('a[rel="prev"][href^="/docs"], a[rel="next"][href^="/docs"]')).toHaveCount(0);
 });
 
 test('a blog post keeps its "On this page" contents', async ({ page }) => {

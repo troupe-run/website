@@ -156,6 +156,15 @@ test.describe("each version's sidebar", () => {
     await expect(stagecraft(page)).toHaveText(['A new guide', 'Design a flow']);
   });
 
+  test("/status/ shows the latest release's sidebar: no link under /docs/next/ or /docs/v0.1/ (troupe-run/website#28)", async ({ page }) => {
+    await page.goto('/status/');
+    const hrefs = await sidebarHrefs(page);
+    expect(hrefs.filter((h) => !h.startsWith('/docs/'))).toEqual(['/status/', 'https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md']);
+    expect(hrefs.filter((h) => h.startsWith('/docs/next/') || h.startsWith('/docs/v0.1/'))).toEqual([]);
+    // v0.2 has one Stagecraft page; main adds "A new guide".
+    await expect(stagecraft(page)).toHaveText(['Design a flow']);
+  });
+
   test('"Next" stays in the version', async ({ page }) => {
     await page.goto('/docs/v0.1/programme/what-is-troupe/');
     await expect(page.locator('a[rel="next"]')).toHaveAttribute('href', /^\/docs\/v0\.1\//);
