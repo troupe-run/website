@@ -76,7 +76,8 @@
   post among them. Save the output to the scratchpad.
   Done 2026-10-20: all gates passed, with 315 unit tests and 236 e2e tests across both projects. The output is saved at
   /private/tmp/claude-502/-Users-martin-Projects-troupe-website/d979b2a5-b154-47d9-98db-2b8793ac5129/scratchpad/final-check-28.log.
-- [ ] 4.3 Open the pull request with `Closes #28`. Verify: CI's `test` and `guard` jobs pass.
+- [x] 4.3 Open the pull request with `Closes #28`. Verify: CI's `test` and `guard` jobs pass.
+  Done 2026-10-20: troupe-run/website#29 says Closes #28. CI's `test` and `guard` jobs pass.
 
 ## Workflow follow-up
 
