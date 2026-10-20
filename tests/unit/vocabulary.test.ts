@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { section, table } from './support/markdown';
 
 // The glossary is the single source of each term's meaning; the brand guide holds each term's status
 // (troupe-run/troupe#15, spec: vocabulary). The glossary is troupe's docs/prompt-book/glossary.md on main, read as
@@ -20,29 +21,6 @@ function files(dir: string): string[] {
     const p = join(dir, n);
     return statSync(p).isDirectory() ? files(p) : [p];
   });
-}
-
-/** The text of a `## ` section whose heading starts with `prefix`, up to the next `## ` heading. */
-function section(text: string, prefix: string): string {
-  const start = text.indexOf(`\n## ${prefix}`);
-  if (start < 0) throw new Error(`no section "## ${prefix}"`);
-  const end = text.indexOf('\n## ', start + 1);
-  return text.slice(start, end < 0 ? undefined : end);
-}
-
-/** The first Markdown table in `text`: its header cells and its rows. Backticks are stripped from cells. */
-function table(text: string): { header: string[]; rows: string[][] } {
-  const lines = text.split('\n');
-  const first = lines.findIndex((l) => l.trimStart().startsWith('|'));
-  if (first < 0) throw new Error('no table');
-  const block: string[] = [];
-  for (const l of lines.slice(first)) {
-    if (!l.trimStart().startsWith('|')) break;
-    block.push(l);
-  }
-  const cells = (l: string) =>
-    l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim().replace(/`/g, ''));
-  return { header: cells(block[0]), rows: block.slice(2).map(cells) };
 }
 
 const glossaryTerms = () => table(readFileSync(GLOSSARY, 'utf8')).rows.map((r) => r[0]);
