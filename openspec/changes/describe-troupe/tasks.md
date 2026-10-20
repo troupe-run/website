@@ -61,7 +61,10 @@
   to the scratchpad.
   Done 2026-10-20: all gates passed, with 226 e2e tests across both projects. The output is saved at
   /private/tmp/claude-502/-Users-martin-Projects-troupe-website/d979b2a5-b154-47d9-98db-2b8793ac5129/scratchpad/final-check.log.
-- [ ] 5.3 Open the pull request with `Closes #26`. Verify: CI's `test` and `guard` jobs pass.
+- [x] 5.3 Open the pull request with `Closes #26`. Verify: CI's `test` and `guard` jobs pass.
+  Done 2026-10-20: troupe-run/website#27 says Closes #26. `guard` passed. `test` failed first because the runner's
+  `apt-get` got a 403 from packages.microsoft.com while installing Chromium's libraries, before any check ran. It passed
+  on a re-run of the failed job.
 
 ## Workflow follow-up
 
