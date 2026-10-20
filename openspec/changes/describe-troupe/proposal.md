@@ -18,9 +18,10 @@ that describe troupe to the same words (troupe-run/website#26).
 - **Landing page (`src/pages/index.astro`):** the `<title>` (and so `og:title`) becomes the page title, "troupe: your
   agents need a director". The meta description (and so `og:description`) becomes the one-line description followed
   by the status line.
-- **README banner (`brand/templates/readme-banner.html`):** its line under the wordmark becomes the sentence, and
+- **README banner (`brand/templates/readme-banner.html`):** its line under the wordmark becomes the tagline, and
   `brand/out/readme-banner.png` is re-rendered and committed. The issue doesn't list it; the owner added it to this
-  change on 2026-10-20, so every surface in this repository uses the agreed set.
+  change on 2026-10-20, so every surface in this repository uses the agreed set. The owner first chose the sentence,
+  then, on seeing it rendered, the tagline, so the banner reads the same as the OG and repository previews.
 - **A check** fails when the hero, the page's title and description, or the banner differ from the brand guide's
   table, naming the surface and the text it should have.
 

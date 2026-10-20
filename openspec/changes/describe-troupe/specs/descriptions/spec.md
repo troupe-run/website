@@ -59,12 +59,12 @@ the one-line description followed by the status line.
 - **WHEN** the landing page's title or description differs from the brand guide's set
 - **THEN** the check fails, naming which one and the text it should have
 
-### Requirement: The README banner uses the sentence
-The README banner's line under the wordmark SHALL be the sentence, and the committed banner image SHALL be rendered
+### Requirement: The README banner uses the tagline
+The README banner's line under the wordmark SHALL be the tagline, and the committed banner image SHALL be rendered
 from that text.
 
 #### Scenario: The banner's text drifts from the guide
-- **WHEN** the banner template's line differs from the sentence in the brand guide
+- **WHEN** the banner template's line differs from the tagline in the brand guide
 - **THEN** the check fails, naming the banner and the text it should have
 
 #### Scenario: The template changes but the image isn't re-rendered

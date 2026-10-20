@@ -51,7 +51,7 @@ The test, `tests/unit/descriptions.test.ts`, parses the guide's table and checks
   dependency);
 - `index.astro`'s `title` prop is the page title and its `description` prop is the one-line description, a space and
   the status line;
-- the banner template's `.sub` line is the sentence.
+- the banner template's `.sub` line is the tagline.
 
 Each failure message names the surface and the text it should have. The `section()` and `table()` helpers in
 `vocabulary.test.ts` move to `tests/unit/support/markdown.ts` so both tests use one parser.
@@ -63,10 +63,12 @@ either can't drift unnoticed.
 title, meta description, `og:title` and `og:description`, each against the literal text. The unit test proves the
 sources agree; the e2e tests prove the page shows them.
 
-**D4. The banner's line is widened to fit the sentence.** The `.sub` rule is 30px with `max-width: 22ch`, sized for
-the old 56-character line. The 89-character sentence at 22ch wraps to five lines in a 1280×320 image. The measure
-widens (about 40ch, three lines) and the type may drop a step; the exact values are set by rendering and looking, then
-shown to the owner. The image is re-rendered with `npm run assets:render`, and `npm run assets:verify` must pass.
+**D4. The banner's line is the tagline, in the banner's original style.** It reads the same as the OG and repository
+previews, which already show the tagline. The 28-character tagline sits on one line in the existing `.sub` rule (30px,
+`max-width: 22ch`). Centred as a box, its capitals sat about 8px above the marks' centre, so it moves down 8px
+(`position: relative; top: 8px`), which centres the capitals on the marks. The sentence was tried first, at 26px and 26ch with balanced lines,
+and the owner chose the tagline on seeing it (2026-10-20). The image is re-rendered with `npm run assets:render`, and
+`npm run assets:verify` must pass.
 
 **D5. The page title and description stay in `index.astro`**, as the issue says, rather than moving into
 `src/content/copy/`. They're now copies of text the owner has already agreed in the brand guide, and the check holds
