@@ -7,7 +7,7 @@
     "brand/templates/preview.html": "fd859767b8e2debb096e83f0486044a74bb2a682ab307ecf77a28f5433877092",
     "brand/templates/icon.html": "eb9fc911ae22ea668d82a6568aaffd69935b3d88566f8772efab2401a446761c",
     "brand/templates/github-avatar.html": "77bbb16c8d342438e052758ca6c15f2f207804a7fa36103f02f30b1b54325b5f",
-    "brand/templates/readme-banner.html": "070860df39be223a2f86b0d173857f9f297d6ff2b205057c3116aa4d363a6537",
+    "brand/templates/readme-banner.html": "4547617b60499a32b1c8c0029ec493c54eb6cf1e50cfebef4927b8b18e60ff3b",
     "brand/templates/lockup.html": "46472afae375e184255275996561e987a004dd44cd24b19cf319e4451a5ecd32"
   },
   "outputs": {
@@ -16,7 +16,7 @@
     "public/apple-touch-icon.png": "9b4e1ac51cda439d1ea192199773e568bfd769deab2e16f96a784e813455a613",
     "brand/out/github-avatar.png": "ac6270f11641e133fe4296007e469af7235b21be33accd7f20825b95d31cb980",
     "brand/out/repo-preview.png": "d3c592956387f91721d53074928c31ec6f5cac3d896df44e38a99263f6c18757",
-    "brand/out/readme-banner.png": "a380bda042e7da0a80be85f5ee0ff27293ba78099597bd4e9496c4de23a181ee",
+    "brand/out/readme-banner.png": "8aaad5b86abdd69ec70f0760198d2ad444d6f6c392076ab6b76d5e05d6a6b467",
     "brand/out/lockup-light.png": "c39ff226fb04f5a2fb2afee6c9c9a022e3c09c93af454beec55c7aadca3a79e9",
     "brand/out/lockup-dark.png": "6058eb782f598f98561240f96497897b5916470fb5624ad414630cd63145e130",
     "public/favicon.svg": "17cad59f80e2766b225da2bea942f02bda592cb5666670dd1c392b322ffd8241",

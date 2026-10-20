@@ -108,8 +108,8 @@ describe('the site describes troupe as the brand guide does', () => {
       .toBe(pageDescription(set()));
   });
 
-  it("the README banner's line under the wordmark is the sentence", () => {
+  it("the README banner's line under the wordmark is the tagline", () => {
     const m = readFileSync(BANNER, 'utf8').match(/<p class="sub">([^<]*)<\/p>/);
-    expect(m?.[1], `${BANNER}: the .sub line should be the sentence`).toBe(set().Sentence);
+    expect(m?.[1], `${BANNER}: the .sub line should be the tagline`).toBe(set().Tagline);
   });
 });
