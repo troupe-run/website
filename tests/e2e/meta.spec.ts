@@ -6,6 +6,20 @@ test('landing page declares og:image as https://troupe.run/og.png', async ({ pag
   await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
 });
 
+test("landing page's title and og:title are the brand guide's page title", async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle('troupe: your agents need a director');
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', 'troupe: your agents need a director');
+});
+
+test("landing page's description and og:description are the one-line description, then the status line", async ({ page }) => {
+  const description = 'Your agents need a director. troupe runs your development process with a team of agents, ' +
+    "asking only when it needs you. Pre-alpha: there's nothing to install yet.";
+  await page.goto('/');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', description);
+});
+
 for (const path of ['/', '/docs/programme/what-is-troupe/']) {
   test(`${path} makes no request to Google Fonts`, async ({ page }) => {
     const hits: string[] = [];

@@ -232,6 +232,29 @@ check.
 - **Before 1.0, claims are principles and intent only.** No benchmarks, no customer claims, no licence or
   pricing statements beyond what has been decided and published.
 
+### How troupe is described
+
+Agreed with the owner on 2026-10-20 (troupe-run/infrastructure#108). GitHub (the org's description, troupe's
+repository description and the org profile), troupe's README and this site all describe troupe with this set, and
+this table is the reference they follow.
+
+| Part | Text |
+|---|---|
+| Tagline | Your agents need a director. |
+| Sentence | troupe runs your development process with a team of agents, asking only when it needs you. |
+| Paragraph | troupe runs your development process with a team of agents, asking only when it needs you. Work branches and loops, decisions go to whoever owns them, and every decision records who made it. |
+| Status line | Pre-alpha: there's nothing to install yet. |
+| One-line description | Your agents need a director. troupe runs your development process with a team of agents, asking only when it needs you. |
+| Page title | troupe: your agents need a director |
+
+The one-line description is the tagline, then the sentence. It stays within the 160 characters GitHub allows an org's
+description. The landing page's description is the one-line description followed by the status line.
+
+Deliberate variants:
+
+- the hero's "Install: coming" button, which is the landing page's pre-alpha signal (above);
+- troupe's README, which follows its status line with what exists so far.
+
 ## 8. Assets
 
 | Asset | Formats | Status |

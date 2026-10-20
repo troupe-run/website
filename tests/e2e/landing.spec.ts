@@ -90,6 +90,13 @@ test('page has exactly one h1, and it is the hero title', async ({ page }) => {
   await expect(page.locator('#top h1')).toHaveText('Your agents need a director.');
 });
 
+test("the hero's line under the title is the brand guide's paragraph", async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#top .sub')).toHaveText(
+    'troupe runs your development process with a team of agents, asking only when it needs you. ' +
+    'Work branches and loops, decisions go to whoever owns them, and every decision records who made it.');
+});
+
 test('the how-it-works section has the --surface background', async ({ page }) => {
   await page.goto('/');
   const bgs = await page.evaluate(() => {
