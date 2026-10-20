@@ -52,8 +52,11 @@
 
 ## 5. Review and integration
 
-- [ ] 5.1 Build the site and show the owner the hero at 320px, 768px and 1280px, in light and dark, and the rendered
+- [x] 5.1 Build the site and show the owner the hero at 320px, 768px and 1280px, in light and dark, and the rendered
   README banner. Verify: the owner agrees the text and layout in this session, recorded in this task with the date.
+  Done 2026-10-20: the owner saw the hero at 320px, 768px and 1280px in light and dark (screenshots), and the built page
+  in a browser, and agreed it, including the line that starts with "you." at 768px and 1280px ("that's fine"). The
+  banner was agreed after two changes: the tagline instead of the sentence, and 8px lower (task 4.1).
 - [x] 5.2 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes, axe among them. Save the output
   to the scratchpad.
   Done 2026-10-20: all gates passed, with 226 e2e tests across both projects. The output is saved at
