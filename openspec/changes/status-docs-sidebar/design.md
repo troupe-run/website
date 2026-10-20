@@ -27,7 +27,6 @@ the menu, and `starlight.css` narrows the content only when there's no sidebar.
 
 - Remembering which version a reader came from. The site is static, and a script that rewrites the sidebar after load
   would show the wrong sidebar first.
-- Changing the header on `/status/`: it keeps the plain wordmark and "| troupe" in the tab title (D3).
 
 ## Decisions
 
@@ -42,10 +41,12 @@ page path (`programme/what-is-troupe.md`) or a kept link's href (`/status/`). A 
 matches, a kept link when its href matches. One function keeps docs pages and `/status/` on the same sidebar, so they
 can't drift. The alternative, a separate `siteSidebar()`, would copy the group-building.
 
-**D3. The header and tab title stay the site's.** The page belongs to this repository, not to a docs version, and the
-issue is about navigation, not naming. So the header keeps the plain wordmark, there's no version picker (`locate()`
-still finds no version), and the title stays "Status and roadmap | troupe". The owner can ask for "troupe docs" in
-review. It's a one-line change in `Header.astro` and the middleware.
+**D3. A page the docs sidebar links to is "troupe docs" in the header and tab title.** It shows the docs sidebar, so
+it reads as part of the docs. `headerSection(routeId, pathname)` in `src/lib/site-section.ts` names the section
+after the wordmark: "docs" for a docs page and for a kept page, "blog" for a blog page, none otherwise. `Header.astro`
+shows it, and the middleware names the tab title and `og:site_name` from it, so the two can't disagree. There's still
+no version picker, because `locate()` finds no version for the page. The first build kept the plain wordmark and
+"| troupe"; the owner asked for "docs" on seeing it (2026-10-20).
 
 **D4. Pagination outside `/docs` keeps only links within the page's own section.** For a `site` page that's none.
 For a blog page, the middleware drops any link whose href isn't under `/blog/`, so starlight-blog's links between posts

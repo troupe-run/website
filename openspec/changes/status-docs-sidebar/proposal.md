@@ -17,8 +17,8 @@ to `/docs/the-company/theatres/`, and the blog post `/blog/2026-10-10-methodolog
 
 - **`/status/` shows the docs sidebar** of the version at `/docs/` (the latest release, or troupe's `main` before the
   first one), with "Status and roadmap" marked as the current page. It stays this repository's own page at
-  `/status/`, in no version, with no version menu, and its header and tab title stay the site's ("troupe"), not
-  "troupe docs".
+  `/status/`, in no version, with no version menu. Its header reads "troupe docs" and its tab title ends
+  "| troupe docs", as a docs page's do (the owner, on seeing it with the plain wordmark, 2026-10-20).
 - **Any page the docs sidebar links to** gets the sidebar this way, not only `/status/`. A page outside `/docs` that
   the sidebar doesn't link to keeps having none. Contributing is on GitHub, so it isn't affected.
 - **Pages outside `/docs` have no "Previous" or "Next" link into `/docs`.** `/status/` has neither. A blog post keeps

@@ -34,7 +34,10 @@ export interface SidebarGroup { type: 'group'; label: string; entries: SidebarLi
 const link = (label: string, href: string, isCurrent = false): SidebarLink =>
   ({ type: 'link', label, href, isCurrent, badge: undefined, attrs: {} });
 
-/** The version's sidebar: its pages in each section's order, then the section's link to a page the website keeps. */
+/**
+ * The version's sidebar: its pages in each section's order, then the section's link to a page the website keeps.
+ * `current` is what the reader is on: a page's path under docs/, or a kept link's href (`/status/`, troupe-run/website#28).
+ */
 export function sidebar(version: Version, current: string): SidebarGroup[] {
   return ordered(version.pages)
     .filter(({ section, pages }) => pages.length > 0 || section.kept)
@@ -45,7 +48,7 @@ export function sidebar(version: Version, current: string): SidebarGroup[] {
       badge: undefined,
       entries: [
         ...pages.map((p) => link(p.title, pageUrl(version.base, p.path), p.path === current)),
-        ...(section.kept ? [link(section.kept.label, section.kept.href)] : []),
+        ...(section.kept ? [link(section.kept.label, section.kept.href, section.kept.href === current)] : []),
       ],
     }));
 }
