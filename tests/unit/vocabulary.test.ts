@@ -106,6 +106,11 @@ const PROJECT_USES: { file: string; text: string; reason: string }[] = [
     reason: 'explains what a theatre is, the first time the landing page says it',
   },
   { file: 'src/content/copy/footer.md', text: 'a project by hps.gd', reason: 'troupe itself, the fixed attribution' },
+  {
+    file: 'src/content/docs/status.md',
+    text: '(https://github.com/orgs/troupe-run/projects/1)',
+    reason: "the roadmap board's URL on GitHub, which GitHub names; the link's text says \"roadmap board\"",
+  },
 ];
 
 describe('site copy says "theatre" for a theatre', () => {
