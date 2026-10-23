@@ -57,8 +57,8 @@ troupe's `main`.
 
 ### Modified Capabilities
 
-- `quality-check`: the fixture build also uses a fixture milestones file, so the roadmap's e2e tests don't depend on
-  the live milestones.
+- `quality-check`: a new requirement, that the fixture build reads a fixture milestones file, so the roadmap's e2e
+  tests don't depend on the live milestones.
 
 ## Impact
 
