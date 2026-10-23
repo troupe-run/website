@@ -122,8 +122,10 @@ version order, exactly one current), never live wording.
 - [The page lags a milestone change until the next deploy] → Deploys run on every merge here and every push to
   troupe's `main`, which is most days. The follow-up infrastructure notice (task 1.2) removes the lag.
 - [A malformed `tofu/milestones.json` blocks every deploy of the site, docs included] → The same is true of a malformed
-  troupe tag, by design: a wrong page is worse than a late one. The error names the file and the fix, and infra's own
-  checks are the first line. A follow-up in infrastructure could validate the file against the same rules.
+  troupe tag, by design: a wrong page is worse than a late one. The error names the file and the fix. Infrastructure's
+  plan already fails on invalid JSON (`jsondecode` in `tofu/milestones.tf`), but not on a bad title, a duplicate
+  title or an empty description, so task 1.3 opens an issue there to check the D4 rules in its pull requests. A bad
+  edit then fails where it's made, before it reaches this site.
 - [Milestone descriptions break the site's copy rules ("config")] → They're shown verbatim by design (Non-Goals).
   Task 5.2 asks the owner whether to reword them in infrastructure; the page doesn't rewrite them.
 - [Sätteri's `html` node or `replaceNode` behaves differently than expected] → Task 3.1 proves the plugin on a

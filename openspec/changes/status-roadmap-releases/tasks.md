@@ -9,6 +9,11 @@
 - [ ] 1.2 Open an issue in troupe-run/infrastructure (with `--project "troupe roadmap"`): dispatch troupe-run/website's
   Deploy when `tofu/milestones.json` changes on `main`, as troupe's release workflow does after every push. Link it
   from #32. Verify: `gh issue view <n> -R troupe-run/infrastructure --json projectItems` shows it on the board.
+- [ ] 1.3 Open an issue in troupe-run/infrastructure (with `--project "troupe roadmap"`): check `tofu/milestones.json`
+  in its pull requests against the rules this site's build enforces (D4: every title `MAJOR.MINOR.PATCH` with no
+  leading zeros, titles unique, every description non-empty), so a bad edit fails there before it can stop this site's
+  deploys. Today its plan catches only invalid JSON. Name D4 as the rules' source, so the two stay in step. Link it
+  from #32. Verify: it's on the board, as in 1.2.
 
 ## 2. The milestones reader (D1 to D4, D8)
 
