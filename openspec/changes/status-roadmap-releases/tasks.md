@@ -146,7 +146,8 @@
   dark among them. Save the output to the scratchpad.
   Done 2026-10-23: all gates passed on 77712d9, with 364 unit tests and 243 e2e tests across both projects. The output
   is saved at /private/tmp/claude-502/-Users-martin-Projects-troupe-website-status-roadmap-releases/47aa5c59-2708-4b87-9279-82b9c6495ae5/scratchpad/final-check-32.log.
-- [ ] 5.4 Open the pull request with `Closes #32` (body via `--body-file`). Verify: CI's `test` and `guard` jobs pass.
+- [x] 5.4 Open the pull request with `Closes #32` (body via `--body-file`). Verify: CI's `test` and `guard` jobs pass.
+  Done 2026-10-23: troupe-run/website#33 says Closes #32. CI's `test` (2m8s) and `guard` jobs pass.
 
 ## Workflow follow-up
 
