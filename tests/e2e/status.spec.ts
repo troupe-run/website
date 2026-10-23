@@ -74,9 +74,9 @@ const byVersion = (a: string, b: string) => {
   return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
 };
 
-test("/status/ lists the releases as an ordered list under Releases, each starting with its version in bold, in version order", async ({ page }) => {
+test("/status/ lists the milestones as an ordered list under Milestones, each starting with its version in bold, in version order", async ({ page }) => {
   await page.goto('/status/');
-  const list = page.locator('.sl-heading-wrapper:has(h2#releases) ~ ol');
+  const list = page.locator('.sl-heading-wrapper:has(h2#milestones) ~ ol');
   await expect(list).toHaveCount(1);
   const versions = await releases(page).locator('> strong').allInnerTexts();
   expect(versions.length).toBeGreaterThan(1);
@@ -100,8 +100,8 @@ test("/status/ links to troupe's milestones and the roadmap board", async ({ pag
   await expect(page.getByRole('link', { name: 'roadmap board' })).toHaveAttribute('href', 'https://github.com/orgs/troupe-run/projects/1');
 });
 
-test('/status/ lists Status, Releases and How to read it in "On this page"', async ({ page }) => {
+test('/status/ lists Status, Milestones and How to read it in "On this page"', async ({ page }) => {
   await page.goto('/status/');
   const toc = await page.locator('starlight-toc a').allInnerTexts();
-  expect(toc).toEqual(expect.arrayContaining(['Status', 'Releases', 'How to read it']));
+  expect(toc).toEqual(expect.arrayContaining(['Status', 'Milestones', 'How to read it']));
 });

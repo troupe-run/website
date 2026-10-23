@@ -78,7 +78,8 @@ page consumes.
 
 **D5. The list is rendered into `status.md` by a Sätteri mdast plugin, at a marker.** `status.md` keeps its headings
 and prose, and marks where the generated parts go with HTML comments on their own lines:
-`<!-- roadmap:status -->` under "Status" and `<!-- roadmap:releases -->` under "Releases", each with a comment beside
+`<!-- roadmap:status -->` under "Status" and `<!-- roadmap:releases -->` under "Milestones" (the owner's word for a
+plan, since "Releases" reads as what's already out, 2026-10-23), each with a comment beside
 it saying the content comes from `tofu/milestones.json` in troupe-run/infrastructure. A `roadmap` plugin, added next
 to `troupe-links` and active for `status.md` only, replaces each marker with Markdown nodes: a paragraph for the
 status line, and an ordered list for the releases. A page with a marker missing, repeated or unknown fails the build.
