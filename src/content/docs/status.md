@@ -9,8 +9,6 @@ prerelease: false
 
 <!-- roadmap:status: the status line, from troupe's release tags. Its words are in src/content/copy/roadmap.md. -->
 
-The first release will be installed with uv, from its tag on GitHub.
-
 ## Releases
 
 Each release is a set of things you'll be able to do, in the order we plan to build them.

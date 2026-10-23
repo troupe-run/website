@@ -126,6 +126,14 @@
 
 - [ ] 5.1 Build the site and show the owner `/status/` at 320px, 768px and 1280px, in light and dark. Verify: the
   owner agrees the layout in this session, recorded here with the date.
+- [x] 5.5 Apply the owner's review of the first build (2026-10-23): drop the install sentence before the first
+  release and fold it into the copy's after-release status line; hide the list's numbers; make apostrophes
+  consistent by fixing content, raising the milestone descriptions' upstream. Verify: unit and e2e tests pass on both
+  builds with axe, and the 320px screenshots show no numbers and a curly apostrophe in the fixture.
+  Done 2026-10-23: `status.md` has no install sentence; "Pre-alpha. The latest release is {latest}, installed with uv
+  from its tag on GitHub."; `<ol class="roadmap-releases" role="list">` with `list-style: none`; the fixture's
+  "fixture’s" fixed in the fixture file; troupe-run/infrastructure#127 (on the board, Todo, linked from #32) for 0.2.0,
+  0.5.0 and 0.13.0's straight apostrophes. 364 unit tests and 69 e2e tests (status, versions, a11y) pass.
 - [ ] 5.2 Ask the owner whether any milestone description should be reworded in troupe-run/infrastructure (for
   instance "config" and "worktree", which the site's copy avoids). Verify: their answer is recorded here, and any
   rewording is an issue in infrastructure on the board, not an edit here.

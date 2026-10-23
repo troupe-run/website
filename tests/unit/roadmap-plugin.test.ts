@@ -8,7 +8,7 @@ import { roadmapPlugin } from '../../scripts/roadmap-plugin.mjs';
 const PAGE = resolve('src/content/docs/status.md');
 const COPY = {
   unreleased: 'Pre-alpha. Nothing has been released yet.',
-  released: 'Pre-alpha. The latest release is {latest}.',
+  released: 'Pre-alpha. The latest release is {latest}, installed with uv from its tag on GitHub.',
   releasedOn: 'Released {date}',
 };
 type Release = { version: string; description: string; released: string | null };
@@ -30,10 +30,10 @@ const released = (released: (string | null)[]) => PLAN.map((r, i) => ({ ...r, re
 describe('roadmap plugin: the list', () => {
   it('replaces the releases marker with an ordered list in version order, leaving no marker comment', async () => {
     const html = await render(PAGE_TEXT, { releases: PLAN, latest: null });
-    expect(html).toContain('<ol>');
+    expect(html).toContain('<ol class="roadmap-releases" role="list">');
     expect(html).not.toContain('roadmap:');
     expect(html.indexOf('0.1.0')).toBeLessThan(html.indexOf('0.2.0'));
-    expect(html.indexOf('<h2')).toBeLessThan(html.indexOf('<ol>'));
+    expect(html.indexOf('<h2')).toBeLessThan(html.indexOf('<ol'));
   });
 
   it('shows each version in bold and its description word for word, as text, not Markdown or HTML', async () => {
@@ -57,7 +57,7 @@ describe('roadmap plugin: the status line', () => {
 
   it('names the latest release once there is one', async () => {
     const html = await render(PAGE_TEXT, { releases: released(['2026-11-05', null]), latest: '0.1.0' });
-    expect(html).toContain('<p>Pre-alpha. The latest release is 0.1.0.</p>');
+    expect(html).toContain('<p>Pre-alpha. The latest release is 0.1.0, installed with uv from its tag on GitHub.</p>');
   });
 });
 
@@ -65,7 +65,7 @@ describe('roadmap plugin: where it runs, and its refusals', () => {
   it('leaves every other page alone, markers included', async () => {
     const html = await render(PAGE_TEXT, { releases: PLAN, latest: null }, resolve('src/content/docs/blog/post.md'));
     expect(html).toContain('roadmap:releases');
-    expect(html).not.toContain('<ol>');
+    expect(html).not.toContain('<ol');
   });
 
   it.each([

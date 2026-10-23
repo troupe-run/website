@@ -34,6 +34,9 @@ function releasedOn(date, copy) {
 function releaseList({ releases }, copy) {
   return {
     type: 'list',
+    // Ordered, for the order's sake, with its numbers hidden: the versions say it. role="list" keeps the list a list
+    // in Safari, which drops the role from one styled with no markers.
+    data: { hProperties: { className: ['roadmap-releases'], role: 'list' } },
     ordered: true,
     start: 1,
     spread: false,
