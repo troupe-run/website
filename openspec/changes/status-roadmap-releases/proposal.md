@@ -18,18 +18,19 @@ build time, and changing a milestone needs no second edit here.
   troupe-run/infrastructure's `main`, as it already reads troupe's docs from troupe-run/troupe, and lists every
   milestone in version order: its version and its description, word for word. 1.0.0 comes last, as the stability
   promise its description says it is.
-- **It says which release is current.** A release is released when troupe has its tag (`troupe-v0.1.0` for 0.1.0),
-  the same tags `/docs` is built from. The first unreleased milestone is marked as the one being worked on. Before
-  the first release, the page says nothing has been released yet and work is on 0.1.0.
+- **It dates each release that's out.** A release is out when troupe has its tag (`troupe-v0.1.0` for 0.1.0), the
+  same tags `/docs` is built from, and it shows "Released" with the tag's date. A release that isn't out has no date
+  and no other mark: there's no "working on now" (owner, 2026-10-23). Before the first release, the status says
+  nothing has been released yet.
 - **The status and the rest of the page are rewritten.** Status: pre-alpha, nothing released yet, and the first
   release is installed with uv from its tag (troupe-run/troupe#144). "How to read it" says each release is a planned
-  set of things a user gets, the order can change, there are no dates, and links to troupe's milestones and the
+  set of things a user gets, the order can change, only a release that's out has a date, and links to troupe's milestones and the
   roadmap board for the issues behind each release. The old "Now" and "Next" sections go.
 - **A malformed milestones file stops the build**, naming the file, the milestone and the fix, as a malformed release
   tag already does. A fetch failure stops it too, and `TROUPE_MILESTONES` builds from a local infrastructure checkout,
   as `TROUPE_DOCS` does for troupe.
-- **The fixture build gets a fixture milestones file**, so the e2e tests check the list, the order and the current
-  marker against fixed data, with troupe releases and without.
+- **The fixture build gets a fixture milestones file**, so the e2e tests check the list, the order and the release
+  dates against fixed data, with troupe releases and without.
 
 Decided here, as #32 asked (each is argued in design.md):
 
@@ -37,6 +38,10 @@ Decided here, as #32 asked (each is argued in design.md):
   build, and the milestones span four repositories. It links to the milestones and the board instead.
 - The **source** is `tofu/milestones.json`, not GitHub's milestones API: it's the declaration the milestones are
   applied from, it's public, and reading it needs no token and no rate limit.
+
+Also in this change (owner, 2026-10-23): the brand guide's §6 gives **character** and **direction** the status "In
+use, 2026-10-22". troupe's glossary added both that day (troupe 514c788), and the vocabulary check fails until §6
+gives each a status, which would stop this change's commits and main's next CI run.
 
 Out of scope, as a follow-up issue in troupe-run/infrastructure: dispatching this site's deploy when
 `tofu/milestones.json` changes on infrastructure's `main`, as troupe already does after every push to its `main`.
@@ -59,12 +64,13 @@ troupe's `main`.
 
 - New: a milestones reader beside `scripts/troupe-docs-lib.mjs` (fetch, check, order, write
   `src/generated/roadmap.json`), a Sätteri mdast plugin that renders the release list into `status.md` where it
-  marks it, and a copy file `src/content/copy/roadmap.md` for the few words the list adds ("Released", "Working on
-  now", the status line). The troupe-docs integration in `astro.config.mjs` runs the reader after the docs sync.
+  marks it, and a copy file `src/content/copy/roadmap.md` for the few words the list adds ("Released" and
+  its date, the status line). The troupe-docs integration in `astro.config.mjs` runs the reader after the docs sync.
 - `src/content/docs/status.md` is rewritten. Its copy is shown to the owner as text before it ships.
 - `scripts/troupe-fixture.mjs` and `tests/fixtures/` gain the fixture milestones; `.cache/` holds the infrastructure
   clone, already ignored.
-- Tests: unit tests for the reader (order, released and current, every refusal) and the plugin; e2e tests on
+- Tests: unit tests for the reader (order, released and dated, every refusal) and the plugin; e2e tests on
   `/status/` against the fixture build. The axe test already covers `/status/`.
 - The owner sees `/status/` at 320px, 768px and 1280px, in light and dark, before it's called done.
+- `docs/brand-guide.md` §6 gains the rows for character and direction.
 - No new dependency: `yaml` is already a dev dependency, and git is already required by the build.

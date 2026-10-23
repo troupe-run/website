@@ -56,10 +56,13 @@ working tree. Considered:
 The fetch follows `versioned-docs`'s rules for troupe: a failure stops the build with the repository, the git error
 and the variable to set, and nothing builds from an older copy.
 
-**D2. Released means troupe has the tag; the first unreleased milestone is current.** The tags are the release, and
-`/docs` is already built from them. A milestone's `state` isn't used: closing a milestone is bookkeeping that can lag
+**D2. Released means troupe has the tag, dated by the tag.** The tags are the release, and `/docs` is already built
+from them. A released milestone shows "Released" and its tag's date (`git for-each-ref`'s `creatordate`: the tagger
+date of an annotated tag, the commit date of a lightweight one), as `YYYY-MM-DD`, the form the site's other dates
+take. Nothing marks the next release as in progress (owner, 2026-10-23: "just show the version roadmap"), so the page
+never claims what's being worked on, which the board says better. A milestone's `state` isn't used: closing a milestone is bookkeeping that can lag
 or lead the tag, and the page would then disagree with `/docs`. A tag for a version no milestone declares (a patch,
-`troupe-v0.1.1`) adds nothing to the list. The sync's manifest gains the list of release tags it read, so the roadmap
+`troupe-v0.1.1`) adds nothing to the list. The sync's manifest gains the release tags it read, each with its date, so the roadmap
 uses the exact tags `/docs` was built from, in the same run.
 
 **D3. Order is by version, parsed, not by the file's order.** Titles are parsed as `MAJOR.MINOR.PATCH` and sorted
@@ -80,9 +83,10 @@ it saying the content comes from `tofu/milestones.json` in troupe-run/infrastruc
 to `troupe-links` and active for `status.md` only, replaces each marker with Markdown nodes: a paragraph for the
 status line, and an ordered list for the releases. A page with a marker missing, repeated or unknown fails the build.
 
-The rendered list item is: the version in bold, then the description verbatim, then the marker words in a span the
-CSS layer styles (released, or being worked on). For example: **0.1.0** One real actor, safely: an actor defined in
-config runs … *Working on now*. The status line is a template in the copy file, with `{latest}` and `{next}`.
+The rendered list item is: the version in bold, then the description verbatim, then, for a release that's out, a
+span the CSS layer styles holding "Released" and a `<time>` with its date. For example: **0.1.0** One real actor,
+safely: an actor defined in config runs … *Released 2026-11-05*. The status line is a template in the copy file, with
+`{latest}`.
 
 Considered:
 
@@ -95,8 +99,8 @@ Considered:
   source path.
 
 **D6. The words the list adds live in `src/content/copy/roadmap.md`.** The site's own words are reviewed as text in
-`src/content/copy/` (project rule). The file holds the status line before and after the first release, and the two
-marker words. The `copy` collection's schema in `src/content.config.ts` gains a `roadmap` section, so Astro checks it;
+`src/content/copy/` (project rule). The file holds the status line before and after the first release, and the
+"Released {date}" label. The `copy` collection's schema in `src/content.config.ts` gains a `roadmap` section, so Astro checks it;
 the plugin reads the same file with `yaml` (already a dev dependency) at plugin creation, since a Sätteri plugin is
 synchronous and can't call `getCopy()`.
 
@@ -107,15 +111,15 @@ GitHub's to change. No counts (proposal): a static count is as old as its build.
 
 **D8. Data flow.** In `astro:config:setup`, after `sync()`, the integration calls the milestones reader with the
 manifest's release tags. It writes `src/generated/roadmap.json`: the releases in order, each with version, description
-and `released`, and the current version (or null when every milestone is released). The plugin reads that file. The
+and `released` (the tag's date, or null), and the latest release tag's version (or null before the first). The plugin reads that file. The
 reader is pure apart from the fetch (parse, check, order, mark), so the unit tests drive it with strings.
 
 **D9. Fixture.** `tests/fixtures/milestones.json` holds a short list in a deliberately wrong order (with a 0.10.0 to
 test numeric order, and an unknown key). `scripts/troupe-fixture.mjs` writes it into a temporary folder shaped like an
 infrastructure checkout (`tofu/milestones.json`) and sets `TROUPE_MILESTONES` to it, as it sets `TROUPE_DOCS`. Its
-troupe has `troupe-v0.1.0`, `troupe-v0.1.1` and `troupe-v0.2.0`, so 0.1.0 and 0.2.0 are released, 0.3.0 is current,
-and 0.1.1 adds nothing. The regular build reads the live file, and its e2e tests assert only shape (a list exists, in
-version order, exactly one current), never live wording.
+troupe has `troupe-v0.1.0`, `troupe-v0.1.1` and `troupe-v0.2.0`, so 0.1.0 and 0.2.0 are released, dated by the fixture's
+fixed commit dates, and 0.1.1 adds nothing. The regular build reads the live file, and its e2e tests assert only shape (a list exists, in
+version order, no date on a release that isn't out), never live wording.
 
 ## Risks / Trade-offs
 
