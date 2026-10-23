@@ -142,8 +142,10 @@
   instance "config" and "worktree", which the site's copy avoids). Verify: their answer is recorded here, and any
   rewording is an issue in infrastructure on the board, not an edit here.
   Done 2026-10-23: the owner is happy with the content as it is; no rewording.
-- [ ] 5.3 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes, axe on `/status/` in light and
+- [x] 5.3 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes, axe on `/status/` in light and
   dark among them. Save the output to the scratchpad.
+  Done 2026-10-23: all gates passed on 77712d9, with 364 unit tests and 243 e2e tests across both projects. The output
+  is saved at /private/tmp/claude-502/-Users-martin-Projects-troupe-website-status-roadmap-releases/47aa5c59-2708-4b87-9279-82b9c6495ae5/scratchpad/final-check-32.log.
 - [ ] 5.4 Open the pull request with `Closes #32` (body via `--body-file`). Verify: CI's `test` and `guard` jobs pass.
 
 ## Workflow follow-up
