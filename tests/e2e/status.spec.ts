@@ -65,3 +65,43 @@ test("the old Contributing URL redirects to the org's contributing guide", async
   await page.goto('/docs/backstage/contributing/');
   await expect(page).toHaveURL('https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md');
 });
+
+// The roadmap, from troupe-run/infrastructure's live milestones (spec: roadmap). The live wording changes, so these check
+// shape only; tests/e2e/versions.spec.ts checks fixed releases on the fixture build.
+const releases = (page: import('@playwright/test').Page) => page.locator('.sl-markdown-content ol > li');
+const byVersion = (a: string, b: string) => {
+  const [x, y] = [a, b].map((v) => v.split('.').map(Number));
+  return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
+};
+
+test("/status/ lists the releases as an ordered list under Releases, each starting with its version in bold, in version order", async ({ page }) => {
+  await page.goto('/status/');
+  const list = page.locator('.sl-heading-wrapper:has(h2#releases) ~ ol');
+  await expect(list).toHaveCount(1);
+  const versions = await releases(page).locator('> strong').allInnerTexts();
+  expect(versions.length).toBeGreaterThan(1);
+  for (const v of versions) expect(v).toMatch(/^\d+\.\d+\.\d+$/);
+  expect(versions).toEqual([...versions].sort(byVersion));
+  await expect(page.locator('.sl-markdown-content')).not.toContainText('roadmap:');
+});
+
+test('/status/ has no count, percentage, progress mark or date beside a release that is not out', async ({ page }) => {
+  await page.goto('/status/');
+  const unreleased = await releases(page).filter({ hasNot: page.locator('.roadmap-released') }).allInnerTexts();
+  expect(unreleased.length).toBeGreaterThan(0);
+  for (const text of unreleased) {
+    expect(text).not.toMatch(/\d{4}-\d{2}-\d{2}|%|\b\d+\s*(?:of|\/)\s*\d+\b|in progress|working on|current/i);
+  }
+});
+
+test("/status/ links to troupe's milestones and the roadmap board", async ({ page }) => {
+  await page.goto('/status/');
+  await expect(page.getByRole('link', { name: 'troupe’s milestones' })).toHaveAttribute('href', 'https://github.com/troupe-run/troupe/milestones');
+  await expect(page.getByRole('link', { name: 'roadmap board' })).toHaveAttribute('href', 'https://github.com/orgs/troupe-run/projects/1');
+});
+
+test('/status/ lists Status, Releases and How to read it in "On this page"', async ({ page }) => {
+  await page.goto('/status/');
+  const toc = await page.locator('starlight-toc a').allInnerTexts();
+  expect(toc).toEqual(expect.arrayContaining(['Status', 'Releases', 'How to read it']));
+});

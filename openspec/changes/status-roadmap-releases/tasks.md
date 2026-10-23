@@ -100,11 +100,14 @@
 
 ## 4. Fixture and end-to-end tests (D9, spec scenarios)
 
-- [ ] 4.1 Add `tests/fixtures/milestones.json` (wrong order, a 0.10.0, an unknown key), and have
+- [x] 4.1 Add `tests/fixtures/milestones.json` (wrong order, a 0.10.0, an unknown key), and have
   `scripts/troupe-fixture.mjs` put it in a temporary `tofu/` folder, set `TROUPE_MILESTONES` to it, and remove it
   afterwards. Verify: `tests/unit/troupe-fixture.test.ts` gains a test that nothing is left behind and passes, and
   after `npm run build:fixture`, `dist-fixture/status/index.html` lists the fixture releases in version order.
-- [ ] 4.2 In `tests/e2e/status.spec.ts`, tests named for what they check:
+  Done 2026-10-23: 2 new tests (the folder holds the fixture file, and is gone after a passing or failing build) fail
+  before `withFixtureMilestones` exists and pass after. The fixture build's `/status/` lists 0.1.0 (Released
+  2026-01-01), 0.2.0 (Released 2026-03-01), 0.3.0, 0.10.0 and 1.0.0, and says "The latest release is 0.2.0."
+- [x] 4.2 In `tests/e2e/status.spec.ts`, tests named for what they check:
   - every build: the releases are an ordered list in version order, and the page links to troupe's milestones and
     the roadmap board, with no count, percentage, progress mark or date beside any release that isn't out;
   - the fixture build (`tests/e2e/versions.spec.ts`, or the fixture project): 0.1.0 and 0.2.0 show "Released" with
@@ -113,6 +116,11 @@
 
   Verify: they pass on both builds, and the fixture tests fail when the plugin ignores the tags (shown by running them
   with the `released` check removed).
+  Done 2026-10-23: 4 tests in `status.spec.ts` (live data, shape only: an ordered list under Releases in version
+  order, nothing beside an unreleased release, the two links, the three headings in "On this page") and 3 in
+  `versions.spec.ts` (fixed order, the two dates as text and `<time>`, the status line); 52 pass across both files.
+  With `released` forced to null and the fixture rebuilt, the dating test fails and the order and status tests pass,
+  as they should; restored, all pass. The locators first missed Starlight's heading wrapper and the rendered ’.
 
 ## 5. Review and integration
 
