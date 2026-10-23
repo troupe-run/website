@@ -180,6 +180,8 @@ product nouns: body copy uses them as plainly as any other word. The rule above 
 | theatre | In use |
 | role | In use |
 | actor | In use |
+| character | In use, 2026-10-22 |
+| direction | In use, 2026-10-22 |
 | system | Decided 2026-10-11: the actor kind for troupe acting by itself |
 | cast | Reserved |
 | performance | In use |

@@ -3,8 +3,8 @@
 ## Purpose
 
 What `/status/` says about where troupe is and the releases it's heading for. The release list comes from the
-milestones troupe-run/infrastructure declares, and which ones are released comes from troupe's release tags, so the
-page never needs a second edit when the plan changes.
+milestones troupe-run/infrastructure declares, and which ones are released, and when, comes from troupe's release
+tags, so the page never needs a second edit when the plan changes.
 
 ## ADDED Requirements
 
@@ -34,34 +34,33 @@ declares them in. 1.0.0 SHALL therefore come after every 0.x release.
 - **WHEN** the file declares 0.10.0 before 0.2.0
 - **THEN** `/status/` lists 0.2.0 before 0.10.0
 
-### Requirement: The page says which releases are out and which is being worked on
+### Requirement: The page says which releases are out, and when
 A milestone SHALL be shown as released when troupe-run/troupe has the release tag for its version (`troupe-v0.1.0`
-for 0.1.0). The first milestone in version order that isn't released SHALL be marked as the one being worked on. No
-other milestone SHALL be marked.
+for 0.1.0), with the date of that tag. A milestone without its tag SHALL show no date and no other mark. The status
+SHALL name the latest release, or say nothing has been released yet.
 
 #### Scenario: Before the first release
 - **WHEN** troupe has no release tags
-- **THEN** no release is shown as released, 0.1.0 is marked as being worked on, and the status says nothing has been
-  released yet
+- **THEN** no release shows a date, and the status says nothing has been released yet
 
 #### Scenario: After a release
-- **WHEN** troupe has `troupe-v0.1.0` and no later release tag
-- **THEN** 0.1.0 is shown as released, 0.2.0 is marked as being worked on, and the status names 0.1.0 as the latest
-  release
+- **WHEN** troupe has `troupe-v0.1.0`, tagged on 2026-11-05, and no later release tag
+- **THEN** 0.1.0 shows "Released 2026-11-05", no other release shows a date, and the status names 0.1.0 as the
+  latest release
 
 #### Scenario: A patch release
 - **WHEN** troupe has `troupe-v0.1.1` but the milestones declare no 0.1.1
-- **THEN** the list is unchanged by it: no entry is added for 0.1.1
+- **THEN** the list is unchanged by it: no entry is added for 0.1.1, and the status names 0.1.1 as the latest release
 
-### Requirement: The page shows no progress counts or dates
-`/status/` SHALL NOT show issue counts, percentages or dates for a release. It SHALL say that each release is a
-planned set of things a user gets, that the order can change, and that there are no dates, and SHALL link to troupe's
-milestones and to the troupe roadmap board for the issues behind each release.
+### Requirement: The page shows no progress counts or planned dates
+`/status/` SHALL NOT show issue counts, percentages, a "current" or "in progress" mark, or a planned date for a
+release. It SHALL say that each release is planned, that the order can change, and that only a release that's out has
+a date, and SHALL link to troupe's milestones and to the troupe roadmap board for the issues behind each release.
 
 #### Scenario: Reading the page
 - **WHEN** a reader opens `/status/`
 - **THEN** it has links to `https://github.com/troupe-run/troupe/milestones` and the troupe roadmap board, and no
-  count, percentage or date beside any release
+  count, percentage, progress mark or date beside any release that isn't out
 
 ### Requirement: A malformed milestones file stops the build
 The build SHALL fail when `tofu/milestones.json` isn't JSON, has no `milestones` list, or has a milestone whose title
@@ -104,8 +103,8 @@ tree, uncommitted edits included. A `TROUPE_MILESTONES` that's set but empty, or
 
 ### Requirement: The page's own words are written here, the list's are not
 The status, the section headings and the text explaining how to read the roadmap SHALL be written in this repository
-and reviewed by the owner as text. The words the list adds to each release (released, being worked on) and the status
-line SHALL live in the site's copy files. A release's description SHALL be changed in troupe-run/infrastructure, never
+and reviewed by the owner as text. The words the list adds to a release that's out ("Released" and its date) and the
+status line SHALL live in the site's copy files. A release's description SHALL be changed in troupe-run/infrastructure, never
 here.
 
 #### Scenario: Improving a release's wording
