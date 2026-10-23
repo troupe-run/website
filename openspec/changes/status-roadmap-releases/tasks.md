@@ -71,20 +71,32 @@
   Done 2026-10-23: a throwaway test ran a plugin through `createSatteriMarkdownProcessor`; `## Releases`, the marker
   and a paragraph rendered with an `<ol>` in place of the marker and no comment left. Its case moves into task 3.3's
   tests, so the throwaway file is gone. No fallback needed.
-- [ ] 3.2 Add `src/content/copy/roadmap.md` with the agreed words (task 1.1) and a `roadmap` section in the `copy`
+- [x] 3.2 Add `src/content/copy/roadmap.md` with the agreed words (task 1.1) and a `roadmap` section in the `copy`
   collection's schema in `src/content.config.ts`. Verify: `npm run check` passes, and fails when a key is removed
   from the file.
-- [ ] 3.3 The `roadmap` plugin, tests first: active for `src/content/docs/status.md` only; `roadmap:status` becomes
+  Done 2026-10-23: `npm run check` has 0 errors. With `releasedOn` removed, `astro build` stops with
+  "copy → roadmap data does not match collection schema. releasedOn: Required" (`astro check` doesn't load content,
+  so the build is where it fails); restored. The words: "Pre-alpha. Nothing has been released yet.", "Pre-alpha. The
+  latest release is {latest}.", "Released {date}".
+- [x] 3.3 The `roadmap` plugin, tests first: active for `src/content/docs/status.md` only; `roadmap:status` becomes
   the status line from the copy (before and after the first release); `roadmap:releases` becomes the list, each item
   the version in bold, the description verbatim and, for a release that's out, "Released" and its date in a `<time>`; a missing, repeated or
   unknown `roadmap:` marker fails naming the page and the marker. Add it to the processor's plugins in
   `astro.config.mjs` beside `troupe-links`, and style the marker words in `src/styles/starlight.css` from tokens only.
   Verify: `npx vitest run tests/unit` passes, and `tests/unit/token-discipline.test.ts` still passes.
-- [ ] 3.4 Rewrite `src/content/docs/status.md` with the agreed text (task 1.1), the two markers, and beside each a
+  Done 2026-10-23: 10 tests in `tests/unit/roadmap-plugin.test.ts`, including 3.1's case, pass; 362 unit tests in
+  all, token discipline among them. A tight list renders each item without a `<p>`, and a description stays literal
+  text (`*keep*` isn't emphasis, `<runs>` is escaped). Each marker is one comment that also says where its content
+  comes from, so status.md needs no second comment. The date is teal's text shade.
+- [x] 3.4 Rewrite `src/content/docs/status.md` with the agreed text (task 1.1), the two markers, and beside each a
   comment saying its content comes from `tofu/milestones.json` in troupe-run/infrastructure. Update its frontmatter
   description if task 1.1 changed it. Verify: `npm run build` succeeds, `dist/status/index.html` holds 21 list items in
   version order with no date on any (troupe has no release yet), "On this page" lists the page's headings, and
   `tests/unit/vocabulary.test.ts` and `tests/unit/descriptions.test.ts` pass.
+  Done 2026-10-23: `astro build` writes `/status/` with 21 items, 0.1.0 to 1.0.0 in order, no date (troupe has no
+  release yet), "Pre-alpha. Nothing has been released yet.", no marker left, and Status, Releases and How to read
+  it in "On this page". The vocabulary check flagged "projects" in the board's URL; it's recorded in `PROJECT_USES`
+  as GitHub's URL. Both tests pass.
 
 ## 4. Fixture and end-to-end tests (D9, spec scenarios)
 

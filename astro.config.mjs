@@ -5,6 +5,7 @@ import { isSatteriProcessor } from '@astrojs/markdown-satteri';
 import { fileURLToPath } from 'node:url';
 import { sync } from './scripts/troupe-docs-lib.mjs';
 import { syncRoadmap } from './scripts/roadmap-lib.mjs';
+import { loadRoadmapInputs, roadmapPlugin } from './scripts/roadmap-plugin.mjs';
 import { troupeLinks } from './scripts/troupe-links.mjs';
 import { CONTRIBUTING, firstPage, pageUrl } from './src/lib/docs-nav.ts';
 
@@ -37,6 +38,9 @@ function troupeDocs() {
         const { processor } = config.markdown;
         if (!isSatteriProcessor(processor)) throw new Error(`troupe-docs needs the Sätteri Markdown processor, not ${processor.name}`);
         processor.options.mdastPlugins.push(troupeLinks(fileURLToPath(new URL('src/content/docs/docs/', import.meta.url))));
+        // /status/'s status line and release list, where status.md marks them (spec: roadmap; design D5).
+        const page = fileURLToPath(new URL('src/content/docs/status.md', import.meta.url));
+        processor.options.mdastPlugins.push(roadmapPlugin({ page, load: () => loadRoadmapInputs(root) }));
       },
     },
   };
