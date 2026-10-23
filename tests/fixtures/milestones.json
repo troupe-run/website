@@ -1,0 +1,10 @@
+{
+  "repositories": ["troupe"],
+  "milestones": [
+    { "key": "0.10.0", "title": "0.10.0", "state": "open", "description": "Ten: the tenth fixture release, listed after 0.3.0", "colour": "a key the page ignores" },
+    { "key": "0.3.0", "title": "0.3.0", "state": "open", "description": "Three: planned, with no tag in the fixture troupe" },
+    { "key": "0.1.0", "title": "0.1.0", "state": "closed", "description": "One: the first fixture release" },
+    { "key": "1.0.0", "title": "1.0.0", "state": "open", "description": "Stable: the fixture's last release" },
+    { "key": "0.2.0", "title": "0.2.0", "state": "open", "description": "Two: the second fixture release" }
+  ]
+}

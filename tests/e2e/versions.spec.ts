@@ -242,3 +242,28 @@ for (const theme of ['light', 'dark'] as const) {
     });
   }
 }
+
+// The roadmap on the fixture build: tests/fixtures/milestones.json against the fixture troupe's tags, troupe-v0.1.0
+// (2026-01-01), troupe-v0.1.1 (2026-02-01) and troupe-v0.2.0 (2026-03-01) (spec: roadmap; quality-check).
+test.describe('the roadmap on /status/', () => {
+  test('lists the fixture milestones in version order, whatever order the file has, with no entry for the 0.1.1 patch', async ({ page }) => {
+    await page.goto('/status/');
+    const versions = await page.locator('.sl-markdown-content ol > li > strong').allInnerTexts();
+    expect(versions).toEqual(['0.1.0', '0.2.0', '0.3.0', '0.10.0', '1.0.0']);
+  });
+
+  test("dates 0.1.0 and 0.2.0 by their tags, as text and in a <time>, and nothing else", async ({ page }) => {
+    await page.goto('/status/');
+    const items = page.locator('.sl-markdown-content ol > li');
+    await expect(items.nth(0)).toHaveText("0.1.0 One: the first fixture release Released 2026-01-01");
+    await expect(items.nth(1).locator('.roadmap-released time')).toHaveAttribute('datetime', '2026-03-01');
+    await expect(items.nth(1).locator('.roadmap-released')).toHaveText('Released 2026-03-01');
+    await expect(page.locator('.roadmap-released')).toHaveCount(2);
+    await expect(items.nth(2)).toHaveText('0.3.0 Three: planned, with no tag in the fixture troupe');
+  });
+
+  test('names 0.2.0 as the latest release in the status', async ({ page }) => {
+    await page.goto('/status/');
+    await expect(page.locator('.sl-heading-wrapper:has(h2#status) + p')).toHaveText('Pre-alpha. The latest release is 0.2.0.');
+  });
+});

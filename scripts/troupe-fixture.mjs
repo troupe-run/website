@@ -1,9 +1,11 @@
 // npm run build:fixture: builds the site into dist-fixture/ against a troupe with releases, so /docs/next/, archived
 // versions and the version menu are tested before troupe has a release (spec: quality-check; design D9). The troupe
 // is a throwaway git repository, made from tests/fixtures/troupe-docs/ in a fresh temporary folder, with no remote,
-// and removed afterwards. Nothing it builds is published: the deploy builds only from troupe-run/troupe.
+// and removed afterwards. Nothing it builds is published: the deploy builds only from troupe-run/troupe. It reads the
+// release milestones from tests/fixtures/milestones.json too, never troupe-run/infrastructure's, so /status/'s list is
+// tested against fixed releases (spec: roadmap).
 import { execFileSync, spawnSync } from 'node:child_process';
-import { copyFileSync, cpSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const FIXTURE = join(ROOT, 'tests', 'fixtures', 'troupe-docs');
 export const OUT_DIR = 'dist-fixture';
+export const MILESTONES_FIXTURE = join(ROOT, 'tests', 'fixtures', 'milestones.json');
 
 // git with no global or system config, so no hook or setting of the machine's touches the fixture.
 const ENV = {
@@ -56,14 +59,29 @@ export function withFixtureRepo(fn, fixtureDir = FIXTURE) {
   }
 }
 
+/**
+ * Runs `fn` with a temporary folder shaped like an infrastructure checkout, whose tofu/milestones.json is `file`, and
+ * removes it afterwards, whether `fn` returns or throws.
+ */
+export function withFixtureMilestones(fn, file = MILESTONES_FIXTURE) {
+  const path = mkdtempSync(join(tmpdir(), 'milestones-fixture-'));
+  try {
+    mkdirSync(join(path, 'tofu'));
+    copyFileSync(file, join(path, 'tofu', 'milestones.json'));
+    return fn(path);
+  } finally {
+    rmSync(path, { recursive: true, force: true });
+  }
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const status = withFixtureRepo((path) => {
+  const status = withFixtureRepo((path) => withFixtureMilestones((milestones) => {
     const build = spawnSync('npx', ['astro', 'build', '--outDir', OUT_DIR], {
-      cwd: ROOT, env: { ...process.env, TROUPE_DOCS: path }, stdio: 'inherit',
+      cwd: ROOT, env: { ...process.env, TROUPE_DOCS: path, TROUPE_MILESTONES: milestones }, stdio: 'inherit',
     });
     // The version tests read what this build was made from, not whatever the last sync left in src/generated/.
     if (build.status === 0) copyFileSync(join(ROOT, 'src', 'generated', 'troupe-docs.json'), join(ROOT, OUT_DIR, 'troupe-docs.json'));
     return build.status ?? 1;
-  });
+  }));
   process.exit(status);
 }
