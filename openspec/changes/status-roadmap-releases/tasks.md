@@ -52,12 +52,15 @@
   recorded in this task; if the cold clone adds more than about 10 seconds, raise it with the owner before going on.
   Done 2026-10-23: cold (no `.cache/infrastructure.git`) 1.6 s, warm 1.2 s, on this machine.
 
-- [ ] 2.5 Date each release from its tag, and drop "current" (D2, owner 2026-10-23): the manifest's release tags carry
+- [x] 2.5 Date each release from its tag, and drop "current" (D2, owner 2026-10-23): the manifest's release tags carry
   each tag's date, a released milestone's `released` is that date as `YYYY-MM-DD` instead of `true`, and the reader
   returns no `current`. Tests first in `tests/unit/roadmap.test.ts`, `roadmap-source.test.ts` and
   `troupe-sync.test.ts`, including an annotated tag (its tagger date) and a lightweight one (its commit date). Verify:
   they fail on the code from 2.1 to 2.3 and pass after, and after `npm run docs:sync` `src/generated/roadmap.json` has
   no `current` key. (2.1 and 2.3 above are recorded as they were done, with "current".)
+  Done 2026-10-23: 12 tests failed on the earlier code and pass after (352 unit tests in all). git writes a UTC date
+  with `Z`, which the tests first expected as `+00:00`; the code was right. `src/generated/roadmap.json` now has only
+  `releases` and `latest`.
 
 ## 3. Rendering into status.md (D5, D6)
 

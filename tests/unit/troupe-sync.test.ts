@@ -120,6 +120,18 @@ describe('sync', () => {
     expect(manifest.glossary).toBe(join(root, 'src/content/docs/docs/next/prompt-book/glossary.md'));
   });
 
+  it("records in the manifest the release tags the versions were chosen from, each with its date, and no other tag (spec: roadmap)", () => {
+    const root = site();
+    const r = troupe();
+    r.git('tag', 'not-a-release');
+    const manifest = sync({ env: {}, root, remote: r.path });
+    expect(manifest.releases).toEqual([
+      { tag: 'troupe-v0.1.0', date: '2026-01-01T00:00:00Z' },
+      { tag: 'troupe-v0.2.0', date: '2026-02-01T00:00:00Z' },
+    ]);
+    expect(JSON.parse(readFileSync(join(root, 'src/generated/troupe-docs.json'), 'utf8')).releases).toEqual(manifest.releases);
+  });
+
   it('removes pages that troupe no longer has on the next run', () => {
     const r = troupe();
     const root = site();

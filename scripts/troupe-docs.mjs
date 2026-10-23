@@ -1,13 +1,18 @@
-// npm run docs:sync: fetch troupe-run/troupe and write /docs's pages, as every Astro command does through the
-// troupe-docs integration in astro.config.mjs (spec: versioned-docs). TROUPE_DOCS builds from a local checkout.
+// npm run docs:sync: fetch troupe-run/troupe and write /docs's pages, then troupe-run/infrastructure's milestones for
+// /status/, as every Astro command does through the troupe-docs integration in astro.config.mjs (spec: versioned-docs,
+// roadmap). TROUPE_DOCS and TROUPE_MILESTONES build from local checkouts.
 import { fileURLToPath } from 'node:url';
 import { sync, TroupeDocsError } from './troupe-docs-lib.mjs';
+import { RoadmapError, syncRoadmap } from './roadmap-lib.mjs';
 
 try {
-  const manifest = sync({ root: fileURLToPath(new URL('..', import.meta.url)) });
+  const root = fileURLToPath(new URL('..', import.meta.url));
+  const manifest = sync({ root });
   for (const v of manifest.versions) console.log(`docs:sync: ${v.base} from ${v.ref}, ${v.pages.length} pages`);
+  const roadmap = syncRoadmap({ root, tags: manifest.releases });
+  console.log(`docs:sync: /status/ lists ${roadmap.releases.length} releases, the latest released ${roadmap.latest ?? 'none yet'}`);
 } catch (error) {
-  if (!(error instanceof TroupeDocsError)) throw error;
+  if (!(error instanceof TroupeDocsError) && !(error instanceof RoadmapError)) throw error;
   console.error(`docs:sync: ${error.message}`);
   process.exit(1);
 }
