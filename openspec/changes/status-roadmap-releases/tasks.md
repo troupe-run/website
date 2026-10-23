@@ -124,8 +124,12 @@
 
 ## 5. Review and integration
 
-- [ ] 5.1 Build the site and show the owner `/status/` at 320px, 768px and 1280px, in light and dark. Verify: the
+- [x] 5.1 Build the site and show the owner `/status/` at 320px, 768px and 1280px, in light and dark. Verify: the
   owner agrees the layout in this session, recorded here with the date.
+  Done 2026-10-23: the owner saw `/status/` at 320px, 768px and 1280px in light and dark, live and fixture, and agreed
+  the layout, with one change: the section is "Milestones", not "Releases", which reads as what's already out (its
+  text says "milestone" to match; "release" stays for what's out). A later split into released versions and a
+  roadmap is a possible follow-up.
 - [x] 5.5 Apply the owner's review of the first build (2026-10-23): drop the install sentence before the first
   release and fold it into the copy's after-release status line; hide the list's numbers; make apostrophes
   consistent by fixing content, raising the milestone descriptions' upstream. Verify: unit and e2e tests pass on both
@@ -134,9 +138,10 @@
   from its tag on GitHub."; `<ol class="roadmap-releases" role="list">` with `list-style: none`; the fixture's
   "fixture’s" fixed in the fixture file; troupe-run/infrastructure#127 (on the board, Todo, linked from #32) for 0.2.0,
   0.5.0 and 0.13.0's straight apostrophes. 364 unit tests and 69 e2e tests (status, versions, a11y) pass.
-- [ ] 5.2 Ask the owner whether any milestone description should be reworded in troupe-run/infrastructure (for
+- [x] 5.2 Ask the owner whether any milestone description should be reworded in troupe-run/infrastructure (for
   instance "config" and "worktree", which the site's copy avoids). Verify: their answer is recorded here, and any
   rewording is an issue in infrastructure on the board, not an edit here.
+  Done 2026-10-23: the owner is happy with the content as it is; no rewording.
 - [ ] 5.3 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes, axe on `/status/` in light and
   dark among them. Save the output to the scratchpad.
 - [ ] 5.4 Open the pull request with `Closes #32` (body via `--body-file`). Verify: CI's `test` and `guard` jobs pass.
