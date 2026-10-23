@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -30,6 +31,19 @@ describe('openSource with TROUPE_DOCS unset', () => {
     expect(source.read('troupe-v0.1.0', 'programme/a.md')).toContain('title: A');
     expect(source.tags()).toEqual(['troupe-v0.1.0']);
     expect(new Date(source.date('main', 'programme/a.md')!).toISOString()).toBe('2026-01-02T03:04:05.000Z');
+  });
+
+  it("dates a lightweight tag by its commit, and an annotated one by its tagger date (spec: roadmap)", () => {
+    const r = repo();
+    execFileSync('git', ['tag', '-a', '-m', 'release', 'troupe-v0.2.0'], {
+      cwd: r.path,
+      env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1', GIT_COMMITTER_NAME: 'F', GIT_COMMITTER_EMAIL: 'f@example.com', GIT_COMMITTER_DATE: '2026-03-04T05:06:07+10:00' },
+    });
+    const source = openSource({}, { cacheDir: join(tempDir(), 'troupe.git'), remote: r.path });
+    expect(source.tagDates()).toEqual({
+      'troupe-v0.1.0': '2026-01-02T03:04:05Z',
+      'troupe-v0.2.0': '2026-03-04T05:06:07+10:00',
+    });
   });
 
   it('fetches new commits and tags on the next run', () => {

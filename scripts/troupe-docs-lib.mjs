@@ -214,6 +214,12 @@ function fromGit(gitArgs) {
     readRepo: (ref, path) => git([...gitArgs, 'show', `${refName(ref)}:${path}`]),
     date: (ref, path) => git([...gitArgs, 'log', '-1', '--format=%cI', refName(ref), '--', `docs/${path}`]).trim() || null,
     tags: () => git([...gitArgs, 'tag', '--list']).split('\n').filter(Boolean),
+    /** Each tag's date: an annotated tag's tagger date, or a lightweight tag's commit date (spec: roadmap). */
+    tagDates: () =>
+      Object.fromEntries(
+        git([...gitArgs, 'for-each-ref', '--format=%(refname:short) %(creatordate:iso-strict)', 'refs/tags'])
+          .split('\n').filter(Boolean).map((line) => line.split(' ')),
+      ),
   };
 }
 
@@ -277,6 +283,7 @@ function local(value) {
  * @typedef {object} Source
  * @property {'remote' | 'local'} kind
  * @property {() => string[]} tags
+ * @property {() => Record<string, string>} tagDates
  * @property {(ref: string) => string[]} list
  * @property {(ref: string, path: string) => string} read
  * @property {(ref: string, path: string) => string} readRepo
@@ -346,7 +353,7 @@ export function renderPage(version, page) {
 }
 
 /** Replaces `outDir` with every version's pages, and writes the manifest. Refuses to clear a folder it didn't make. */
-export function writeDocs(versions, outDir, manifestPath) {
+export function writeDocs(versions, outDir, manifestPath, releases = []) {
   if (existsSync(outDir) && readdirSync(outDir).length && !existsSync(join(outDir, MARKER))) {
     throw new TroupeDocsError(`${outDir} holds files the docs sync didn't write, so it won't replace them. Fix: move them, then run it again.`);
   }
@@ -364,6 +371,9 @@ export function writeDocs(versions, outDir, manifestPath) {
   const manifest = {
     versions: versions.map(({ pages, ...v }) => ({ ...v, pages: pages.map((p) => ({ path: p.path, title: p.front.title })) })),
     glossary: join(outDir, main.dir, 'prompt-book', 'glossary.md'),
+    // The release tags the versions were chosen from, with their dates, which the roadmap on /status/ marks as
+    // released (spec: roadmap).
+    releases,
   };
   mkdirSync(dirname(manifestPath), { recursive: true });
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
@@ -377,5 +387,7 @@ export function writeDocs(versions, outDir, manifestPath) {
 export function sync({ env = process.env, root, remote }) {
   const source = openSource(env, { cacheDir: join(root, '.cache', 'troupe.git'), remote });
   const versions = buildVersions(source);
-  return writeDocs(versions, join(root, 'src', 'content', 'docs', 'docs'), join(root, 'src', 'generated', 'troupe-docs.json'));
+  const dates = source.tagDates();
+  const releases = source.tags().filter((t) => t.startsWith(RELEASE_PREFIX)).map((tag) => ({ tag, date: dates[tag] }));
+  return writeDocs(versions, join(root, 'src', 'content', 'docs', 'docs'), join(root, 'src', 'generated', 'troupe-docs.json'), releases);
 }

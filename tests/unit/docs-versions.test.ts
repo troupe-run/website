@@ -11,7 +11,7 @@ const v = (role: Version['role'], dir: string, paths: string[]): Version => ({
 });
 const current = { ...v('current', '', ['programme/what-is-troupe.md', 'programme/principles.md', 'stagecraft/build-a-flow.md', 'stagecraft/new-guide.md', 'stagecraft/another.md']), version: '0.2' };
 const archived = v('archived', 'v0.1', ['programme/what-is-troupe.md', 'stagecraft/build-a-flow.md']);
-const manifest: Manifest = { versions: [v('next', 'next', ['programme/what-is-troupe.md']), current, archived], glossary: '' };
+const manifest: Manifest = { versions: [v('next', 'next', ['programme/what-is-troupe.md']), current, archived], glossary: '', releases: [] };
 
 describe('ordered', () => {
   it("lists a section's named pages in the website's order, then pages it doesn't name, by title", () => {

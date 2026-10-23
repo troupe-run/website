@@ -33,6 +33,10 @@ anything else.
   edit there is lost: edit the page in troupe. `npm run docs:sync` does just that step.
   - To preview troupe edits you haven't pushed, or to work offline, set `TROUPE_DOCS` to your troupe checkout:
     `TROUPE_DOCS=../troupe npm run dev`. Its working tree is `main`, and its tags are the releases.
+- The same step fetches troupe-run/infrastructure's `main` into `.cache/` and reads `tofu/milestones.json`, the
+  release list on `/status/`. A release's wording is changed there, not here.
+  - To preview a milestone edit, or to work offline, set `TROUPE_MILESTONES` to your infrastructure checkout:
+    `TROUPE_MILESTONES=../infrastructure npm run dev`. Its working tree is read, uncommitted edits included.
 - `uv run scripts/check.py` runs every check CI runs, in the same order: `npm ci`, Playwright's browser,
   `astro check`, the unit tests, the build, the fixture build, the brand-asset check, the internal link check of
   both builds and the end-to-end tests. It stops at the first failure and says which one. `npm ci` reinstalls

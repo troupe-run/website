@@ -11,7 +11,7 @@ export interface Version {
   ref: string;
   pages: Page[];
 }
-export interface Manifest { versions: Version[]; glossary: string }
+export interface Manifest { versions: Version[]; glossary: string; releases: { tag: string; date: string }[] }
 
 /** The version a docs route id (`docs/v0.1/the-company/flows`) belongs to, and the page's path under docs/. */
 export function locate(manifest: Manifest, id: string): { version: Version; path: string } | undefined {

@@ -4,12 +4,14 @@ import starlightBlog from 'starlight-blog';
 import { isSatteriProcessor } from '@astrojs/markdown-satteri';
 import { fileURLToPath } from 'node:url';
 import { sync } from './scripts/troupe-docs-lib.mjs';
+import { syncRoadmap } from './scripts/roadmap-lib.mjs';
 import { troupeLinks } from './scripts/troupe-links.mjs';
 import { CONTRIBUTING, firstPage, pageUrl } from './src/lib/docs-nav.ts';
 
 // Writes /docs's pages from troupe-run/troupe before Astro reads content, for every command (dev, check, build,
 // sync), redirects each version's root to its first page, and rewrites the pages' .md links to the site's URLs
-// (spec: versioned-docs; design D2, D5, D6).
+// (spec: versioned-docs; design D2, D5, D6). Then reads the release milestones from troupe-run/infrastructure for
+// /status/, marked against the release tags /docs was built from (spec: roadmap).
 function troupeDocs() {
   return {
     name: 'troupe-docs',
@@ -25,6 +27,8 @@ function troupeDocs() {
           if (first) redirects[v.base.slice(0, -1)] = pageUrl(v.base, first.path);
           logger.info(`${v.base} from ${v.ref}, ${v.pages.length} pages`);
         }
+        const roadmap = syncRoadmap({ root, tags: manifest.releases });
+        logger.info(`/status/ lists ${roadmap.releases.length} releases, the latest released ${roadmap.latest ?? 'none yet'}`);
         // The pages the website keeps moved out of /docs (design D10). troupe's "What is troupe?" links the first.
         redirects['/docs/programme/status-and-roadmap'] = '/status/';
         redirects['/docs/backstage/contributing'] = CONTRIBUTING;
