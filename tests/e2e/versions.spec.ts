@@ -264,6 +264,6 @@ test.describe('the roadmap on /status/', () => {
 
   test('names 0.2.0 as the latest release in the status', async ({ page }) => {
     await page.goto('/status/');
-    await expect(page.locator('.sl-heading-wrapper:has(h2#status) + p')).toHaveText('Pre-alpha. The latest release is 0.2.0.');
+    await expect(page.locator('.sl-heading-wrapper:has(h2#status) + p')).toHaveText('Pre-alpha. The latest release is 0.2.0, installed with uv from its tag on GitHub.');
   });
 });

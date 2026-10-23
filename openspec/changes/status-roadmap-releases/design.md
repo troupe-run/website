@@ -85,8 +85,13 @@ status line, and an ordered list for the releases. A page with a marker missing,
 
 The rendered list item is: the version in bold, then the description verbatim, then, for a release that's out, a
 span the CSS layer styles holding "Released" and a `<time>` with its date. For example: **0.1.0** One real actor,
-safely: an actor defined in config runs … *Released 2026-11-05*. The status line is a template in the copy file, with
-`{latest}`.
+safely: an actor defined in config runs … *Released 2026-11-05*. The list stays ordered for assistive technology, with
+`role="list"` so Safari keeps it a list, but its numbers are hidden: the versions already say the order (owner,
+2026-10-23). The status line is a template in the copy file, with `{latest}`; after the first release it also says the
+release is installed with uv from its tag, so `status.md` holds no sentence that a release would make stale.
+
+Descriptions are shown with their own punctuation. Their straight apostrophes, unlike the site's rendered ’, are fixed
+in `tofu/milestones.json` (troupe-run/infrastructure#127), not rewritten when rendered (owner, 2026-10-23).
 
 Considered:
 
