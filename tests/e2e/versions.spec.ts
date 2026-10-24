@@ -283,3 +283,43 @@ test.describe('the roadmap on /status/', () => {
     await expect(page.locator('.sl-heading-wrapper:has(h2#status) + p')).toHaveText('Pre-alpha. The latest release is 0.2.0, installed with uv from its tag on GitHub.');
   });
 });
+
+// /protocol/ on the fixture build: protocol-v0.1.0, protocol-v0.2.0 and protocol-v1.0.0, and main after them, from
+// tests/fixtures/troupe-docs/ (spec: protocol-schemas; quality-check; design D9). pinned.schema.json names its ref in
+// its description; config/actor.schema.json exists only on main.
+test.describe('the protocol copies', () => {
+  const BASE = 'https://troupe.run/protocol/';
+  const pinned = async (request: import('@playwright/test').APIRequestContext, prefix: string) => {
+    const response = await request.get(`/protocol/${prefix}pinned.schema.json`);
+    expect(response.status(), prefix).toBe(200);
+    return response.json();
+  };
+  const copies: [string, string][] = [
+    ['', 'protocol-v1.0.0'], ['1/', 'protocol-v1.0.0'], ['0/', 'protocol-v0.2.0'], ['next/', 'main'],
+    ['1.0.0/', 'protocol-v1.0.0'], ['0.2.0/', 'protocol-v0.2.0'], ['0.1.0/', 'protocol-v0.1.0'],
+  ];
+  for (const [prefix, ref] of copies) {
+    test(`/protocol/${prefix} serves ${ref}, with its own ids and its absolute reference moved with them`, async ({ request }) => {
+      const schema = await pinned(request, prefix);
+      expect(schema.description).toBe(`The fixture troupe at ${ref}: an absolute reference to another of its schemas.`);
+      expect(schema.$id).toBe(`${BASE}${prefix}pinned.schema.json`);
+      expect(schema.properties.hash.$ref).toBe(`${BASE}${prefix}lineage.schema.json#/$defs/hash`);
+    });
+  }
+
+  test("main's change after the last tag is only in next/", async ({ request }) => {
+    expect((await request.get('/protocol/next/config/actor.schema.json')).status()).toBe(200);
+    for (const prefix of ['', '1/', '0/', '1.0.0/']) {
+      expect((await request.get(`/protocol/${prefix}config/actor.schema.json`)).status(), prefix).toBe(404);
+    }
+  });
+
+  test('/protocol/ lists the releases newest first, naming the latest', async ({ page }) => {
+    await page.goto('/protocol/');
+    await expect(page.locator('.protocol-releases li')).toHaveText([
+      '1.0.0 (latest), at /protocol/1.0.0/', '0.2.0, at /protocol/0.2.0/', '0.1.0, at /protocol/0.1.0/',
+    ]);
+    await expect(page.getByText('No protocol release yet.')).toHaveCount(0);
+  });
+});
+

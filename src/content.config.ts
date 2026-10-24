@@ -49,6 +49,12 @@ const copySchema = z.discriminatedUnion('section', [
     unreleased: z.string(), released: z.string().includes('{latest}'), releasedOn: z.string().includes('{date}'),
   }),
   z.object({
+    section: z.literal('protocol'),
+    none: z.string(),
+    latest: z.string().includes('{version}').includes('{path}'),
+    release: z.string().includes('{version}').includes('{path}'),
+  }),
+  z.object({
     section: z.literal('footer'),
     attribution: z.string(), copyright: z.string(),
     links: z.array(link),

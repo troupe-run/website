@@ -7,10 +7,14 @@
   copy", D2 and D3 to match before task 3.1.
   Done 2026-10-24: the owner chose to serve `main` at `/protocol/0/` before the first protocol release, as D3
   recommends. The spec, D2 and D3 stand.
-- [ ] 1.2 Show the owner, as text, the draft of `src/content/docs/protocol.md` (what the schemas are, the four paths and
+- [x] 1.2 Show the owner, as text, the draft of `src/content/docs/protocol.md` (what the schemas are, the four paths and
   when to use each, the release list) and of `src/content/copy/protocol.md` (the list's phrases before and after the
   first protocol release, and "latest"), with the list rendered as it will read in both states. Verify: the owner
   agrees the words in this session, recorded here with the date. Later tasks write exactly the agreed text.
+  Done 2026-10-24: the owner agreed the draft as written: the intro, "Which URL to use" (the four rows), the
+  before-1.0 note, the `$id` line, "Releases" ("No protocol release yet. Until there is one, /protocol/ and
+  /protocol/0/ serve troupe's unreleased main." before; "0.2.0 (latest), at /protocol/0.2.0/" and "0.1.0, at
+  /protocol/0.1.0/" after) and "What each schema defines", linking troupe's protocol README.
 - [x] 1.3 Prove D6 before anything depends on it: with a hand-made `public/protocol/next/x.schema.json` and a page at
   `src/content/docs/protocol.md`, `astro build` writes both `dist/protocol/index.html` and
   `dist/protocol/next/x.schema.json`, `astro dev` serves both, and `astro preview` serves the file as
@@ -85,17 +89,26 @@
 
 ## 8. The page at /protocol/ (D8)
 
-- [ ] 8.1 Write `src/content/docs/protocol.md` and `src/content/copy/protocol.md` with exactly the words agreed in 1.2,
+- [x] 8.1 Write `src/content/docs/protocol.md` and `src/content/copy/protocol.md` with exactly the words agreed in 1.2,
   and the mdast plugin that fills the release list at its marker from the manifest, with unit tests for both states
   (none yet; several, newest first, the latest named). Verify: `npx vitest run` passes; the built page shows the words
   in both the live and fixture builds.
-- [ ] 8.2 E2E tests, in `tests/e2e/protocol.spec.ts`: on the live build, `/protocol/` has no left-hand sidebar and no
+  Done 2026-10-24: `scripts/protocol-plugin.mjs`, with 4 tests in `tests/unit/protocol-plugin.test.ts`. The copy's
+  paths and `main` are in backticks, shown as code as `/status/`'s are; the words are the agreed ones. The live build
+  shows "No protocol release yet…", the fixture build lists 1.0.0 (latest), 0.2.0 and 0.1.0.
+- [x] 8.2 E2E tests, in `tests/e2e/protocol.spec.ts`: on the live build, `/protocol/` has no left-hand sidebar and no
   version menu, says there's no protocol release yet, and `/protocol/config/actor.schema.json`,
   `/protocol/0/config/actor.schema.json` and `/protocol/next/config/actor.schema.json` respond 200 with
   `application/json` and each copy's own `$id`. On the fixture build: the latest is 1.0.0's schemas, `/protocol/0/` is
   0.2.0's, `/protocol/1/` is 1.0.0's, `/protocol/next/` has `main`'s change, each tag's copy exists with its own ids,
   and the page lists 1.0.0, 0.2.0 and 0.1.0. axe on `/protocol/` in light and dark reports no serious or critical
   violation. Verify: the tests pass on both builds, and one fails when the rewrite is turned off for `0/`.
+  Done 2026-10-24: the live tests are in `tests/e2e/protocol.spec.ts`; the fixture's are a describe block in
+  `tests/e2e/versions.spec.ts`, the one file the fixture build's Playwright project serves, as the roadmap's fixture
+  tests are. `/protocol/` is in `a11y.spec.ts`'s pages, light and dark. They also check that a major or release with
+  no tag gives 404 and the sync's marker isn't served. 74 tests passed. Turning the rewrite off for the majors showed
+  that `writeProtocol` ignored the copy's `rewrite` flag (it rewrote by prefix alone); it now honours it, with a unit
+  test. With the flag off, the `0/` and `1/` tests failed, and so did the reference check.
 - [ ] 8.3 Build the site and show the owner `/protocol/` at 320px, 768px and 1280px, in light and dark, live and
   fixture. Verify: the owner agrees the page in this session, recorded here with the date.
 
