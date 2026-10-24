@@ -66,30 +66,50 @@ test("the old Contributing URL redirects to the org's contributing guide", async
   await expect(page).toHaveURL('https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md');
 });
 
-// The roadmap, from troupe-run/infrastructure's live milestones (spec: roadmap). The live wording changes, so these check
-// shape only; tests/e2e/versions.spec.ts checks fixed releases on the fixture build.
-const releases = (page: import('@playwright/test').Page) => page.locator('.sl-markdown-content ol > li');
+// The roadmap, from troupe-run/infrastructure's live milestones and troupe's live tags (spec: roadmap). Both change, so
+// these check shape only; tests/e2e/versions.spec.ts checks fixed releases on the fixture build.
+type Page = import('@playwright/test').Page;
+// A section's list is the first list after its heading (Milestones has an introduction before its own).
+const list = (page: Page, id: string) => page.locator(`.sl-heading-wrapper:has(h2#${id}) ~ ol`).first();
+const entries = (page: Page, id: string) => list(page, id).locator('> li');
+const versionsIn = (page: Page, id: string) => entries(page, id).locator('> strong').allInnerTexts();
 const byVersion = (a: string, b: string) => {
   const [x, y] = [a, b].map((v) => v.split('.').map(Number));
   return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
 };
 
-test("/status/ lists the milestones as an ordered list under Milestones, each starting with its version in bold, in version order", async ({ page }) => {
+test('/status/ lists the milestones not yet out under Milestones, each starting with its version in bold, in version order', async ({ page }) => {
   await page.goto('/status/');
-  const list = page.locator('.sl-heading-wrapper:has(h2#milestones) ~ ol');
-  await expect(list).toHaveCount(1);
-  const versions = await releases(page).locator('> strong').allInnerTexts();
+  await expect(page.locator('.sl-markdown-content ol')).not.toHaveCount(0);
+  const versions = await versionsIn(page, 'milestones');
   expect(versions.length).toBeGreaterThan(1);
   for (const v of versions) expect(v).toMatch(/^\d+\.\d+\.\d+$/);
   expect(versions).toEqual([...versions].sort(byVersion));
   await expect(page.locator('.sl-markdown-content')).not.toContainText('roadmap:');
 });
 
-test('/status/ has no count, percentage, progress mark or date beside a release that is not out', async ({ page }) => {
+test('/status/ has a Releases section exactly when the status names a latest release, each entry dated and in version order', async ({ page }) => {
   await page.goto('/status/');
-  const unreleased = await releases(page).filter({ hasNot: page.locator('.roadmap-released') }).allInnerTexts();
-  expect(unreleased.length).toBeGreaterThan(0);
-  for (const text of unreleased) {
+  const status = await page.locator('.sl-heading-wrapper:has(h2#status) + p').innerText();
+  const latest = /The latest release is (\d+\.\d+\.\d+)/.exec(status)?.[1];
+  await expect(page.locator('h2#releases')).toHaveCount(latest ? 1 : 0);
+  const versions = await versionsIn(page, 'releases');
+  expect(versions).toEqual([...versions].sort(byVersion));
+  for (const text of await entries(page, 'releases').allInnerTexts()) expect(text).toMatch(/Released \d{4}-\d{2}-\d{2}$/);
+});
+
+test('/status/ lists no version under both Releases and Milestones', async ({ page }) => {
+  await page.goto('/status/');
+  const planned = new Set(await versionsIn(page, 'milestones'));
+  expect((await versionsIn(page, 'releases')).filter((v) => planned.has(v))).toEqual([]);
+});
+
+test('/status/ has no count, percentage, progress mark or date beside a milestone under Milestones', async ({ page }) => {
+  await page.goto('/status/');
+  const planned = await entries(page, 'milestones').allInnerTexts();
+  expect(planned.length).toBeGreaterThan(0);
+  await expect(list(page, 'milestones').locator('.roadmap-released')).toHaveCount(0);
+  for (const text of planned) {
     expect(text).not.toMatch(/\d{4}-\d{2}-\d{2}|%|\b\d+\s*(?:of|\/)\s*\d+\b|in progress|working on|current/i);
   }
 });
@@ -100,8 +120,8 @@ test("/status/ links to troupe's milestones and the roadmap board", async ({ pag
   await expect(page.getByRole('link', { name: 'roadmap board' })).toHaveAttribute('href', 'https://github.com/orgs/troupe-run/projects/1');
 });
 
-test('/status/ lists Status, Milestones and How to read it in "On this page"', async ({ page }) => {
+test('/status/ lists Status, Milestones and How to read it in "On this page", in that order', async ({ page }) => {
   await page.goto('/status/');
-  const toc = await page.locator('starlight-toc a').allInnerTexts();
-  expect(toc).toEqual(expect.arrayContaining(['Status', 'Milestones', 'How to read it']));
+  const toc = (await page.locator('starlight-toc a').allInnerTexts()).filter((t) => ['Status', 'Milestones', 'How to read it'].includes(t));
+  expect(toc).toEqual(['Status', 'Milestones', 'How to read it']);
 });

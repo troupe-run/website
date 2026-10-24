@@ -1,14 +1,15 @@
 // Renders /status/'s generated parts into src/content/docs/status.md, where its markers say (spec: roadmap; design D5,
 // D6). A marker is an HTML comment on its own line that starts `<!-- roadmap:NAME`: `status` becomes the status line,
-// and `releases` the list of releases from src/generated/roadmap.json. A Sätteri mdast plugin, like troupe-links, so
-// the page keeps its own headings and prose in Markdown.
+// `released` the list of milestones that are out, and `planned` the rest, from src/generated/roadmap.json. A list
+// with nothing in it takes its whole section with it, heading included (status-released-and-planned, design D1 to
+// D3). A Sätteri mdast plugin, like troupe-links, so the page keeps its own headings and prose in Markdown.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 
 const MARKER = /^<!--\s*roadmap:([a-z-]*)[\s\S]*-->$/;
-const MARKERS = ['status', 'releases'];
+const MARKERS = ['status', 'released', 'planned'];
 
 /** The inputs the plugin renders from: the roadmap the sync wrote, and the copy's `roadmap` section. */
 export function loadRoadmapInputs(root) {
@@ -31,12 +32,12 @@ function releasedOn(date, copy) {
   return { type: 'roadmapReleased', data: { hName: 'span', hProperties: { className: ['roadmap-released'] } }, children };
 }
 
-function releaseList({ releases }, copy) {
+function releaseList(releases, copy) {
   return {
     type: 'list',
     // Ordered, for the order's sake, with its numbers hidden: the versions say it. role="list" keeps the list a list
     // in Safari, which drops the role from one styled with no markers.
-    data: { hProperties: { className: ['roadmap-releases'], role: 'list' } },
+    data: { hProperties: { className: ['roadmap-list'], role: 'list' } },
     ordered: true,
     start: 1,
     spread: false,
@@ -71,10 +72,24 @@ export function roadmapPlugin({ page, load }) {
         const marker = MARKER.exec(node.value.trim())?.[1];
         if (marker === undefined) return;
         if (!MARKERS.includes(marker)) {
-          throw new Error(`${name} has an unknown marker roadmap:${marker}: use ${MARKERS.map((m) => `roadmap:${m}`).join(' or ')}`);
+          throw new Error(`${name} has an unknown marker roadmap:${marker}: use ${MARKERS.slice(0, -1).map((m) => `roadmap:${m}`).join(', ')} or roadmap:${MARKERS.at(-1)}`);
         }
         found[marker] += 1;
-        ctx.replaceNode(node, marker === 'status' ? statusLine(roadmap, copy) : releaseList(roadmap, copy));
+        if (marker === 'status') return ctx.replaceNode(node, statusLine(roadmap, copy));
+        const releases = roadmap.releases.filter((r) => (marker === 'released') === (r.released !== null));
+        const siblings = ctx.parent(node).children;
+        const at = ctx.indexOf(node);
+        let start = at - 1;
+        while (start >= 0 && siblings[start].type !== 'heading') start -= 1;
+        if (start < 0) {
+          throw new Error(`${name}'s roadmap:${marker} marker has no heading before it: put it under the heading of its section`);
+        }
+        if (releases.length > 0) return ctx.replaceNode(node, releaseList(releases, copy));
+        // Nothing to list: leave out the section, from its heading to the next heading at its level or above (D3).
+        const depth = siblings[start].depth;
+        let end = at + 1;
+        while (end < siblings.length && !(siblings[end].type === 'heading' && siblings[end].depth <= depth)) end += 1;
+        for (const sibling of siblings.slice(start, end)) ctx.removeNode(sibling);
       },
       after: () => {
         for (const m of MARKERS) {

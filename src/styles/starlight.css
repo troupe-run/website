@@ -43,8 +43,8 @@
 /* Code inside a link: the accent colour on Starlight's inline-code background is under 4.5:1 (4.04 light, 4.49
    dark), so a linked code span drops the background and reads as the link it is (4.62 and 7.71 on the page). */
 .sl-markdown-content a code:not(:where(.not-content *)) { background-color: transparent; }
-/* /status/'s release list: ordered, with no numbers beside the versions that already say the order. */
-.sl-markdown-content ol.roadmap-releases { list-style: none; padding-inline-start: 0; }
+/* /status/'s Releases and Milestones lists: ordered, with no numbers beside the versions that already say the order. */
+.sl-markdown-content ol.roadmap-list { list-style: none; padding-inline-start: 0; }
 /* "Released" and its date, after a release's description on /status/ (spec: roadmap; design D5). Teal's text shade,
    so it reads as a mark rather than part of the description, and it stays on one line. */
 .roadmap-released { color: var(--teal-text); font-weight: 600; white-space: nowrap; }
