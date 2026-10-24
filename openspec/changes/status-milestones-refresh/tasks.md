@@ -83,8 +83,12 @@
   Verify: `uv run python -m unittest discover -s scripts/tests` passes.
   Done 2026-10-24: 19 tests pass. CONTRIBUTING.md's list of the check's gates names the rebuild test, and a bullet
   says what it does.
-- [ ] 3.2 Run the full check, `uv run scripts/check.py` (the agent workaround for local e2e is in memory). Verify: it
+- [x] 3.2 Run the full check, `uv run scripts/check.py` (the agent workaround for local e2e is in memory). Verify: it
   ends `check: all gates passed`, with the rebuild test gate reported passed and its time. Record it here.
+  Done 2026-10-24: run by the guard on commit f68da52, with `ASTRO_PREVIEW_BACKGROUND=0`. It ended `check: all gates
+  passed` in 120s: rebuild test passed in 17.8s, 264 e2e tests passed. The rebuild test and the fix landed in one
+  commit, not two: the guard refuses a commit with unstaged changes, and setting them aside means the shared stash.
+  The test's failure on the unfixed loader is recorded in 1.2.
 
 ## Workflow follow-up
 
