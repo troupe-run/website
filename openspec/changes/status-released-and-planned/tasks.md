@@ -64,9 +64,13 @@
   status, versions and a11y e2e tests pass on both builds, and a 320px fixture screenshot shows the page ending with
   Milestones.
   Done 2026-10-24: 372 unit tests and 72 status, versions and a11y e2e tests pass on both builds; the 320px fixture
-  screenshot ends with Milestones' 1.0.0. Not yet committed: committing waits for #36 (owner, 2026-10-24).
-- [ ] 3.2 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes, axe on `/status/` in light and
+  screenshot ends with Milestones' 1.0.0. Committed as 3f72cb1 after #36's fix merged and
+  this branch was rebased onto it (owner, 2026-10-24).
+- [x] 3.2 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes, axe on `/status/` in light and
   dark among them. Save the output to the scratchpad and record its path here.
+  Done 2026-10-24: all gates passed on the tree committed as 3f72cb1, with the generated docs folder present (#36's
+  fix), 372 unit tests and 246 e2e tests. The output is at
+  /private/tmp/claude-502/-Users-martin-Projects-troupe-website-status-released-and-planned/14f9a7ca-fb71-41ce-aacb-8f74b3a38a07/scratchpad/final-check-34.log.
 - [ ] 3.3 Open the pull request with `Closes #34` (body via `--body-file`). Verify: CI's `test` and `guard` jobs
   pass.
 
