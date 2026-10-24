@@ -34,7 +34,7 @@
   `npx playwright test --repeat-each 3` across both projects, the load the test failed under, and verify every test
   passes; record both outputs. Recorded 2026-10-24: `check: all gates passed` (e2e 28.8s); repeat-each 3:
   795 passed, none failed or flaky
-- [ ] 3.2 Open the pull request with `Closes #37` and verify CI's `test` job passes
+- [x] 3.2 Open the pull request with `Closes #37` and verify CI's `test` job passes. Recorded 2026-10-24: PR #43; `test` passed (265 e2e passed, none retried)
 
 ## Workflow follow-up
 
