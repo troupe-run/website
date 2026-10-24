@@ -103,10 +103,19 @@ checked directly rather than through a test that happens to sample at the right 
 ### D4. Show the fix against main with an injected delay
 
 The proof the flake is gone can't be "it passed N times", since the old test passes nearly every time too. Instead,
-task 2.3 adds `await page.waitForTimeout(1000)`, real time on the test's side, just before the first assertion in
-`season-carousel.spec.ts:197` and in `idle-bows.spec.ts:6`. The delay stands in for a slow machine. With main's
-versions of the files, both fail every time. With the fixed ones, both pass every time. The delay is then removed;
-it isn't committed. The permanent guard against regression is D3.
+task 2.3 adds `await page.waitForTimeout(…)`, real time on the test's side, after `runFor` and before the state the
+test names is read. The delay stands in for a slow machine. With main's versions, the read is wrong every time; with
+the fixed ones, right every time. The delay isn't committed. The permanent guard against regression is D3.
+
+The delay has to fit each test's timing, because on main the clock keeps running while a retrying assertion polls
+for its 5s timeout, and the poll can catch the *next* event instead (found applying the change: a 1s delay let
+main's versions of both tests pass, 5 of 5):
+
+- **Carousel, `season-carousel.spec.ts:197`: a 500ms delay.** The poll starts at 6.75s, after the 6.0–6.5s slide,
+  and ends at 11.75s, before the next one at 12s. With a 1s delay, the poll reaches the 12s slide and passes.
+- **Idle bow, `idle-bows.spec.ts:6`: a 1s delay, then a one-shot read.** A bow lasts 700ms every 5s, so the 5s poll
+  always reaches the next bow and no delay can make main's retrying assertion fail. A one-shot read at the named
+  moment, as `idle-bows.spec.ts:52` already does, shows the state the test names has gone.
 
 ## Risks / Trade-offs
 
