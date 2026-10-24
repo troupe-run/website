@@ -3,8 +3,8 @@
 // the same source as /docs (troupe-docs-lib.mjs's openSource), checks every schema, rewrites each copy's ids to its
 // own URLs and writes the copies into public/protocol/ (design D1 to D6).
 
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative, sep } from 'node:path';
 import { TroupeDocsError } from './troupe-error.mjs';
 
 const PREFIX = 'protocol-v';
@@ -188,4 +188,82 @@ export function writeProtocol({ copies, releases }, outDir) {
     }
   }
   return { copies: copies.map(({ prefix, ref, schemas }) => ({ prefix, ref, files: schemas.length })), releases };
+}
+
+// The reference check over a built site (design D7). linkinator reads HTML only, so scripts/linkcheck.mjs runs this
+// on the same folder.
+
+/** The copy a published path belongs to: its first folder when that is a copy's name, or '' for the latest. */
+const copyOf = (path) => {
+  const first = path.split('/')[0];
+  return path.includes('/') && COPY_NAME.test(first) ? `${first}/` : '';
+};
+
+function files(dir) {
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir).flatMap((name) => {
+    const at = join(dir, name);
+    return statSync(at).isDirectory() ? files(at) : name.endsWith('.schema.json') ? [at] : [];
+  });
+}
+
+/** Whether `node` declares an $anchor or $dynamicAnchor named `name`, outside data. */
+function hasAnchor(node, name) {
+  if (Array.isArray(node)) return node.some((item) => hasAnchor(item, name));
+  if (!node || typeof node !== 'object') return false;
+  return Object.entries(node).some(([key, value]) =>
+    ((key === '$anchor' || key === '$dynamicAnchor') && value === name) || (!DATA.has(key) && hasAnchor(value, name)));
+}
+
+/** Follows a JSON Pointer, already percent-decoded, into `node`. Returns whether it leads to a value. */
+function follows(node, pointer) {
+  let at = node;
+  for (const raw of pointer.split('/').slice(1)) {
+    const token = raw.replaceAll('~1', '/').replaceAll('~0', '~');
+    if (!at || typeof at !== 'object' || !Object.hasOwn(at, token)) return false;
+    at = at[token];
+  }
+  return true;
+}
+
+/**
+ * Resolves every $ref and $dynamicRef in every schema under `<dir>/protocol/` against the schema's own URL. Returns
+ * how many it checked, how many it skipped (outside troupe.run), and each broken one as `{ file, at, ref, reason }`,
+ * where `at` is the keyword's JSON Pointer in the file.
+ */
+export function checkReferences(dir) {
+  const root = join(dir, 'protocol');
+  const docs = new Map(files(root).map((f) => [relative(root, f).split(sep).join('/'), JSON.parse(readFileSync(f, 'utf8'))]));
+  const result = { checked: 0, skipped: 0, broken: [] };
+  for (const [path, schema] of [...docs].sort(([a], [b]) => (a < b ? -1 : 1))) {
+    const base = typeof schema.$id === 'string' ? schema.$id : `${BASE}${path}`;
+    eachKeyword(schema, (key, ref, pointer) => {
+      if (key === '$id') return;
+      const url = new URL(ref, base);
+      const target = `${url.origin}${url.pathname}`;
+      if (!target.startsWith(BASE)) {
+        result.skipped += 1;
+        return;
+      }
+      result.checked += 1;
+      const at = target.slice(BASE.length);
+      const fragment = decodeURIComponent(url.hash.slice(1));
+      const fail = (reason) => result.broken.push({ file: `protocol/${path}`, at: `${pointer}/${key}`, ref, reason });
+      if (copyOf(at) !== copyOf(path)) return fail(`it leaves the copy at /protocol/${copyOf(path)} for the one at /protocol/${copyOf(at)}`);
+      if (!docs.has(at)) return fail(`protocol/${at} isn't published`);
+      if (fragment === '') return;
+      if (fragment.startsWith('/')) {
+        if (!follows(docs.get(at), fragment)) fail(`${fragment} isn't in protocol/${at}`);
+      } else if (!hasAnchor(docs.get(at), fragment)) {
+        fail(`no $anchor or $dynamicAnchor in protocol/${at} is named ${fragment}`);
+      }
+    });
+  }
+  return result;
+}
+
+/** What the link check prints for a reference check's result: each broken reference, or that it checked nothing. */
+export function referenceProblems({ checked, broken }) {
+  if (checked === 0) return ['checked no schema reference under protocol/: the reference check is not checking anything'];
+  return broken.map((b) => `${b.file} at ${b.at}: ${b.ref}: ${b.reason}`);
 }

@@ -64,7 +64,7 @@
 
 ## 6. The reference check (D7)
 
-- [ ] 6.1 Tests first, in `tests/unit/schema-refs.test.ts`, for a pure checker over a folder of published copies:
+- [x] 6.1 Tests first, in `tests/unit/schema-refs.test.ts`, for a pure checker over a folder of published copies:
   passes on a pointer into another file's `$defs`, `#`, a `$dynamicRef` with a matching `$dynamicAnchor`, an `$anchor`,
   a pointer with `~1` and a percent-encoded character; fails naming the file, the reference and the reason on a missing
   file, a pointer that leads nowhere, an undeclared anchor, and a reference from one copy into another; skips and counts
