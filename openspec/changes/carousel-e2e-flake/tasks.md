@@ -30,9 +30,10 @@
 
 ## 3. Verify in the check
 
-- [ ] 3.1 Run `uv run scripts/check.py` and verify it passes, then run
+- [x] 3.1 Run `uv run scripts/check.py` and verify it passes, then run
   `npx playwright test --repeat-each 3` across both projects, the load the test failed under, and verify every test
-  passes; record both outputs
+  passes; record both outputs. Recorded 2026-10-24: `check: all gates passed` (e2e 28.8s); repeat-each 3:
+  795 passed, none failed or flaky
 - [ ] 3.2 Open the pull request with `Closes #37` and verify CI's `test` job passes
 
 ## Workflow follow-up
