@@ -16,9 +16,14 @@ never comes back. The failed run's 5.7s fits that.
 
 The same flaw is in every e2e test that calls `clock.install()`: 21 in `season-carousel.spec.ts` and 5 in
 `idle-bows.spec.ts`. The ones that sample a short-lived moment can lose the same race: the carousel's slide offsets,
-tab indicator, wrap ghost and dial angle mid-transition, and a character's 700ms bow ("after 5s … exactly one
-character is bowing", and the bow at 9.1s). The others pass only because nothing they check changes during the drift.
-`idle-bows.spec.ts:52` already works round it in one place, with a one-shot count instead of a retrying assertion.
+tab indicator, wrap ghost and dial angle mid-transition. The others pass only because nothing they check changes
+during the drift.
+
+The idle-bow tests can't fail this way, but they don't check what they name either. A bow lasts 700ms and comes
+every 5s, so when "after 5s … exactly one character is bowing" misses the first bow, its retrying assertion goes on
+polling for 5s in running time and catches the second. It checks "a bow some time between 5.1s and 10.1s".
+`idle-bows.spec.ts:52` already works round the drift in one place, with a one-shot count instead of a retrying
+assertion. (Found while applying this change; see design D4.)
 
 A second race sits under it. The carousel arms its timer when its IntersectionObserver says it's on screen. The test
 scrolls it into view and calls `runFor` straight away, without waiting for the observer to report. When the
@@ -33,10 +38,11 @@ observer is late, the timer is armed later than the test assumes, or not at all 
   timer is armed at a known moment. The idle-bow tests already wait for the cast's `data-idle` state.
 - The freezing is one shared helper, and a unit test fails if an e2e test installs the clock without it, so a new
   test can't bring the race back.
-- No assertion is loosened and no test name changes. Each test checks what it checked before, at the same moments.
-- The fix is shown to work by adding a real one-second delay between advancing time and asserting: with the delay,
-  the test at `season-carousel.spec.ts:197` and the idle-bow test at `idle-bows.spec.ts:6` fail every time on
-  main's version of the files, and pass on the fixed ones.
+- No assertion is loosened and no test name changes. Each test checks the moment it names, which the idle-bow tests
+  didn't before.
+- The fix is shown to work by adding a real delay between advancing time and reading the state the test names
+  (design D4): with the delay, `season-carousel.spec.ts:197` and the bow at `idle-bows.spec.ts:6` read wrong every
+  time on main's versions of the files, and right on the fixed ones.
 - The site's code (`src/components/sections/HowItWorks.astro`, `src/scripts/season-carousel.ts`, the cast's idle
   script) doesn't change, and gains no test-only hooks.
 

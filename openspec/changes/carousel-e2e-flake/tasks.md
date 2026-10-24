@@ -19,10 +19,14 @@
 - [x] 2.2 Add `tests/unit/e2e-clock.test.ts`, which fails, naming the file, when a file under `tests/e2e/` other than
   `clock.ts` calls `clock.install(` (design D3). Verify it passes, then add a `page.clock.install()` to a spec file,
   verify the test fails and names that file, and take it out again
-- [ ] 2.3 Show the race is gone (design D4): add `await page.waitForTimeout(1000)` just before the first assertion
-  after `runFor` in `season-carousel.spec.ts:197` and `idle-bows.spec.ts:6`. With main's versions of both files
-  (`git show main:<file>`), verify each fails in 5 of 5 runs (`--repeat-each 5`). With the fixed versions, verify
-  each passes in 5 of 5. Remove the delay, verify `git diff` shows none of it, and record the four results
+- [x] 2.3 Show the race is gone (design D4), on throwaway copies of the files: in `season-carousel.spec.ts:197` add
+  `await page.waitForTimeout(500)` before `toHaveCount(2)`; in `idle-bows.spec.ts:6` add
+  `await page.waitForTimeout(1000)` and then a one-shot `expect(await bowing(page).count()).toBe(1)`. With main's
+  versions (`git show main:<file>`), verify each fails in 5 of 5 runs (`--repeat-each 5`). With the fixed versions,
+  verify each passes in 5 of 5. Delete the copies, verify `git status` shows none of them, and record the results.
+  Recorded 2026-10-24: carousel, main fails 5/5, fixed passes 5/5; idle bow, main fails 5/5 (0 bowing), fixed
+  passes 5/5. With a 1s delay before the unchanged assertions, the fixed versions also passed 5/5, and so did
+  main's, by catching the next slide or bow (design D4)
 
 ## 3. Verify in the check
 
