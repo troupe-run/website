@@ -1,6 +1,8 @@
 // Internal link check over a built site. Wraps linkinator and refuses to pass when it scanned nothing
-// (a bad --skip pattern once made the gate pass on 0 links).
+// (a bad --skip pattern once made the gate pass on 0 links). Then checks every reference in /protocol/'s schemas,
+// which linkinator doesn't read (spec: protocol-schemas; design D7).
 import { runLinkinator, summarise } from './linkinator-lib.mjs';
+import { checkReferences, referenceProblems } from './protocol-lib.mjs';
 
 const dir = process.argv[2] ?? 'dist';
 // Skip every external URL, but not linkinator's own local server root.
@@ -17,3 +19,10 @@ for (const l of broken) console.error(`✗ ${l.status} ${l.url} (from ${l.parent
 if (scanned.length < 2) { console.error('✗ scanned fewer than 2 links (root only or nothing): the link check is not checking anything'); process.exit(1); }
 if (broken.length) { console.error(`✗ ${broken.length} broken link(s)`); process.exit(1); }
 console.log('✓ no broken internal links');
+
+const references = checkReferences(dir);
+console.log(`Checked ${references.checked} schema references in ${dir}/protocol (${references.skipped} outside troupe.run skipped)`);
+const problems = referenceProblems(references);
+for (const p of problems) console.error(`✗ ${p}`);
+if (problems.length) { console.error(`✗ ${references.broken.length} broken schema reference(s)`); process.exit(1); }
+console.log('✓ no broken schema references');
