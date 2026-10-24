@@ -273,7 +273,7 @@ test.describe('the roadmap on /status/', () => {
   test('puts Releases before Milestones, in the page and in "On this page"', async ({ page }) => {
     await page.goto('/status/');
     const headings = await page.locator('.sl-markdown-content h2').allInnerTexts();
-    expect(headings).toEqual(['Status', 'Releases', 'Milestones', 'How to read it']);
+    expect(headings).toEqual(['Status', 'Releases', 'Milestones']);
     const toc = (await page.locator('starlight-toc a').allInnerTexts()).filter((t) => headings.includes(t));
     expect(toc).toEqual(headings);
   });

@@ -51,9 +51,20 @@
 
 ## 3. Review and integration
 
-- [ ] 3.1 Show the owner D4's "How to read it" wording as text, and `/status/` built live (no Releases) and from the
+- [x] 3.1 Show the owner D4's "How to read it" wording as text, and `/status/` built live (no Releases) and from the
   fixture (both sections) at 320px, 768px and 1280px, in light and dark. Verify: the owner agrees the wording and the
   layout in this session, recorded here with the date and any change they ask for.
+  Done 2026-10-24: the owner saw the 12 screenshots and agreed the wording and the layout, with one change: drop "How
+  to read it", which isn't needed (task 3.4).
+- [x] 3.4 Remove "How to read it" from `src/content/docs/status.md`, its links and closing line with it (D4). Update
+  the unit test page so Milestones is last and an all-released render removes it to the end of the page; drop the
+  e2e test of its links; make the "On this page" tests Status, Milestones (live) and Status, Releases, Milestones
+  (fixture), exactly; and add a test that `/status/` has no "How to read it" heading. Remove the board URL's
+  entry from `tests/unit/vocabulary.test.ts`'s recorded uses of "project", since the link goes. Verify: unit tests and the
+  status, versions and a11y e2e tests pass on both builds, and a 320px fixture screenshot shows the page ending with
+  Milestones.
+  Done 2026-10-24: 372 unit tests and 72 status, versions and a11y e2e tests pass on both builds; the 320px fixture
+  screenshot ends with Milestones' 1.0.0. Not yet committed: committing waits for #36 (owner, 2026-10-24).
 - [ ] 3.2 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes, axe on `/status/` in light and
   dark among them. Save the output to the scratchpad and record its path here.
 - [ ] 3.3 Open the pull request with `Closes #34` (body via `--body-file`). Verify: CI's `test` and `guard` jobs

@@ -114,14 +114,15 @@ test('/status/ has no count, percentage, progress mark or date beside a mileston
   }
 });
 
-test("/status/ links to troupe's milestones and the roadmap board", async ({ page }) => {
+test('/status/ lists exactly Status and Milestones in "On this page" while nothing is released, and Releases between them after', async ({ page }) => {
   await page.goto('/status/');
-  await expect(page.getByRole('link', { name: 'troupe’s milestones' })).toHaveAttribute('href', 'https://github.com/troupe-run/troupe/milestones');
-  await expect(page.getByRole('link', { name: 'roadmap board' })).toHaveAttribute('href', 'https://github.com/orgs/troupe-run/projects/1');
+  const sections = ['Status', 'Releases', 'Milestones', 'How to read it'];
+  const toc = (await page.locator('starlight-toc a').allInnerTexts()).filter((t) => sections.includes(t));
+  const released = (await page.locator('h2#releases').count()) > 0;
+  expect(toc).toEqual(released ? ['Status', 'Releases', 'Milestones'] : ['Status', 'Milestones']);
 });
 
-test('/status/ lists Status, Milestones and How to read it in "On this page", in that order', async ({ page }) => {
+test('/status/ has no "How to read it" section', async ({ page }) => {
   await page.goto('/status/');
-  const toc = (await page.locator('starlight-toc a').allInnerTexts()).filter((t) => ['Status', 'Milestones', 'How to read it'].includes(t));
-  expect(toc).toEqual(['Status', 'Milestones', 'How to read it']);
+  await expect(page.getByRole('heading', { name: 'How to read it' })).toHaveCount(0);
 });
