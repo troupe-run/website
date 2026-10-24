@@ -28,6 +28,7 @@ LABELS = [
     "unit tests",
     "build",
     "fixture build",
+    "rebuild test",
     "assets verify",
     "link check",
     "fixture link check",
@@ -71,6 +72,7 @@ class Gates(unittest.TestCase):
         self.assertEqual(commands["build"], [npm, "run", "build"])
         self.assertEqual(commands["assets verify"], [npm, "run", "assets:verify"])
         self.assertEqual(commands["fixture build"], [npm, "run", "build:fixture"])
+        self.assertEqual(commands["rebuild test"], [npm, "run", "test:rebuild"])
         self.assertEqual(commands["link check"], [npm, "run", "linkcheck"])
         self.assertEqual(commands["fixture link check"], [npm, "run", "linkcheck", "--", "dist-fixture"])
         self.assertEqual(commands["e2e tests"], [npm, "run", "test:e2e"])

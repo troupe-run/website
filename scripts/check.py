@@ -55,6 +55,10 @@ def gates(env: Mapping[str, str] = os.environ) -> list[tuple[str, list[str]]]:
         # The site again, against a throwaway troupe with releases, so the versions are tested before troupe has
         # one (spec: quality-check). It's never published.
         ("fixture build", [npm, "run", "build:fixture"]),
+        # The fixture site built again on that build's content store, with only the milestones and then only the tags
+        # changed, as the deploy builds on a restored cache: /status/ and /protocol/ must follow their sources
+        # (spec: quality-check; troupe-run/website#35).
+        ("rebuild test", [npm, "run", "test:rebuild"]),
         ("assets verify", [npm, "run", "assets:verify"]),
         ("link check", [npm, "run", "linkcheck"]),
         ("fixture link check", [npm, "run", "linkcheck", "--", "dist-fixture"]),

@@ -17,7 +17,8 @@
     "assets:render": "node scripts/render-assets.mjs",
     "assets:verify": "node scripts/verify-assets.mjs",
     "linkcheck": "node scripts/linkcheck.mjs",
-    "linkcheck:external": "node scripts/linkcheck-external.mjs"
+    "linkcheck:external": "node scripts/linkcheck-external.mjs",
+    "test:rebuild": "node scripts/rebuild-test.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "0.4.3",

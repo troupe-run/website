@@ -4,11 +4,11 @@ import starlightBlog from 'starlight-blog';
 import { isSatteriProcessor } from '@astrojs/markdown-satteri';
 import { fileURLToPath } from 'node:url';
 import { rmSync } from 'node:fs';
+import { join } from 'node:path';
 import { sync } from './scripts/troupe-docs-lib.mjs';
 import { MARKER as PROTOCOL_MARKER } from './scripts/protocol-lib.mjs';
 import { syncRoadmap } from './scripts/roadmap-lib.mjs';
-import { loadRoadmapInputs, roadmapPlugin } from './scripts/roadmap-plugin.mjs';
-import { loadProtocolInputs, protocolPlugin } from './scripts/protocol-plugin.mjs';
+import { GENERATED_PAGES } from './scripts/generated-pages.mjs';
 import { troupeLinks } from './scripts/troupe-links.mjs';
 import { CONTRIBUTING, firstPage, pageUrl } from './src/lib/docs-nav.ts';
 
@@ -44,12 +44,12 @@ function troupeDocs() {
         const { processor } = config.markdown;
         if (!isSatteriProcessor(processor)) throw new Error(`troupe-docs needs the Sätteri Markdown processor, not ${processor.name}`);
         processor.options.mdastPlugins.push(troupeLinks(fileURLToPath(new URL('src/content/docs/docs/', import.meta.url))));
-        // /status/'s status line and release list, where status.md marks them (spec: roadmap; design D5).
-        const page = fileURLToPath(new URL('src/content/docs/status.md', import.meta.url));
-        processor.options.mdastPlugins.push(roadmapPlugin({ page, load: () => loadRoadmapInputs(root) }));
-        // /protocol/'s release list, where protocol.md marks it (spec: protocol-schemas; design D8).
-        const protocolPage = fileURLToPath(new URL('src/content/docs/protocol.md', import.meta.url));
-        processor.options.mdastPlugins.push(protocolPlugin({ page: protocolPage, load: () => loadProtocolInputs(root) }));
+        // /status/'s status line and release lists, and /protocol/'s release list, where their pages mark them (spec:
+        // roadmap, protocol-schemas). Registered from scripts/generated-pages.mjs, the table src/content.config.ts's
+        // docs loader reads to render a page again when its inputs change (troupe-run/website#35).
+        for (const { page, load, plugin } of GENERATED_PAGES) {
+          processor.options.mdastPlugins.push(plugin({ page: join(root, page), load: () => load(root) }));
+        }
       },
     },
   };
