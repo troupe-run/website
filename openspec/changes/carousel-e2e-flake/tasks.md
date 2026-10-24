@@ -13,10 +13,10 @@
 
 ## 2. Arm the carousel's timer at a known moment
 
-- [ ] 2.1 In `season-carousel.spec.ts`'s `open()`, after scrolling the carousel into view, wait for a fresh
+- [x] 2.1 In `season-carousel.spec.ts`'s `open()`, after scrolling the carousel into view, wait for a fresh
   IntersectionObserver on the carousel to report it intersecting (design D2). Verify
   `npx playwright test tests/e2e/season-carousel.spec.ts --repeat-each 5` passes
-- [ ] 2.2 Add `tests/unit/e2e-clock.test.ts`, which fails, naming the file, when a file under `tests/e2e/` other than
+- [x] 2.2 Add `tests/unit/e2e-clock.test.ts`, which fails, naming the file, when a file under `tests/e2e/` other than
   `clock.ts` calls `clock.install(` (design D3). Verify it passes, then add a `page.clock.install()` to a spec file,
   verify the test fails and names that file, and take it out again
 - [ ] 2.3 Show the race is gone (design D4): add `await page.waitForTimeout(1000)` just before the first assertion

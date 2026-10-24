@@ -6,10 +6,18 @@ const CAROUSEL = '#how-it-works [data-carousel]';
 const current = (page: Page) => page.locator(`${CAROUSEL} .slide.is-current .eyebrow`);
 
 // The carousel only runs while on screen, so every test scrolls it into view first and parks the mouse away from it.
+// Then it waits for a fresh IntersectionObserver to see the carousel: a document's observers are told in the order
+// they were made, so the carousel's own has been told too, and has armed its timer before the test moves the clock
+// (carousel-e2e-flake design D2).
 async function open(page: Page) {
   await page.goto('/');
   await page.locator(CAROUSEL).scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
+  await page.locator(CAROUSEL).evaluate((el) => new Promise<void>((resolve) => {
+    new IntersectionObserver((entries, o) => {
+      if (entries[0].isIntersecting) { o.disconnect(); resolve(); }
+    }).observe(el);
+  }));
 }
 
 test('initially the Cast step is shown and the other three are hidden', async ({ page }) => {
