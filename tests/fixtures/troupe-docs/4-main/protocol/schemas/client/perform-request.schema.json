@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://troupe.run/protocol/client/perform-request.schema.json",
+  "title": "perform: request",
+  "description": "Run one actor as config defines it, and record the run. A request names only the actor, its direction and whether to rehearse: never a runner, options, an effect check, a host path, a command line or a policy value.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "actor"
+  ],
+  "properties": {
+    "actor": {
+      "$ref": "run.schema.json#/$defs/actorName"
+    },
+    "direction": {
+      "description": "What the actor is asked to do in this run. Absent means the empty string.",
+      "type": "string"
+    },
+    "rehearse": {
+      "description": "Run every check, start nothing, and report what would run. Absent means false.",
+      "type": "boolean"
+    }
+  }
+}

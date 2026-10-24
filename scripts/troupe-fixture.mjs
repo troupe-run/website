@@ -5,7 +5,7 @@
 // release milestones from tests/fixtures/milestones.json too, never troupe-run/infrastructure's, so /status/'s list is
 // tested against fixed releases (spec: roadmap).
 import { execFileSync, spawnSync } from 'node:child_process';
-import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,7 +26,11 @@ const ENV = {
   GIT_COMMITTER_EMAIL: 'fixture@troupe.run',
 };
 
-/** Commits each step of `fixtureDir` (`1-troupe-v0.1.0`, …, `N-main`) in order, tagging all but main. */
+/**
+ * Commits each step of `fixtureDir` (`1-troupe-v0.1.0+protocol-v0.1.0`, …, `N-main`) in order, tagging each with the
+ * tags its name lists after the number, joined by `+`, except main. A step holds `docs/`, `protocol/` or both; each one
+ * it holds replaces that folder, and one it doesn't hold is kept from the step before (protocol-schemas design D9).
+ */
 export function makeFixtureRepo(fixtureDir = FIXTURE) {
   const path = mkdtempSync(join(tmpdir(), 'troupe-fixture-'));
   const git = (args, env = ENV) => execFileSync('git', args, { cwd: path, env, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -34,13 +38,16 @@ export function makeFixtureRepo(fixtureDir = FIXTURE) {
     git(['init', '--quiet', '--initial-branch=main']);
     const steps = readdirSync(fixtureDir).filter((n) => /^\d+-/.test(n)).sort((a, b) => parseInt(a) - parseInt(b));
     steps.forEach((step, i) => {
-      rmSync(join(path, 'docs'), { recursive: true, force: true });
-      cpSync(join(fixtureDir, step, 'docs'), join(path, 'docs'), { recursive: true });
+      for (const folder of ['docs', 'protocol']) {
+        if (!existsSync(join(fixtureDir, step, folder))) continue;
+        rmSync(join(path, folder), { recursive: true, force: true });
+        cpSync(join(fixtureDir, step, folder), join(path, folder), { recursive: true });
+      }
       const date = `2026-0${i + 1}-01T00:00:00Z`;
       git(['add', '--all']);
       git(['commit', '--quiet', '-m', step], { ...ENV, GIT_AUTHOR_DATE: date, GIT_COMMITTER_DATE: date });
       const name = step.replace(/^\d+-/, '');
-      if (name !== 'main') git(['tag', name]);
+      if (name !== 'main') for (const tag of name.split('+')) git(['tag', tag]);
     });
   } catch (error) {
     rmSync(path, { recursive: true, force: true });

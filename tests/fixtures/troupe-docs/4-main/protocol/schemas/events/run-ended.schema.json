@@ -1,0 +1,339 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://troupe.run/protocol/events/run-ended.schema.json",
+  "title": "Run.Ended",
+  "description": "The payload of a run's last event (topic troupe.core.runs.aggregate:Run.Ended): the outcome the run host derived, and whether recording failed part-way.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "lineage",
+    "timestamp",
+    "outcome"
+  ],
+  "properties": {
+    "lineage": {
+      "$ref": "../lineage.schema.json"
+    },
+    "timestamp": {
+      "$ref": "../event-record.schema.json#/$defs/libraryTimestamp"
+    },
+    "outcome": {
+      "description": "How the run ended, as the run host derived it from what the runner reported, never from its exit code alone: the outcome, whether the runner exited, was killed or never started, and the limits it ran under.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "ending",
+        "limits"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "succeeded",
+            "failed",
+            "cancelled",
+            "timed-out",
+            "crashed",
+            "could-not-start"
+          ]
+        },
+        "error": {
+          "description": "Why the run didn't succeed. Absent: the outcome has no error.",
+          "$ref": "../error.schema.json"
+        },
+        "result": {
+          "description": "The result event the runner sent. Absent: it sent none, or never started.",
+          "$ref": "../runner/run-event.schema.json#/$defs/result"
+        },
+        "exitCode": {
+          "description": "The runner process's exit code. Present exactly when the runner started (ending isn't never-started).",
+          "type": "integer"
+        },
+        "ending": {
+          "enum": [
+            "exited",
+            "killed",
+            "never-started"
+          ]
+        },
+        "transcript": {
+          "description": "The transcript's artifact reference. Present exactly when the runner started.",
+          "$ref": "../lineage.schema.json#/$defs/hash"
+        },
+        "stderr": {
+          "description": "The artifact reference of the runner's standard error. Present exactly when the runner started.",
+          "$ref": "../lineage.schema.json#/$defs/hash"
+        },
+        "limits": {
+          "description": "The limits the run ran under, by setting.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "start_timeout",
+            "run_timeout",
+            "cancel_grace",
+            "silence_announce",
+            "max_message_bytes",
+            "event_max_bytes",
+            "transcript_max_bytes",
+            "stderr_max_bytes",
+            "fail_fast_on_auth_retry"
+          ],
+          "properties": {
+            "start_timeout": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "run_timeout": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "cancel_grace": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "silence_announce": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "max_message_bytes": {
+              "type": "integer",
+              "exclusiveMinimum": 0
+            },
+            "event_max_bytes": {
+              "type": "integer",
+              "exclusiveMinimum": 0
+            },
+            "transcript_max_bytes": {
+              "type": "integer",
+              "exclusiveMinimum": 0
+            },
+            "stderr_max_bytes": {
+              "type": "integer",
+              "exclusiveMinimum": 0
+            },
+            "fail_fast_on_auth_retry": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "if": {
+        "properties": {
+          "ending": {
+            "const": "never-started"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exitCode": false,
+          "transcript": false,
+          "stderr": false,
+          "result": false
+        }
+      },
+      "else": {
+        "required": [
+          "exitCode",
+          "transcript",
+          "stderr"
+        ]
+      }
+    },
+    "recording": {
+      "description": "Where recording the run's events failed, and why. Absent: recording didn't fail.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "failedAt",
+        "error"
+      ],
+      "properties": {
+        "failedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "error": {
+          "$ref": "../error.schema.json"
+        }
+      }
+    },
+    "changes": {
+      "description": "What a worktree run changed, captured when it ended. Present exactly when the run's workspace was a worktree.",
+      "$ref": "#/$defs/changes"
+    }
+  },
+  "$defs": {
+    "shared": {
+      "title": "Shared changes",
+      "description": "What changed during the run in the state the repository's worktrees share, which discarding doesn't undo. Each list is left out when nothing in it changed.",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "refs": {
+          "description": "Each of the refs, the stash and the theatre's HEAD that changed. Absent: none did.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "change"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "change": {
+                "enum": [
+                  "added",
+                  "changed",
+                  "removed"
+                ]
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "config": {
+          "description": "Each of the repository's config files that changed. Absent: none did.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "change"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "change": {
+                "enum": [
+                  "added",
+                  "changed",
+                  "removed"
+                ]
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "hooks": {
+          "description": "Each of the hooks, in the hooks directory git uses that changed. Absent: none did.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "change"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "change": {
+                "enum": [
+                  "added",
+                  "changed",
+                  "removed"
+                ]
+              }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "changes": {
+      "title": "Captured changes",
+      "description": "A worktree run's changes against its base commit: the diff's reference with the counts of files it adds, modifies and deletes, and how many paths under .troupe/ were left out; or, when capturing failed, the error. diff is absent when nothing changed.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "added",
+            "modified",
+            "deleted",
+            "leftOut"
+          ],
+          "properties": {
+            "diff": {
+              "description": "The diff's artifact reference: git's binary diff from the base commit. Absent: the run changed nothing.",
+              "$ref": "../lineage.schema.json#/$defs/hash"
+            },
+            "added": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "modified": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "deleted": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "leftOut": {
+              "description": "How many changed paths under .troupe/ were left out of the diff.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "shared": {
+              "description": "What changed in the repository's shared state during the run. Absent: nothing did.",
+              "$ref": "#/$defs/shared"
+            }
+          },
+          "if": {
+            "properties": {
+              "added": {
+                "const": 0
+              },
+              "modified": {
+                "const": 0
+              },
+              "deleted": {
+                "const": 0
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diff": false
+            }
+          },
+          "else": {
+            "required": [
+              "diff"
+            ]
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "error"
+          ],
+          "properties": {
+            "error": {
+              "description": "Why the changes couldn't be captured. The worktree is kept.",
+              "$ref": "../error.schema.json"
+            },
+            "shared": {
+              "description": "What changed in the repository's shared state during the run. Absent: nothing did.",
+              "$ref": "#/$defs/shared"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

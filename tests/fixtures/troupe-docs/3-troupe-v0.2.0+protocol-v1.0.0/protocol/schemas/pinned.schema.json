@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://troupe.run/protocol/pinned.schema.json",
+  "description": "The fixture troupe at protocol-v1.0.0: an absolute reference to another of its schemas.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "hash": {
+      "$ref": "https://troupe.run/protocol/lineage.schema.json#/$defs/hash"
+    },
+    "renamed": {
+      "$ref": "#/$defs/renamed"
+    }
+  },
+  "$defs": {
+    "renamed": {
+      "type": "string"
+    }
+  }
+}

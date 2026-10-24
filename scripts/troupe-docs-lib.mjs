@@ -1,16 +1,17 @@
 // Builds troupe.run's /docs from troupe-run/troupe's docs/, one version per release (spec: versioned-docs). Reads
 // troupe's refs with git, checks every page against troupe's own page contract, and writes the pages where
 // Starlight's content loader reads them (design D1 to D4). The Astro integration in astro.config.mjs and
-// `npm run docs:sync` both call `sync`.
+// `npm run docs:sync` both call `sync`, which also writes /protocol/ from the same source (protocol-lib.mjs; spec:
+// protocol-schemas).
 
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
-/** An input from troupe, or the environment, that the build won't guess about. The message names it and the fix. */
-export class TroupeDocsError extends Error {
-  name = 'TroupeDocsError';
-}
+import { TroupeDocsError } from './troupe-error.mjs';
+import { buildProtocol, writeProtocol } from './protocol-lib.mjs';
+
+export { TroupeDocsError };
 
 // Release tags. release-please tags each component, with linked versions, so troupe-vX.Y.Z stands for the release.
 const RELEASE_PREFIX = 'troupe-v';
@@ -203,13 +204,20 @@ function walk(dir) {
   });
 }
 
-/** Reads one ref's docs/ from a git directory: the paths under docs/, a page's text, and its last commit date. */
+/**
+ * Reads a ref from a git directory: the files under a folder (docs/, or protocol/schemas/ for /protocol/), a file's
+ * text, a page's last commit date, and the tags.
+ */
 function fromGit(gitArgs) {
+  const listTree = (ref, dir) =>
+    git([...gitArgs, 'ls-tree', '-r', '--name-only', refName(ref), '--', `${dir}/`])
+      .split('\n').filter(Boolean).map((p) => p.slice(dir.length + 1));
+  const readFile = (ref, path) => git([...gitArgs, 'show', `${refName(ref)}:${path}`]);
   return {
-    list: (ref) =>
-      git([...gitArgs, 'ls-tree', '-r', '--name-only', refName(ref), '--', 'docs/'])
-        .split('\n').filter(Boolean).map((p) => p.slice('docs/'.length)),
-    read: (ref, path) => git([...gitArgs, 'show', `${refName(ref)}:docs/${path}`]),
+    listTree,
+    readFile,
+    list: (ref) => listTree(ref, 'docs'),
+    read: (ref, path) => readFile(ref, `docs/${path}`),
     /** Any file in the repository at `ref`, such as troupe's own page-contract module, for the drift tests. */
     readRepo: (ref, path) => git([...gitArgs, 'show', `${refName(ref)}:${path}`]),
     date: (ref, path) => git([...gitArgs, 'log', '-1', '--format=%cI', refName(ref), '--', `docs/${path}`]).trim() || null,
@@ -264,13 +272,21 @@ function local(value) {
   }
   if (realpathSync(top) !== realpathSync(root)) throw refuse(`which is inside the git working tree ${top}, not its top`);
   const tagged = fromGit(['-C', root]);
-  const docs = join(root, 'docs');
+  // main is the working tree, uncommitted edits included, so a writer can preview them.
+  const listTree = (ref, dir) => {
+    if (ref !== 'main') return tagged.listTree(ref, dir);
+    const at = join(root, dir);
+    if (!existsSync(at)) return [];
+    return walk(at).map((p) => relative(at, p).split(sep).join('/')).sort();
+  };
+  const readFile = (ref, path) => (ref === 'main' ? readFileSync(join(root, path), 'utf8') : tagged.readFile(ref, path));
   return {
     kind: 'local',
     ...tagged,
-    // main is the working tree, uncommitted edits included, so a writer can preview them.
-    list: (ref) => (ref === 'main' ? walk(docs).map((p) => relative(docs, p).split(sep).join('/')).sort() : tagged.list(ref)),
-    read: (ref, path) => (ref === 'main' ? readFileSync(join(docs, path), 'utf8') : tagged.read(ref, path)),
+    listTree,
+    readFile,
+    list: (ref) => listTree(ref, 'docs'),
+    read: (ref, path) => readFile(ref, `docs/${path}`),
     date: (ref, path) => {
       if (ref !== 'main') return tagged.date(ref, path);
       if (git(['-C', root, 'status', '--porcelain', '--', `docs/${path}`]).trim()) return null;
@@ -284,6 +300,9 @@ function local(value) {
  * @property {'remote' | 'local'} kind
  * @property {() => string[]} tags
  * @property {() => Record<string, string>} tagDates
+ * @property {(ref: string, dir: string) => string[]} listTree the files under `dir` at `ref`, relative to it; none when
+ *   `ref` has no such folder
+ * @property {(ref: string, path: string) => string} readFile a file at `ref`, by its path in the repository
  * @property {(ref: string) => string[]} list
  * @property {(ref: string, path: string) => string} read
  * @property {(ref: string, path: string) => string} readRepo
@@ -352,8 +371,12 @@ export function renderPage(version, page) {
   return `---\n${lines.join('\n')}\n---\n<!-- Generated from ${from} by npm run docs:sync. Edit it there, not here. -->\n${page.body}`;
 }
 
-/** Replaces `outDir` with every version's pages, and writes the manifest. Refuses to clear a folder it didn't make. */
-export function writeDocs(versions, outDir, manifestPath, releases = []) {
+/**
+ * Replaces `outDir` with every version's pages, and writes the manifest. Refuses to clear a folder it didn't make.
+ * `protocol` is what /protocol/ was built from, recorded for its page and the tests (protocol-schemas design D1).
+ * @param {{ copies: { prefix: string, ref: string, files: number }[], releases: string[] }} [protocol]
+ */
+export function writeDocs(versions, outDir, manifestPath, releases = [], protocol = { copies: [], releases: [] }) {
   if (existsSync(outDir) && readdirSync(outDir).length && !existsSync(join(outDir, MARKER))) {
     throw new TroupeDocsError(`${outDir} holds files the docs sync didn't write, so it won't replace them. Fix: move them, then run it again.`);
   }
@@ -374,6 +397,7 @@ export function writeDocs(versions, outDir, manifestPath, releases = []) {
     // The release tags the versions were chosen from, with their dates, which the roadmap on /status/ marks as
     // released (spec: roadmap).
     releases,
+    protocol,
   };
   mkdirSync(dirname(manifestPath), { recursive: true });
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
@@ -381,13 +405,16 @@ export function writeDocs(versions, outDir, manifestPath, releases = []) {
 }
 
 /**
- * Fetches troupe, checks every version, and writes the pages and the manifest under `root`.
- * @param {{ env?: Record<string, string | undefined>, root: string, remote?: string }} options
+ * Fetches troupe once, checks every docs version and every /protocol/ copy, and only then writes the pages, the
+ * schemas (in public/protocol/) and the manifest under `root`. `open` is openSource, replaced only by the tests.
+ * @param {{ env?: Record<string, string | undefined>, root: string, remote?: string, open?: typeof openSource }} options
  */
-export function sync({ env = process.env, root, remote }) {
-  const source = openSource(env, { cacheDir: join(root, '.cache', 'troupe.git'), remote });
+export function sync({ env = process.env, root, remote, open = openSource }) {
+  const source = open(env, { cacheDir: join(root, '.cache', 'troupe.git'), remote });
   const versions = buildVersions(source);
+  const protocol = buildProtocol(source);
   const dates = source.tagDates();
   const releases = source.tags().filter((t) => t.startsWith(RELEASE_PREFIX)).map((tag) => ({ tag, date: dates[tag] }));
-  return writeDocs(versions, join(root, 'src', 'content', 'docs', 'docs'), join(root, 'src', 'generated', 'troupe-docs.json'), releases);
+  const summary = writeProtocol(protocol, join(root, 'public', 'protocol'));
+  return writeDocs(versions, join(root, 'src', 'content', 'docs', 'docs'), join(root, 'src', 'generated', 'troupe-docs.json'), releases, summary);
 }

@@ -109,7 +109,9 @@ together, as `refuse` does for docs pages.
 The sync writes the copies into `public/protocol/`, gitignored, with the same marker-file rule as
 `src/content/docs/docs/` (it replaces only a folder it wrote). Astro copies `public/` into the build and serves it in
 dev, so `/protocol/` works in `astro dev`, `astro build` and the fixture build with no route code, and every file keeps
-its `.json` extension, which is what gives it its content type on Pages.
+its `.json` extension, which is what gives it its content type on Pages. Astro copies the marker file too, so the
+integration removes `protocol/.troupe-protocol` from the output in `astro:build:done` (found building the fixture,
+2026-10-24).
 
 *Alternatives:* an Astro endpoint (`src/pages/protocol/[...path].ts`) with `getStaticPaths`, which works but is route
 code for what are static files, and has to fight `trailingSlash: 'always'` on paths that end in `.json`; or writing into

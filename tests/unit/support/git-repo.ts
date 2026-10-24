@@ -52,3 +52,8 @@ export function makeRepo(): Repo {
 /** A troupe page with valid front matter. */
 export const page = (title: string, body = `${title}'s text.`) =>
   `---\ntitle: ${title}\ndescription: About ${title}.\nstatus: written\nprerelease: false\n---\n\n${body}\n`;
+
+/** The least protocol/schemas/ a troupe's main needs for the sync to build /protocol/ (spec: protocol-schemas). */
+export const SCHEMAS = {
+  'protocol/schemas/a.schema.json': `${JSON.stringify({ $id: 'https://troupe.run/protocol/a.schema.json' })}\n`,
+};

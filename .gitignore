@@ -10,5 +10,7 @@ playwright-report/
 __pycache__/
 # Written by npm run docs:sync from troupe-run/troupe on every run (spec: versioned-docs).
 src/content/docs/docs/
+# /protocol/'s schemas, written by the same sync from troupe-run/troupe's protocol/schemas/ (spec: protocol-schemas).
+public/protocol/
 src/generated/
 .cache/
