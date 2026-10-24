@@ -40,13 +40,16 @@ anything else.
   - To preview a milestone edit, or to work offline, set `TROUPE_MILESTONES` to your infrastructure checkout:
     `TROUPE_MILESTONES=../infrastructure npm run dev`. Its working tree is read, uncommitted edits included.
 - `uv run scripts/check.py` runs every check CI runs, in the same order: `npm ci`, Playwright's browser,
-  `astro check`, the unit tests, the build, the fixture build, the brand-asset check, the internal link check of both
-  builds (with the check of every reference in `/protocol/`'s schemas) and the end-to-end tests. It stops at the first
-  failure and says which one. `npm ci` reinstalls `node_modules`, so a dev server that's running at the time may need
-  a restart.
+  `astro check`, the unit tests, the build, the fixture build, the rebuild test, the brand-asset check, the internal
+  link check of both builds (with the check of every reference in `/protocol/`'s schemas) and the end-to-end tests.
+  It stops at the first failure and says which one. `npm ci` reinstalls `node_modules`, so a dev server that's
+  running at the time may need a restart.
 - The fixture build (`npm run build:fixture`) builds the site into `dist-fixture/` against a throwaway troupe with
   releases, made from `tests/fixtures/troupe-docs/`, so `/docs/next/`, earlier versions, the version menu and every
   `/protocol/` copy are tested before troupe has a release. It's never published.
+- The rebuild test (`npm run test:rebuild`) builds the fixture site three times on one content store, as the deploy
+  does on a restored cache. The second build changes only the milestones and the third only troupe's tags, and each
+  time `/status/` and `/protocol/` must show the new data, not what an earlier build rendered.
 - `npm run test:unit` and `npm run test:e2e` run the tests on their own. The e2e suite builds the site and serves it
   on a port that's free at the time (`E2E_PORT` chooses one), so it never reuses your dev server or another
   worktree's. It serves `dist-fixture/` on a second port (`E2E_FIXTURE_PORT`), so run `npm run build:fixture` first.

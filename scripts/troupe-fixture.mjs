@@ -16,7 +16,7 @@ export const OUT_DIR = 'dist-fixture';
 export const MILESTONES_FIXTURE = join(ROOT, 'tests', 'fixtures', 'milestones.json');
 
 // git with no global or system config, so no hook or setting of the machine's touches the fixture.
-const ENV = {
+export const ENV = {
   ...process.env,
   GIT_CONFIG_GLOBAL: '/dev/null',
   GIT_CONFIG_NOSYSTEM: '1',

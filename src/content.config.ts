@@ -4,6 +4,7 @@ import { glob } from 'astro/loaders';
 import { docsLoader, i18nLoader } from '@astrojs/starlight/loaders';
 import { docsSchema, i18nSchema } from '@astrojs/starlight/schema';
 import { blogSchema } from 'starlight-blog/schema';
+import { rerenderGeneratedPages } from '../scripts/generated-pages.mjs';
 
 const link = z.object({ label: z.string(), href: z.string() });
 const cta = z.object({ label: z.string(), href: z.string().optional() });
@@ -63,7 +64,9 @@ const copySchema = z.discriminatedUnion('section', [
 
 export const collections = {
   docs: defineCollection({
-    loader: docsLoader(),
+    // /status/ and /protocol/ are rendered from src/generated/, which their own files don't show, so a stored render
+    // is dropped when those inputs change (troupe-run/website#35; status-milestones-refresh design D1).
+    loader: rerenderGeneratedPages(docsLoader()),
     schema: docsSchema({
       extend: (context) => blogSchema(context).extend({
         status: z.enum(['written', 'planned']).default('planned'),
