@@ -101,11 +101,15 @@
 
 ## 9. Documentation
 
-- [ ] 9.1 Say where `/protocol/` comes from: CLAUDE.md's first paragraph and `openspec/config.yaml`'s context (the
+- [x] 9.1 Say where `/protocol/` comes from: CLAUDE.md's first paragraph and `openspec/config.yaml`'s context (the
   schemas live in troupe's `protocol/schemas/`, never here), CONTRIBUTING.md's `TROUPE_DOCS` section (it supplies the
   schemas too), and the comments at the top of `scripts/troupe-docs.mjs` and the integration. Check
   `scripts/check-paths.toml` covers the new paths. Verify: `uv run scripts/check.py` passes, and a grep for
   `protocol` in each file shows the line.
+  Done 2026-10-24: each file names `/protocol/` (grep counts: CLAUDE.md 2, config.yaml 2, CONTRIBUTING.md 5,
+  troupe-docs.mjs 4, astro.config.mjs 6). check-paths.toml needs no change: `public/protocol/` is git-ignored and
+  every new file is read by a gate. The three edited files are on its skip list; the full check last passed on the
+  code at the `feat(linkcheck)` commit, and 10.1 runs it again on the final tree.
 
 ## 10. Final checks
 
