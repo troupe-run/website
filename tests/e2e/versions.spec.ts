@@ -246,20 +246,36 @@ for (const theme of ['light', 'dark'] as const) {
 // The roadmap on the fixture build: tests/fixtures/milestones.json against the fixture troupe's tags, troupe-v0.1.0
 // (2026-01-01), troupe-v0.1.1 (2026-02-01) and troupe-v0.2.0 (2026-03-01) (spec: roadmap; quality-check).
 test.describe('the roadmap on /status/', () => {
-  test('lists the fixture milestones in version order, whatever order the file has, with no entry for the 0.1.1 patch', async ({ page }) => {
+  // A section's entries: the first list after its heading (Milestones has an introduction before its own).
+  const entries = (page: import('@playwright/test').Page, id: string) =>
+    page.locator(`.sl-heading-wrapper:has(h2#${id}) ~ ol`).first().locator('> li');
+  const versionsIn = (page: import('@playwright/test').Page, id: string) => entries(page, id).locator('> strong').allInnerTexts();
+
+  test('lists 0.1.0 and 0.2.0 under Releases and the rest under Milestones, each in version order, with no entry for the 0.1.1 patch', async ({ page }) => {
     await page.goto('/status/');
-    const versions = await page.locator('.sl-markdown-content ol > li > strong').allInnerTexts();
-    expect(versions).toEqual(['0.1.0', '0.2.0', '0.3.0', '0.10.0', '1.0.0']);
+    expect(await versionsIn(page, 'releases')).toEqual(['0.1.0', '0.2.0']);
+    expect(await versionsIn(page, 'milestones')).toEqual(['0.3.0', '0.10.0', '1.0.0']);
   });
 
-  test("dates 0.1.0 and 0.2.0 by their tags, as text and in a <time>, and nothing else", async ({ page }) => {
+  test('dates 0.1.0 and 0.2.0 by their tags, as text and in a <time>, and nothing under Milestones', async ({ page }) => {
     await page.goto('/status/');
-    const items = page.locator('.sl-markdown-content ol > li');
-    await expect(items.nth(0)).toHaveText("0.1.0 One: the first fixture release Released 2026-01-01");
-    await expect(items.nth(1).locator('.roadmap-released time')).toHaveAttribute('datetime', '2026-03-01');
-    await expect(items.nth(1).locator('.roadmap-released')).toHaveText('Released 2026-03-01');
+    const released = entries(page, 'releases');
+    await expect(released.nth(0)).toHaveText('0.1.0 One: the first fixture release Released 2026-01-01');
+    await expect(released.nth(0).locator('.roadmap-released time')).toHaveAttribute('datetime', '2026-01-01');
+    await expect(released.nth(1).locator('.roadmap-released time')).toHaveAttribute('datetime', '2026-03-01');
+    await expect(released.nth(1).locator('.roadmap-released')).toHaveText('Released 2026-03-01');
     await expect(page.locator('.roadmap-released')).toHaveCount(2);
-    await expect(items.nth(2)).toHaveText('0.3.0 Three: planned, with no tag in the fixture troupe');
+    const planned = entries(page, 'milestones');
+    await expect(planned.nth(0)).toHaveText('0.3.0 Three: planned, with no tag in the fixture troupe');
+    await expect(planned.locator('.roadmap-released')).toHaveCount(0);
+  });
+
+  test('puts Releases before Milestones, in the page and in "On this page"', async ({ page }) => {
+    await page.goto('/status/');
+    const headings = await page.locator('.sl-markdown-content h2').allInnerTexts();
+    expect(headings).toEqual(['Status', 'Releases', 'Milestones', 'How to read it']);
+    const toc = (await page.locator('starlight-toc a').allInnerTexts()).filter((t) => headings.includes(t));
+    expect(toc).toEqual(headings);
   });
 
   test('names 0.2.0 as the latest release in the status', async ({ page }) => {
