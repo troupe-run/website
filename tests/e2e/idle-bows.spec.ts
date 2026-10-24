@@ -1,10 +1,11 @@
 import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
+import { freezeClock } from './clock';
 
 const bowing = (page: Page) => page.locator('[data-cast] .character.is-bowing');
 
 test('after 5s with no hover, exactly one character is bowing', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await expect(page.locator('[data-cast]')).toHaveAttribute('data-idle', 'running');
@@ -13,7 +14,7 @@ test('after 5s with no hover, exactly one character is bowing', async ({ page })
 });
 
 test('with reduced motion, idle bowing is off and nothing bows after 6s', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   await expect(page.locator('[data-cast]')).toHaveAttribute('data-idle', 'off');
@@ -22,7 +23,7 @@ test('with reduced motion, idle bowing is off and nothing bows after 6s', async 
 });
 
 test('with the hero scrolled out of view, no bow fires', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await page.locator('footer.site-footer').scrollIntoViewIfNeeded();
@@ -32,7 +33,7 @@ test('with the hero scrolled out of view, no bow fires', async ({ page }) => {
 });
 
 test('idle bowing reaches state "done" within 40s', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await page.clock.runFor(40_000);
@@ -40,7 +41,7 @@ test('idle bowing reaches state "done" within 40s', async ({ page }) => {
 });
 
 test('hovering a character at 4s delays the first idle bow until after 9s', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await expect(page.locator('[data-cast]')).toHaveAttribute('data-idle', 'running');

@@ -2,11 +2,11 @@
 
 ## 1. Freeze the clock
 
-- [ ] 1.1 Add `tests/e2e/clock.ts` with `freezeClock(page)`: `page.clock.install()`, then `pauseAt` a second later
+- [x] 1.1 Add `tests/e2e/clock.ts` with `freezeClock(page)`: `page.clock.install()`, then `pauseAt` a second later
   (design D1). Add `tests/e2e/clock.spec.ts`, which freezes the clock, loads `/`, reads `performance.now()` and
   `Date.now()` in the page, waits one second of real time and checks both read the same (design D3). Verify it
   passes, then verify it fails with `pauseAt` taken out of the helper, and put `pauseAt` back
-- [ ] 1.2 Replace every `page.clock.install()` in `tests/e2e/season-carousel.spec.ts` (21) and
+- [x] 1.2 Replace every `page.clock.install()` in `tests/e2e/season-carousel.spec.ts` (21) and
   `tests/e2e/idle-bows.spec.ts` (5) with `await freezeClock(page)` at the same point. Verify `git diff` changes no
   test name and no assertion, and that `npm run test:e2e` passes in full. If a test fails with the clock frozen,
   stop and report which one and why rather than changing what it checks
