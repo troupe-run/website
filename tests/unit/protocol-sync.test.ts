@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { openSource, sync } from '../../scripts/troupe-docs-lib.mjs';
+import { writeProtocol } from '../../scripts/protocol-lib.mjs';
 import { makeRepo, page, type Repo } from './support/git-repo';
 
 // sync writes /protocol/'s copies beside /docs's pages, from the same source (spec: protocol-schemas; design D1, D6).
@@ -90,5 +91,16 @@ describe('sync and /protocol/', () => {
     sync({ env: {}, root, remote: r.path, open: counting });
     expect(opened).toBe(1);
     expect(read(root, 'next/a.schema.json').v).toBe(3);
+  });
+
+  it("moves a copy's ids exactly when the copy says to, whatever its prefix", () => {
+    const out = join(temp(), 'protocol');
+    const schemas = [{ path: 'a.schema.json', value: { $id: `${BASE}a.schema.json` } }];
+    writeProtocol({ copies: [
+      { prefix: 'moved/', ref: 'main', rewrite: true, schemas },
+      { prefix: 'kept/', ref: 'main', rewrite: false, schemas },
+    ], releases: [] }, out);
+    expect(JSON.parse(readFileSync(join(out, 'moved', 'a.schema.json'), 'utf8')).$id).toBe(`${BASE}moved/a.schema.json`);
+    expect(JSON.parse(readFileSync(join(out, 'kept', 'a.schema.json'), 'utf8')).$id).toBe(`${BASE}a.schema.json`);
   });
 });

@@ -8,6 +8,7 @@ import { sync } from './scripts/troupe-docs-lib.mjs';
 import { MARKER as PROTOCOL_MARKER } from './scripts/protocol-lib.mjs';
 import { syncRoadmap } from './scripts/roadmap-lib.mjs';
 import { loadRoadmapInputs, roadmapPlugin } from './scripts/roadmap-plugin.mjs';
+import { loadProtocolInputs, protocolPlugin } from './scripts/protocol-plugin.mjs';
 import { troupeLinks } from './scripts/troupe-links.mjs';
 import { CONTRIBUTING, firstPage, pageUrl } from './src/lib/docs-nav.ts';
 
@@ -46,6 +47,9 @@ function troupeDocs() {
         // /status/'s status line and release list, where status.md marks them (spec: roadmap; design D5).
         const page = fileURLToPath(new URL('src/content/docs/status.md', import.meta.url));
         processor.options.mdastPlugins.push(roadmapPlugin({ page, load: () => loadRoadmapInputs(root) }));
+        // /protocol/'s release list, where protocol.md marks it (spec: protocol-schemas; design D8).
+        const protocolPage = fileURLToPath(new URL('src/content/docs/protocol.md', import.meta.url));
+        processor.options.mdastPlugins.push(protocolPlugin({ page: protocolPage, load: () => loadProtocolInputs(root) }));
       },
     },
   };

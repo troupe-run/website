@@ -144,7 +144,7 @@ export function rewriteIds(schema, prefix) {
   return copy;
 }
 
-/** A schema as it's published in the copy at `prefix`: rewritten unless it's the latest, as two-space JSON. */
+/** A schema as it's published, its ids moved under `prefix` (none for the latest copy), as two-space JSON. */
 export function renderSchema(schema, prefix) {
   return `${JSON.stringify(prefix ? rewriteIds(schema, prefix) : schema, null, 2)}\n`;
 }
@@ -180,11 +180,11 @@ export function writeProtocol({ copies, releases }, outDir) {
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
   writeFileSync(join(outDir, MARKER), 'Written by npm run docs:sync from troupe-run/troupe. Everything here is replaced on each run.\n');
-  for (const { prefix, schemas } of copies) {
+  for (const { prefix, rewrite, schemas } of copies) {
     for (const { path, value } of schemas) {
       const at = join(outDir, prefix, path);
       mkdirSync(dirname(at), { recursive: true });
-      writeFileSync(at, renderSchema(value, prefix));
+      writeFileSync(at, renderSchema(value, rewrite ? prefix : ''));
     }
   }
   return { copies: copies.map(({ prefix, ref, schemas }) => ({ prefix, ref, files: schemas.length })), releases };
