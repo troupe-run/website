@@ -182,3 +182,12 @@ each schema defines. It SHALL show no docs sidebar and no version menu.
 #### Scenario: With releases
 - **WHEN** the site is built with tags `protocol-v0.1.0` and `protocol-v0.2.0`
 - **THEN** the page lists 0.2.0 and 0.1.0, newest first, and names 0.2.0 as the latest
+
+### Requirement: An earlier build never keeps an old release list on the protocol page
+Every build SHALL publish `/protocol/`'s list of protocol releases from the `protocol-v*` tags and page words it read,
+even when it starts from an earlier build's cache and nothing in this repository has changed since.
+
+#### Scenario: A new protocol tag, website unchanged
+- **WHEN** a build runs on an earlier build's cache, with the same website commit, after troupe was tagged with a
+  new `protocol-v*` release
+- **THEN** `/protocol/` lists that release and names it as the latest
