@@ -71,8 +71,9 @@
   Done 2026-10-24: all gates passed on the tree committed as 3f72cb1, with the generated docs folder present (#36's
   fix), 372 unit tests and 246 e2e tests. The output is at
   /private/tmp/claude-502/-Users-martin-Projects-troupe-website-status-released-and-planned/14f9a7ca-fb71-41ce-aacb-8f74b3a38a07/scratchpad/final-check-34.log.
-- [ ] 3.3 Open the pull request with `Closes #34` (body via `--body-file`). Verify: CI's `test` and `guard` jobs
+- [x] 3.3 Open the pull request with `Closes #34` (body via `--body-file`). Verify: CI's `test` and `guard` jobs
   pass.
+  Done 2026-10-24: troupe-run/website#39 says Closes #34. CI's `test` (2m13s) and `guard` jobs pass.
 
 ## Workflow follow-up
 
