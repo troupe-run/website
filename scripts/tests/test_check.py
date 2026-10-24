@@ -212,16 +212,48 @@ class Hooks(unittest.TestCase):
 
 CHECK_PATHS = ROOT / "scripts" / "check-paths.toml"
 
-GATE_SOURCES = [
-    *sorted((ROOT / "src").rglob("*")),
-    *sorted((ROOT / "tests").rglob("*")),
-    *sorted((ROOT / "scripts").glob("*.mjs")),
-    ROOT / "astro.config.mjs",
-    ROOT / "playwright.config.ts",
-    ROOT / "vitest.config.ts",
-    ROOT / "package.json",
+GATE_PATHS = [
+    "src",
+    "tests",
+    "scripts/*.mjs",
+    "astro.config.mjs",
+    "playwright.config.ts",
+    "vitest.config.ts",
+    "package.json",
 ]
 """What the gates read, besides the packages: the site, its tests, its scripts and its config."""
+
+
+def gate_sources(root: Path) -> list[Path]:
+    """The files under GATE_PATHS that git would commit: tracked, or new and not ignored (design D1).
+
+    Raises when git can't list them, rather than reading every file or none (design D2).
+    """
+    try:
+        listed = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard",
+             "--", *GATE_PATHS],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        raise RuntimeError(f"git couldn't list the gate sources in {root}: git isn't on PATH") from None
+    if listed.returncode != 0:
+        raise RuntimeError(f"git couldn't list the gate sources in {root}: {listed.stderr.strip()}")
+    return [root / path for path in sorted(set(listed.stdout.split("\0"))) if path]
+
+
+def naming(root: Path, needles: set[str]) -> list[str]:
+    """Each gate source under root that names a needle, outside URLs."""
+    return [
+        f"{source.relative_to(root)} names {needle}"
+        for source in gate_sources(root)
+        if source.is_file()
+        for text in [re.sub(r"https?://\S+", "", source.read_text(errors="ignore"))]
+        for needle in sorted(needles)
+        if needle in text
+    ]
 
 
 def declaration() -> dict:
@@ -249,21 +281,15 @@ class CheckPaths(unittest.TestCase):
         # The guard skips the check for a commit that stages only these, so a gate that read one
         # could break unchecked until CI (design D5). Directory entries are also matched by their
         # prefix (`openspec/`); docs/ only by its files, since the site's routes say /docs/. URLs
-        # are left out: a link to another repository's CONTRIBUTING.md isn't this one's file.
+        # are left out: a link to another repository's CONTRIBUTING.md isn't this one's file. Only
+        # what git would commit is a source: the docs a build fetches from troupe are ignored, and
+        # troupe holds them to their own rules.
         needles = set()
         for entry in declaration()["skip"]["paths"]:
             needles.update(skipped_files(entry))
             if entry.endswith("/**") and entry != "docs/**":
                 needles.add(entry[:-2])
-        found = [
-            f"{source.relative_to(ROOT)} names {needle}"
-            for source in GATE_SOURCES
-            if source.is_file()
-            for text in [re.sub(r"https?://\S+", "", source.read_text(errors="ignore"))]
-            for needle in sorted(needles)
-            if needle in text
-        ]
-        self.assertEqual(found, [])
+        self.assertEqual(naming(ROOT, needles), [])
 
     @unittest.skipUnless(
         (ROOT / "scripts" / "guard.py").exists(), "the guard isn't delivered yet"
@@ -280,6 +306,51 @@ class CheckPaths(unittest.TestCase):
         self.assertEqual(only_openspec.names, ())
         mixed = guard.check_scope(["openspec/changes/x/tasks.md", "src/pages/index.astro"], parsed)
         self.assertTrue(mixed.full)
+
+
+class GateSources(unittest.TestCase):
+    """Which files count as a gate's sources, in a throwaway repository (spec: quality-check)."""
+
+    def setUp(self) -> None:
+        self.root = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
+        (self.root / ".gitignore").write_text("src/content/docs/docs/\n")
+        (self.root / "src" / "content" / "docs" / "docs").mkdir(parents=True)
+
+    def write(self, path: str) -> None:
+        (self.root / path).write_text("A run doesn't load the theatre's CLAUDE.md.\n")
+
+    def test_a_tracked_file_under_src_naming_claude_md_is_reported(self) -> None:
+        self.write("src/tracked.md")
+        subprocess.run(["git", "-C", str(self.root), "add", "src/tracked.md"], check=True)
+        self.assertEqual(naming(self.root, {"CLAUDE.md"}), ["src/tracked.md names CLAUDE.md"])
+
+    def test_a_new_untracked_file_under_src_naming_claude_md_is_reported(self) -> None:
+        self.write("src/new.md")
+        self.assertEqual(naming(self.root, {"CLAUDE.md"}), ["src/new.md names CLAUDE.md"])
+
+    def test_a_fetched_docs_page_git_ignores_naming_claude_md_isn_t_reported(self) -> None:
+        self.write("src/content/docs/docs/first-performance.md")
+        self.assertEqual(naming(self.root, {"CLAUDE.md"}), [])
+
+
+class GateSourcesWithoutGit(unittest.TestCase):
+    def setUp(self) -> None:
+        self.root = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        (self.root / "src").mkdir()
+        (self.root / "src" / "page.md").write_text("CLAUDE.md\n")
+
+    def test_a_tree_that_isn_t_a_git_checkout_fails_saying_git_couldn_t_list_the_sources(self) -> None:
+        # git's own reason follows; it's worded in git's language, so only the directory is matched.
+        with self.assertRaisesRegex(
+            RuntimeError, f"git couldn't list the gate sources in {re.escape(str(self.root))}: ."
+        ):
+            gate_sources(self.root)
+
+    def test_without_git_on_path_it_fails_saying_git_couldn_t_list_the_sources(self) -> None:
+        with mock.patch.dict(os.environ, {"PATH": str(self.root / "src")}):
+            with self.assertRaisesRegex(RuntimeError, "git couldn't list the gate sources in .*git isn't on PATH"):
+                gate_sources(self.root)
 
 
 if __name__ == "__main__":
