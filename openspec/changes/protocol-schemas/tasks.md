@@ -131,8 +131,11 @@
 
 ## 10. Final checks
 
-- [ ] 10.1 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes, the reference check on both
+- [x] 10.1 Run `uv run scripts/check.py` on the final tree. Verify: every gate passes, the reference check on both
   builds and axe on `/protocol/` among them. Save the output to the scratchpad.
+  Done 2026-10-24: all gates passed on 7b019c1: 422 unit tests, 261 e2e tests, and 786 schema references checked on
+  the live build and 479 on the fixture build. The output is saved at
+  /private/tmp/claude-502/-Users-martin-Projects-troupe-website-protocol-schemas/42319c07-476e-477c-8cde-30b07efe87ab/scratchpad/final-check-30.log.
 - [ ] 10.2 Open the pull request with `Closes #30` (body via `--body-file`). Verify: CI's `test` and `guard` jobs
   pass.
 
