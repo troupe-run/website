@@ -23,8 +23,7 @@ const RELEASED = '<!-- roadmap:released (from tofu/milestones.json in troupe-run
 const PLANNED = '<!-- roadmap:planned (from tofu/milestones.json in troupe-run/infrastructure; edit it there) -->';
 const INTRO = 'Each milestone is a set of things you’ll be able to do.';
 const PAGE_TEXT =
-  `## Status\n\n${STATUS}\n\n## Releases\n\n${RELEASED}\n\n## Milestones\n\n${INTRO}\n\n${PLANNED}\n\n` +
-  '## How to read it\n\nText.\n';
+  `## Status\n\n${STATUS}\n\n## Releases\n\n${RELEASED}\n\n## Milestones\n\n${INTRO}\n\n${PLANNED}\n`;
 
 async function render(markdown: string, roadmap: { releases: Release[]; latest: string | null }, file = PAGE) {
   const plugin = roadmapPlugin({ page: PAGE, load: () => ({ roadmap, copy: COPY }) });
@@ -72,24 +71,35 @@ describe('roadmap plugin: a section with nothing in it', () => {
     const { html, headings } = await render(PAGE_TEXT, { releases: PLAN, latest: null });
     expect(html).not.toContain('Releases</h2>');
     expect(html).not.toContain('roadmap:');
-    expect(headings).toEqual(['Status', 'Milestones', 'How to read it']);
+    expect(headings).toEqual(['Status', 'Milestones']);
     expect(section(html, 'milestones')).toContain(INTRO);
     expect(versions(section(html, 'milestones'))).toEqual(['0.1.0', '0.2.0', '0.10.0']);
   });
 
-  it('lists Status, Releases, Milestones and How to read it in the headings once something is released', async () => {
+  it('lists Status, Releases and Milestones in the headings once something is released', async () => {
     const { headings } = await render(PAGE_TEXT, { releases: released(['2026-01-01', null, null]), latest: '0.1.0' });
-    expect(headings).toEqual(['Status', 'Releases', 'Milestones', 'How to read it']);
+    expect(headings).toEqual(['Status', 'Releases', 'Milestones']);
   });
 
-  it('leaves out Milestones, its introduction included, when every milestone is released', async () => {
-    const { html, headings } = await render(PAGE_TEXT, {
+  it('leaves out Milestones, its introduction included, when every milestone is released, keeping what comes after it', async () => {
+    const { html, headings } = await render(`${PAGE_TEXT}\n## After\n\nText.\n`, {
       releases: released(['2026-01-01', '2026-02-01', '2026-03-01']), latest: '0.10.0',
     });
-    expect(headings).toEqual(['Status', 'Releases', 'How to read it']);
+    expect(headings).toEqual(['Status', 'Releases', 'After']);
     expect(html).not.toContain(INTRO);
     expect(versions(section(html, 'releases'))).toEqual(['0.1.0', '0.2.0', '0.10.0']);
     expect(html).toContain('<p>Text.</p>');
+  });
+});
+
+describe('roadmap plugin: Milestones last on the page', () => {
+  it('leaves out Milestones to the end of the page when every milestone is released', async () => {
+    const { html, headings } = await render(PAGE_TEXT, {
+      releases: released(['2026-01-01', '2026-02-01', '2026-03-01']), latest: '0.10.0',
+    });
+    expect(headings).toEqual(['Status', 'Releases']);
+    expect(html).not.toContain(INTRO);
+    expect(html).not.toContain('roadmap:');
   });
 });
 

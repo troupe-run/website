@@ -66,11 +66,15 @@ Considered:
   already says nothing has been released.
 - *The plugin writes the heading only when there's a list.* The heading's words would leave `status.md` (D1).
 
-**D4. "How to read it" changes one bullet; Milestones' introduction stays.** The bullet "A milestone gets a date when
-it's released. The rest have none." no longer describes the page. Proposed, for the owner's review as text: "When a
-milestone is released, it moves to Releases, with the day it came out." Releases gets no introduction: its entries'
-dates say what it is. Milestones keeps "Each milestone is a set of things you'll be able to do, in the order we plan
-to build them."
+**D4. "How to read it" goes; Milestones' introduction stays.** Its bullet "A milestone gets a date when it's
+released. The rest have none." no longer described the page, and the reworded bullet ("When a milestone is released,
+it moves to Releases, with the day it came out.") was agreed, but at review the owner dropped the whole section as not
+needed (2026-10-24), its links to troupe's milestones and the roadmap board and its closing line with it. Milestones
+is now the page's last section, so D3's removal of an empty Milestones runs to the end of the page. Releases gets no
+introduction: its entries' dates say what it is. Milestones keeps "Each milestone is a set of things you'll be able to
+do, in the order we plan to build them.", which still marks the list as a plan. Asked whether to keep "planned, not promised", the
+links, or fold them into that introduction, the owner chose to drop all of it (2026-10-24): the introduction is the
+page's only label of intent, and the vocabulary test no longer records the board's URL as a use of "project".
 
 **D5. Tests.**
 
@@ -79,7 +83,7 @@ to build them."
   released Milestones' heading and introduction are gone; a marker with no heading before it, the old
   `roadmap:releases` name, and a missing or repeated marker each fail the page.
 - Fixture e2e (`tests/e2e/versions.spec.ts`): Releases holds 0.1.0 and 0.2.0 with their dates; Milestones holds
-  0.3.0, 0.10.0 and 1.0.0 with none; "On this page" is Status, Releases, Milestones, How to read it, in order.
+  0.3.0, 0.10.0 and 1.0.0 with none; "On this page" is Status, Releases, Milestones, in order.
 - Live e2e (`tests/e2e/status.spec.ts`), shape only, since the live tags and wording change: every Releases entry has
   a date and no Milestones entry has one; no version is in both; each list is in version order; there's a Releases
   heading exactly when the status line names a latest release.
@@ -96,5 +100,6 @@ to build them."
 
 ## Migration Plan
 
-Merging deploys the new page. Before 0.1.0 the live page differs only in "How to read it", since Releases is hidden.
+Merging deploys the new page. Before 0.1.0 the live page differs only in having no "How to read it", since Releases
+is hidden.
 Rollback is reverting the merge.

@@ -63,17 +63,16 @@ no date and no other mark. The status SHALL name the latest release, or say noth
 
 ### Requirement: The page shows no progress counts or planned dates
 `/status/` SHALL NOT show issue counts, percentages, a "current" or "in progress" mark, or a planned date for a
-milestone. It SHALL say that each milestone is planned, that the order can change, and that a milestone moves to
-"Releases", with its date, when it's released, and SHALL link to troupe's milestones and to the troupe roadmap board
-for the issues behind each milestone.
+milestone. Its sections SHALL be Status, Releases and Milestones, in that order, with no section explaining how to
+read them (owner, 2026-10-24).
 
 #### Scenario: Reading the page
 - **WHEN** a reader opens `/status/`
-- **THEN** it has links to `https://github.com/troupe-run/troupe/milestones` and the troupe roadmap board, and no
-  count, percentage, progress mark or date beside any milestone under "Milestones"
+- **THEN** it has no count, percentage, progress mark or date beside any milestone under "Milestones", and no "How to
+  read it" section"
 
 ### Requirement: The page's own words are written here, the list's are not
-The status, the section headings and the text explaining how to read the roadmap SHALL be written in this repository
+The status, the section headings and the introduction to the milestones SHALL be written in this repository
 and reviewed by the owner as text. The words the list adds to a release that's out ("Released" and its date) and the
 status line SHALL live in the site's copy files. A release's description SHALL be changed in troupe-run/infrastructure, never
 here.
@@ -92,11 +91,11 @@ its introduction included. A section that's left out SHALL NOT be replaced with 
 
 #### Scenario: Before the first release
 - **WHEN** troupe has no release tags
-- **THEN** `/status/` has no "Releases" heading, and "On this page" lists Status, Milestones and How to read it
+- **THEN** `/status/` has no "Releases" heading, and "On this page" lists Status and Milestones
 
 #### Scenario: After the first release
 - **WHEN** troupe has `troupe-v0.1.0`
-- **THEN** "On this page" lists Status, Releases, Milestones and How to read it, in that order
+- **THEN** "On this page" lists Status, Releases and Milestones, in that order
 
 #### Scenario: Every milestone released
 - **WHEN** troupe has a release tag for every milestone the file declares
