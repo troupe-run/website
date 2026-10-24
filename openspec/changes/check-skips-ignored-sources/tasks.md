@@ -25,7 +25,7 @@
 - [x] 3.1 Run `npm run docs:sync` so `src/content/docs/docs/` holds troupe's docs, confirm a page there names
   `CLAUDE.md` (`grep -rl CLAUDE.md src/content/docs/docs`), then run `uv run scripts/check.py` and verify it passes
   without deleting the folder; record the output
-- [ ] 3.2 Open the pull request with `Closes #36` and verify CI's `test` job passes
+- [x] 3.2 Open the pull request with `Closes #36` and verify CI's `test` job passes
 
 ## Workflow follow-up
 
