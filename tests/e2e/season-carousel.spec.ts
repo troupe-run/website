@@ -1,5 +1,6 @@
 import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
+import { freezeClock } from './clock';
 
 const CAROUSEL = '#how-it-works [data-carousel]';
 const current = (page: Page) => page.locator(`${CAROUSEL} .slide.is-current .eyebrow`);
@@ -28,7 +29,7 @@ test('clicking the CUE tab shows Cue and makes the dial’s third dot the curren
 });
 
 test('after 6.1s on screen the shown step advances from Cast to Perform', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(5000);
   await expect(current(page)).toHaveText('Cast');
@@ -43,7 +44,7 @@ test('the carousel has no previous, next, pause or play buttons', async ({ page 
 });
 
 test('activating a tab shows that step and stops auto-advance: no change after 20s', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.getByRole('tab', { name: 'Perform' }).click();
   await page.mouse.move(0, 0);
@@ -54,7 +55,7 @@ test('activating a tab shows that step and stops auto-advance: no change after 2
 });
 
 test('clicking a loop-dial dot shows that step and stops auto-advance: no change after 20s', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.locator(`${CAROUSEL} .dot`).nth(3).click();
   await page.mouse.move(0, 0);
@@ -65,14 +66,14 @@ test('clicking a loop-dial dot shows that step and stops auto-advance: no change
 });
 
 test('left alone, the steps wrap from Notes back to Cast', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(6100 * 4);
   await expect(current(page)).toHaveText('Cast');
 });
 
 test('hovering the carousel stops the steps advancing', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.locator(`${CAROUSEL} .slides`).hover();
   await page.clock.runFor(20000);
@@ -80,7 +81,7 @@ test('hovering the carousel stops the steps advancing', async ({ page }) => {
 });
 
 test('keyboard focus on a control stops the steps advancing', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.getByRole('tab', { name: 'Cast' }).focus();
   await page.clock.runFor(20000);
@@ -89,7 +90,7 @@ test('keyboard focus on a control stops the steps advancing', async ({ page }) =
 
 test('with prefers-reduced-motion the carousel does not advance in 20s', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(20000);
   await expect(current(page)).toHaveText('Cast');
@@ -187,7 +188,7 @@ const indicatorBox = (page: Page) => page.locator(`${CAROUSEL} [data-indicator]`
 const tabBox = (page: Page, i: number) => page.locator(`${CAROUSEL} [data-tab="${i}"]`).evaluate((e) => e.getBoundingClientRect().toJSON());
 
 test('mid-transition (+250ms) the outgoing card has moved left of its place and the incoming card is still right of it', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(6000 + 250);
   expect(await slideX(page, 0)).toBeLessThan(0);
@@ -195,7 +196,7 @@ test('mid-transition (+250ms) the outgoing card has moved left of its place and 
 });
 
 test('mid-transition both cards are on stage together, and after 500ms only the active card is visible', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(6000 + 250);
   await expect(page.locator(`${CAROUSEL} .slide:visible`)).toHaveCount(2);
@@ -205,7 +206,7 @@ test('mid-transition both cards are on stage together, and after 500ms only the 
 });
 
 test('a jump to an earlier tab reverses direction: the current card exits right and the target enters from the left', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.getByRole('tab', { name: 'Cue' }).click();
   await page.clock.runFor(600);
@@ -216,7 +217,7 @@ test('a jump to an earlier tab reverses direction: the current card exits right 
 });
 
 test('a jump to a later tab slides left like auto-advance: the current card exits left and the target enters from the right', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.getByRole('tab', { name: 'Cue' }).click();
   await page.clock.runFor(250);
@@ -225,7 +226,7 @@ test('a jump to a later tab slides left like auto-advance: the current card exit
 });
 
 test('wrapping from Notes to Cast continues in the same direction: Cast enters from the right', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(6100 * 3 + 600);
   await expect(current(page)).toHaveText('Notes');
@@ -235,7 +236,7 @@ test('wrapping from Notes to Cast continues in the same direction: Cast enters f
 });
 
 test('the stage keeps one height through a transition, so nothing below it shifts', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   const heights: number[] = [];
   const stage = page.locator(`${CAROUSEL} .slides`);
@@ -257,7 +258,7 @@ test('off-stage cards are inert and aria-hidden, so they cannot be focused or re
 });
 
 test('the tab indicator slides right from Cast to Perform and lands on the active tab (±2px)', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   const start = await indicatorBox(page);
   expect(Math.abs(start.left - (await tabBox(page, 0)).left)).toBeLessThanOrEqual(2);
@@ -273,7 +274,7 @@ test('the tab indicator slides right from Cast to Perform and lands on the activ
 });
 
 test('on the wrap the indicator runs off the right end of the strip while a second one enters from the left onto Cast', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(6100 * 3 + 600);
   await expect(current(page)).toHaveText('Notes');
@@ -291,7 +292,7 @@ test('on the wrap the indicator runs off the right end of the strip while a seco
 
 test('with prefers-reduced-motion a tab click swaps the card at once, with no transform, and the indicator lands at once', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.getByRole('tab', { name: 'Cue' }).click();
   expect(await slideX(page, 2)).toBe(0);
@@ -325,7 +326,7 @@ test('the dial has one moving dot over four static marks, and the dot starts on 
 });
 
 test('mid-transition from Cast to Perform the moving dot lies strictly between 0 and 90 degrees on the clockwise arc', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(6000 + 250);
   const a = await dotAngle(page);
@@ -334,14 +335,14 @@ test('mid-transition from Cast to Perform the moving dot lies strictly between 0
 });
 
 test('after the transition the moving dot sits on the target mark (±1px)', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(6000 + 600);
   expect(await dotOffMark(page, 1)).toBeLessThanOrEqual(1);
 });
 
 test('on the Notes to Cast wrap the dot passes through the 9 to 12 arc (270 to 360 degrees), not back through 6 or 3', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.clock.runFor(6100 * 3 + 600);
   expect(await dotOffMark(page, 3)).toBeLessThanOrEqual(1);
@@ -354,7 +355,7 @@ test('on the Notes to Cast wrap the dot passes through the 9 to 12 arc (270 to 3
 });
 
 test('a jump from Cue back to Perform moves the dot anticlockwise, strictly between 90 and 180 degrees', async ({ page }) => {
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.getByRole('tab', { name: 'Cue' }).click();
   await page.clock.runFor(600);
@@ -367,7 +368,7 @@ test('a jump from Cue back to Perform moves the dot anticlockwise, strictly betw
 
 test('with prefers-reduced-motion the dial dot lands on the target mark at once', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.clock.install();
+  await freezeClock(page);
   await open(page);
   await page.getByRole('tab', { name: 'Cue' }).click();
   expect(await dotOffMark(page, 2)).toBeLessThanOrEqual(1);
