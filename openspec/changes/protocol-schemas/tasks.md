@@ -109,8 +109,13 @@
   no tag gives 404 and the sync's marker isn't served. 74 tests passed. Turning the rewrite off for the majors showed
   that `writeProtocol` ignored the copy's `rewrite` flag (it rewrote by prefix alone); it now honours it, with a unit
   test. With the flag off, the `0/` and `1/` tests failed, and so did the reference check.
-- [ ] 8.3 Build the site and show the owner `/protocol/` at 320px, 768px and 1280px, in light and dark, live and
+- [x] 8.3 Build the site and show the owner `/protocol/` at 320px, 768px and 1280px, in light and dark, live and
   fixture. Verify: the owner agrees the page in this session, recorded here with the date.
+  Done 2026-10-24: the first build's 320px view showed the URL table scrolling sideways inside itself, with only the
+  URL column on screen, and the copy's straight apostrophe beside the Markdown's curly ones. The owner chose a list
+  for "Which URL to use" (each entry: the URL, "Serves: …", "Use it for: …", the agreed words), and the copy now uses
+  a curly apostrophe. The owner then agreed the page at 320px, 768px and 1280px, light and dark, live and fixture. No
+  width scrolls sideways; the two long example URLs wrap mid-word at 320px.
 
 ## 9. Documentation
 

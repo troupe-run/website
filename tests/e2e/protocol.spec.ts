@@ -15,10 +15,13 @@ test('/protocol/ shows Protocol schemas with no left-hand sidebar and no version
 
 test('/protocol/ lists the four kinds of URL, and says there is no protocol release yet and what serves main', async ({ page }) => {
   await page.goto('/protocol/');
-  const urls = await page.locator('table tbody tr td:first-child code').allInnerTexts();
-  expect(urls.filter((u) => u.includes('<'))).toEqual(['/protocol/<path>', '/protocol/<major>/<path>', '/protocol/<version>/<path>', '/protocol/next/<path>']);
+  // A list, not a table, so it reads top to bottom at 320px (owner, 2026-10-24): each entry is the URL, what it serves
+  // and what to use it for.
+  const entries = page.locator('li').filter({ hasText: 'Serves:' }).filter({ hasText: 'Use it for:' });
+  const urls = await entries.evaluateAll((lis) => lis.map((li) => li.querySelector('code')!.textContent));
+  expect(urls).toEqual(['/protocol/<path>', '/protocol/<major>/<path>', '/protocol/<version>/<path>', '/protocol/next/<path>']);
   await expect(page.getByText('No protocol release yet.')).toHaveText(
-    "No protocol release yet. Until there is one, /protocol/ and /protocol/0/ serve troupe's unreleased main.",
+    "No protocol release yet. Until there is one, /protocol/ and /protocol/0/ serve troupe’s unreleased main.",
   );
   await expect(page.locator('.protocol-releases')).toHaveCount(0);
 });
