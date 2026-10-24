@@ -136,8 +136,9 @@
   Done 2026-10-24: all gates passed on 7b019c1: 422 unit tests, 261 e2e tests, and 786 schema references checked on
   the live build and 479 on the fixture build. The output is saved at
   /private/tmp/claude-502/-Users-martin-Projects-troupe-website-protocol-schemas/42319c07-476e-477c-8cde-30b07efe87ab/scratchpad/final-check-30.log.
-- [ ] 10.2 Open the pull request with `Closes #30` (body via `--body-file`). Verify: CI's `test` and `guard` jobs
+- [x] 10.2 Open the pull request with `Closes #30` (body via `--body-file`). Verify: CI's `test` and `guard` jobs
   pass.
+  Done 2026-10-24: troupe-run/website#40 says Closes #30. CI's `test` (1m52s) and `guard` jobs pass.
 
 ## Workflow follow-up
 
