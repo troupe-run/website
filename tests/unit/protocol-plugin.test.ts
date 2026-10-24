@@ -7,7 +7,7 @@ import { protocolPlugin } from '../../scripts/protocol-plugin.mjs';
 // The protocol plugin renders /protocol/'s release list where protocol.md marks it (spec: protocol-schemas; design D8).
 const PAGE = resolve('src/content/docs/protocol.md');
 const COPY = {
-  none: 'No protocol release yet. Until there is one, `/protocol/` and `/protocol/0/` serve troupe\'s unreleased `main`.',
+  none: 'No protocol release yet. Until there is one, `/protocol/` and `/protocol/0/` serve troupe’s unreleased `main`.',
   latest: '{version} (latest), at {path}',
   release: '{version}, at {path}',
 };
@@ -24,7 +24,7 @@ describe('protocol plugin', () => {
   it('says there is no release yet, with the paths and main as code, leaving no marker', async () => {
     const html = await render([]);
     expect(html).toContain(
-      "<p>No protocol release yet. Until there is one, <code>/protocol/</code> and <code>/protocol/0/</code> serve troupe's unreleased <code>main</code>.</p>",
+      "<p>No protocol release yet. Until there is one, <code>/protocol/</code> and <code>/protocol/0/</code> serve troupe’s unreleased <code>main</code>.</p>",
     );
     expect(html).not.toContain('protocol:releases');
     expect(html).not.toContain('<ul');

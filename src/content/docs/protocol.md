@@ -11,12 +11,18 @@ never fetches them: it carries its own copy.
 
 ## Which URL to use
 
-| URL | What it serves | Use it for |
-|---|---|---|
-| `/protocol/<path>` | The latest protocol release | Reading the current schemas |
-| `/protocol/<major>/<path>`, such as `/protocol/0/config/actor.schema.json` | The latest release with that major version | Editors, and the `$schema` of files you write. After 1.0, only a new major version breaks it |
-| `/protocol/<version>/<path>`, such as `/protocol/0.2.1/error.schema.json` | Exactly that release | Pinning one release |
-| `/protocol/next/<path>` | troupe's unreleased `main` | Trying a change before it's released |
+- `/protocol/<path>`\
+  Serves: the latest protocol release.\
+  Use it for: reading the current schemas.
+- `/protocol/<major>/<path>`, such as `/protocol/0/config/actor.schema.json`\
+  Serves: the latest release with that major version.\
+  Use it for: editors, and the `$schema` of files you write. After 1.0, only a new major version breaks it.
+- `/protocol/<version>/<path>`, such as `/protocol/0.2.1/error.schema.json`\
+  Serves: exactly that release.\
+  Use it for: pinning one release.
+- `/protocol/next/<path>`\
+  Serves: troupe's unreleased `main`.\
+  Use it for: trying a change before it's released.
 
 Before 1.0, a minor release can break a schema, so `/protocol/0/` can change under you. Pin a version if that matters.
 
