@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://troupe.run/protocol/events/run-started.schema.json",
+  "title": "Run.Started",
+  "description": "The payload of a run's first event (topic troupe.core.runs.aggregate:Run.Started): who and what the run is, recorded when the runner's init arrives, or at the end of a run that never sent one. Field names are as recorded.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "lineage",
+    "timestamp",
+    "originator_topic",
+    "run_id",
+    "actor",
+    "runner_requested",
+    "stage",
+    "effect_check",
+    "direction",
+    "config"
+  ],
+  "properties": {
+    "lineage": {
+      "$ref": "../lineage.schema.json"
+    },
+    "timestamp": {
+      "$ref": "../event-record.schema.json#/$defs/libraryTimestamp"
+    },
+    "originator_topic": {
+      "description": "The event-sourcing library's name for the aggregate the stream holds.",
+      "const": "troupe.core.runs.aggregate:Run"
+    },
+    "run_id": {
+      "$ref": "../runner/jsonrpc.schema.json#/$defs/runId"
+    },
+    "actor": {
+      "$ref": "../client/run.schema.json#/$defs/actorName"
+    },
+    "runner_requested": {
+      "$ref": "../client/run.schema.json#/$defs/runnerName"
+    },
+    "runner_reported": {
+      "description": "The runner's name and version from its init. Absent: the runner never sent one.",
+      "$ref": "../runner/jsonrpc.schema.json#/$defs/named"
+    },
+    "stage": {
+      "$ref": "../lineage.schema.json#/$defs/stage"
+    },
+    "effect_check": {
+      "$ref": "../client/run.schema.json#/$defs/effectCheck"
+    },
+    "direction": {
+      "description": "The artifact reference of the run's direction: what the actor was asked to do.",
+      "$ref": "../lineage.schema.json#/$defs/hash"
+    },
+    "config": {
+      "description": "The config version the run used: the ids of the config stream's heads, sorted. Working out config at that version gives the actor's runner, options, effect check and character.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "../lineage.schema.json#/$defs/hash"
+      }
+    },
+    "workspace": {
+      "description": "Where the run worked. Absent: recorded before runs had workspaces, so in the theatre.",
+      "$ref": "#/$defs/workspace"
+    }
+  },
+  "$defs": {
+    "commit": {
+      "title": "Commit",
+      "description": "A git commit id: 40 hex digits (SHA-1) or 64 (SHA-256).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
+    },
+    "workspace": {
+      "title": "Workspace",
+      "description": "The run's workspace: its own worktree, or the theatre itself.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/theatreWorkspace"
+        },
+        {
+          "$ref": "#/$defs/worktreeWorkspace"
+        }
+      ]
+    },
+    "theatreWorkspace": {
+      "title": "In the theatre",
+      "description": "The run worked in the theatre itself.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "const": "theatre"
+        }
+      }
+    },
+    "worktreeWorkspace": {
+      "title": "In its own worktree",
+      "description": "The run worked in its own git worktree, made at the theatre's HEAD.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "path",
+        "base",
+        "dirty",
+        "clones"
+      ],
+      "properties": {
+        "kind": {
+          "const": "worktree"
+        },
+        "path": {
+          "description": "The worktree, relative to the theatre: .troupe/local/worktrees/<run id>.",
+          "$ref": "../client/run.schema.json#/$defs/theatrePath"
+        },
+        "prefix": {
+          "description": "Where the theatre is in its repository, such as apps/web/, when it isn't the top level; the run works there in the worktree. Absent: the theatre is the repository's top level.",
+          "type": "string",
+          "pattern": "^(?![/\\\\])(?!.*\\\\)(?!(.*/)?\\.\\.(/|$)).+/$"
+        },
+        "base": {
+          "description": "The commit the worktree was made at: the theatre's HEAD.",
+          "$ref": "#/$defs/commit"
+        },
+        "dirty": {
+          "description": "Whether the theatre had changes that differ from HEAD, which the run didn't see.",
+          "type": "boolean"
+        },
+        "clones": {
+          "description": "The clone mechanisms used for the files that matched HEAD, sorted. Empty: every file was checked out.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "clonefile",
+              "ficlone",
+              "copyfile2",
+              "copy",
+              "symlink"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

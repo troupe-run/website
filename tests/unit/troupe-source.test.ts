@@ -74,6 +74,43 @@ describe('openSource with TROUPE_DOCS unset', () => {
   });
 });
 
+describe("the source reads any folder at a ref, as /protocol/ needs (protocol-schemas design D1)", () => {
+  const SCHEMA = '{"$id": "https://troupe.run/protocol/a.schema.json"}\n';
+  function withSchemas(): Repo {
+    const r = repo();
+    r.commit({ 'protocol/schemas/a.schema.json': SCHEMA, 'protocol/schemas/runner/b.schema.json': SCHEMA }, '2026-02-01T00:00:00Z', ['protocol-v0.1.0']);
+    return r;
+  }
+
+  it('lists and reads protocol/schemas/ at a tag and at main, from a clone', () => {
+    const r = withSchemas();
+    const source = openSource({}, { cacheDir: join(tempDir(), 'troupe.git'), remote: r.path });
+    expect(source.listTree('protocol-v0.1.0', 'protocol/schemas')).toEqual(['a.schema.json', 'runner/b.schema.json']);
+    expect(source.listTree('main', 'protocol/schemas')).toEqual(['a.schema.json', 'runner/b.schema.json']);
+    expect(source.readFile('main', 'protocol/schemas/runner/b.schema.json')).toBe(SCHEMA);
+  });
+
+  it('lists nothing for a folder a ref lacks', () => {
+    const source = openSource({}, { cacheDir: join(tempDir(), 'troupe.git'), remote: repo().path });
+    expect(source.listTree('troupe-v0.1.0', 'protocol/schemas')).toEqual([]);
+  });
+
+  it("takes main's protocol/schemas/ from a TROUPE_DOCS checkout's working tree, an uncommitted edit and a new file included", () => {
+    const r = withSchemas();
+    writeFileSync(join(r.path, 'protocol/schemas/a.schema.json'), '{"edited": true}\n');
+    writeFileSync(join(r.path, 'protocol/schemas/c.schema.json'), SCHEMA);
+    const source = openSource({ TROUPE_DOCS: r.path }, { cacheDir: 'unused' });
+    expect(source.listTree('main', 'protocol/schemas')).toEqual(['a.schema.json', 'c.schema.json', 'runner/b.schema.json']);
+    expect(source.readFile('main', 'protocol/schemas/a.schema.json')).toBe('{"edited": true}\n');
+    expect(source.readFile('protocol-v0.1.0', 'protocol/schemas/a.schema.json')).toBe(SCHEMA);
+    expect(source.listTree('protocol-v0.1.0', 'protocol/schemas')).toEqual(['a.schema.json', 'runner/b.schema.json']);
+  });
+
+  it("lists nothing for a folder a TROUPE_DOCS checkout's working tree lacks", () => {
+    expect(openSource({ TROUPE_DOCS: repo().path }, { cacheDir: 'unused' }).listTree('main', 'protocol/schemas')).toEqual([]);
+  });
+});
+
 describe('openSource with TROUPE_DOCS set', () => {
   it("takes main from the checkout's working tree, uncommitted edits included, with no date for an edited page", () => {
     const r = repo();

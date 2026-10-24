@@ -1,0 +1,475 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://troupe.run/protocol/notice.schema.json",
+  "title": "Notice",
+  "description": "Something a person should know while troupe works, such as a wait or a retry, as structured data. It has the same fields as an error; each surface renders it in its own words, and the code identifies it. Every code troupe can produce is listed, with what its details hold.",
+  "$ref": "#/$defs/fields",
+  "unevaluatedProperties": false,
+  "oneOf": [
+    {
+      "required": [
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "const": "run.silent"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "seconds"
+          ],
+          "properties": {
+            "seconds": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": [
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "const": "run.retrying"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "attempt",
+            "delayMs",
+            "reason"
+          ],
+          "properties": {
+            "attempt": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "maxAttempts": {
+              "description": "How many attempts the engine will make in all. Absent: the runner didn't say.",
+              "type": "integer",
+              "minimum": 1
+            },
+            "delayMs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "reason": {
+              "$ref": "runner/run-event.schema.json#/$defs/retry/properties/reason"
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": [
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "const": "events.other-branch"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "session"
+          ],
+          "properties": {
+            "branch": {
+              "description": "The branch the left-out segment was written on. Absent: it was written with no branch (a detached HEAD).",
+              "type": "string",
+              "minLength": 1
+            },
+            "session": {
+              "$ref": "lineage.schema.json#/$defs/ulid"
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": [
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "const": "events.order-rebuilt"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "gone"
+          ],
+          "properties": {
+            "gone": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": [
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "const": "events.incomplete-batch"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "line"
+          ],
+          "properties": {
+            "line": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": [
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "const": "events.subscription-polling"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "reason",
+            "detail",
+            "pollSeconds"
+          ],
+          "properties": {
+            "reason": {
+              "description": "Why the store polls: the platform refused the watch, or the watch accepted but missed a write.",
+              "enum": [
+                "watch-refused",
+                "watch-missed-write"
+              ]
+            },
+            "detail": {
+              "description": "What the platform said, or what was missed, in its own words.",
+              "type": "string",
+              "minLength": 1
+            },
+            "pollSeconds": {
+              "description": "How often the store looks for new events instead.",
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": [
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "const": "run.cancelling"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "presses"
+          ],
+          "properties": {
+            "presses": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": [
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "const": "run.interrupted"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "run"
+          ],
+          "properties": {
+            "run": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": [
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "const": "run.unfinished-elsewhere"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "run"
+          ],
+          "properties": {
+            "run": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "code": {
+          "const": "config.file-rewritten"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "reason"
+          ],
+          "properties": {
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "required": [
+        "details"
+      ]
+    },
+    {
+      "properties": {
+        "code": {
+          "const": "config.merge-rewritten"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "merge",
+            "action",
+            "kept"
+          ],
+          "properties": {
+            "merge": {
+              "description": "How git merged the file: it left it conflicted, or merged it cleanly.",
+              "enum": [
+                "conflicted",
+                "clean"
+              ]
+            },
+            "action": {
+              "description": "What troupe did to it, as the merged config says.",
+              "enum": [
+                "write",
+                "remove"
+              ]
+            },
+            "kept": {
+              "description": "The artifact the file's bytes were kept under before troupe replaced it.",
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        }
+      },
+      "required": [
+        "details"
+      ]
+    },
+    {
+      "properties": {
+        "code": {
+          "const": "config.waiting"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "waitedSeconds"
+          ],
+          "properties": {
+            "waitedSeconds": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      },
+      "required": [
+        "details"
+      ]
+    },
+    {
+      "properties": {
+        "code": {
+          "const": "workspace.waiting"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "operation",
+            "waitedSeconds"
+          ],
+          "properties": {
+            "operation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "waitedSeconds": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      },
+      "required": [
+        "details"
+      ]
+    },
+    {
+      "properties": {
+        "code": {
+          "const": "workspace.uncommitted-unseen"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "count",
+            "paths",
+            "base"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "paths": {
+              "description": "The first of them, up to UNCOMMITTED_NOTICE_PATHS, relative to the repository's top level.",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "base": {
+              "$ref": "events/run-started.schema.json#/$defs/commit"
+            }
+          }
+        }
+      },
+      "required": [
+        "details"
+      ]
+    },
+    {
+      "properties": {
+        "code": {
+          "const": "workspace.shared-git-changed"
+        },
+        "details": {
+          "$ref": "events/run-ended.schema.json#/$defs/shared"
+        }
+      },
+      "required": [
+        "details"
+      ]
+    },
+    {
+      "properties": {
+        "code": {
+          "const": "workspace.not-removed"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "worktree"
+          ],
+          "properties": {
+            "worktree": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "required": [
+        "details"
+      ]
+    }
+  ],
+  "$defs": {
+    "fields": {
+      "title": "Notice fields",
+      "description": "The fields every notice has: the same as an error's.",
+      "type": "object",
+      "required": [
+        "code",
+        "problem",
+        "fix"
+      ],
+      "properties": {
+        "code": {
+          "title": "Code",
+          "description": "Stable, dotted identifier for this kind of notice, such as run.silent. Surfaces use it to recognise and rephrase the notice.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$"
+        },
+        "problem": {
+          "title": "Problem",
+          "description": "What is happening.",
+          "type": "string",
+          "minLength": 1
+        },
+        "fix": {
+          "title": "Fix",
+          "description": "What the person can do about it, if anything.",
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "title": "Path",
+          "description": "The absolute path of the file or directory concerned, when there is one.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

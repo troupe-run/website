@@ -11,14 +11,17 @@
   when to use each, the release list) and of `src/content/copy/protocol.md` (the list's phrases before and after the
   first protocol release, and "latest"), with the list rendered as it will read in both states. Verify: the owner
   agrees the words in this session, recorded here with the date. Later tasks write exactly the agreed text.
-- [ ] 1.3 Prove D6 before anything depends on it: with a hand-made `public/protocol/next/x.schema.json` and a page at
+- [x] 1.3 Prove D6 before anything depends on it: with a hand-made `public/protocol/next/x.schema.json` and a page at
   `src/content/docs/protocol.md`, `astro build` writes both `dist/protocol/index.html` and
   `dist/protocol/next/x.schema.json`, `astro dev` serves both, and `astro preview` serves the file as
   `application/json` (`curl -sI`). Verify: the three outputs, saved to the scratchpad; then remove the hand-made files.
+  Done 2026-10-24: the build wrote `dist/protocol/index.html` and `dist/protocol/next/x.schema.json`; preview served
+  the file 200 `application/json` and the page 200 `text/html`; dev served both the same. Output in the scratchpad
+  (`d6-build.log`, `d6-preview.txt`, `d6-dev.txt`); the hand-made files are removed.
 
 ## 2. The source reads any folder (D1)
 
-- [ ] 2.1 Tests first, in `tests/unit/troupe-source.test.ts`: the source lists and reads `protocol/schemas/` at a tag
+- [x] 2.1 Tests first, in `tests/unit/troupe-source.test.ts`: the source lists and reads `protocol/schemas/` at a tag
   and at `main`, from a cloned repository and from a `TROUPE_DOCS` checkout, where `main` is the working tree with an
   uncommitted schema edit included. Then generalise `Source` with `listTree(ref, dir)` and `readFile(ref, path)`,
   keeping `list` and `read` as wrappers over them. Verify: the new tests fail before the change, and
@@ -26,7 +29,7 @@
 
 ## 3. Choosing the copies (D2, D3)
 
-- [ ] 3.1 Tests first, in `tests/unit/protocol-copies.test.ts`, for a pure function beside `chooseVersions`: no tag
+- [x] 3.1 Tests first, in `tests/unit/protocol-copies.test.ts`, for a pure function beside `chooseVersions`: no tag
   gives latest, `0/` and `next/` from `main`; `protocol-v0.2.1` and `protocol-v0.10.0` give latest from 0.10.0 (not
   0.2.1), `0/` from 0.10.0, `next/` from `main` and one copy per tag; `protocol-v0.4.2` and `protocol-v1.0.0` give `0/`
   from 0.4.2 and `1/` from 1.0.0; `troupe-v*` tags are ignored; `protocol-v1.0.0-rc.1`, `protocol-v01.0.0` and
@@ -35,13 +38,13 @@
 
 ## 4. Checking and rewriting a ref's schemas (D4, D5)
 
-- [ ] 4.1 Tests first, in `tests/unit/protocol-schemas.test.ts`, for the per-ref check. Each refuses naming the ref,
+- [x] 4.1 Tests first, in `tests/unit/protocol-schemas.test.ts`, for the per-ref check. Each refuses naming the ref,
   the path and the fix, and all of a ref's problems are reported together: a file not named `*.schema.json`; a file
   that isn't JSON (the parser's error quoted); JSON that isn't an object; a top-level folder `next`, `0` or `0.2.1`; a
   missing `$id`; an `$id` of another file (found and expected named); a nested `$id`; an absolute reference naming a
   major version, `next`, or a file that isn't at that ref (with the fix to use the unversioned URL or a relative
   reference); and a ref with no `protocol/schemas/`. Verify: the tests fail first, then pass.
-- [ ] 4.2 Tests first, in the same file, for the rewrite: in a `0/` copy the `$id` and an absolute `$ref` with a
+- [x] 4.2 Tests first, in the same file, for the rewrite: in a `0/` copy the `$id` and an absolute `$ref` with a
   fragment move under `/protocol/0/`; a relative `$ref`, a `$dynamicRef` of `#runnerOptions`, a `description` holding a
   versioned URL, and `$id`/`$ref` keys inside `const`, `enum`, `examples` and `default` are left as written; the latest
   copy's values are unchanged; and apart from the rewritten values, each output parses to the same JSON value as its
@@ -50,7 +53,7 @@
 
 ## 5. Writing the copies (D1, D6)
 
-- [ ] 5.1 Tests first, in `tests/unit/protocol-sync.test.ts`, over a throwaway troupe repository: `sync` writes each
+- [x] 5.1 Tests first, in `tests/unit/protocol-sync.test.ts`, over a throwaway troupe repository: `sync` writes each
   copy under `public/protocol/` with a marker file; a second run after a tag is deleted leaves no folder for it; a run
   refuses to clear a `public/protocol/` it didn't write, naming the folder; the manifest's `protocol` entry lists the
   copies and the releases newest first; one source is opened per run (the clone is fetched once). Then wire it into
@@ -72,7 +75,7 @@
 
 ## 7. The fixture troupe (D9)
 
-- [ ] 7.1 Extend `scripts/troupe-fixture.mjs`: a step may hold `protocol/` as well as `docs/`, each replacing only its
+- [x] 7.1 Extend `scripts/troupe-fixture.mjs`: a step may hold `protocol/` as well as `docs/`, each replacing only its
   own folder, and its name may carry several tags joined by `+`. Rename the steps to `1-troupe-v0.1.0+protocol-v0.1.0`,
   `2-troupe-v0.1.1+protocol-v0.2.0`, `3-troupe-v0.2.0+protocol-v1.0.0` and `4-main`, and add their schemas: a small
   closed set copied verbatim from troupe's `main` at 30402fa, with a `$dynamicRef`, a cross-folder `$ref` with a pointer

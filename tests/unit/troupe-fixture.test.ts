@@ -1,21 +1,61 @@
 import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { MILESTONES_FIXTURE, makeFixtureRepo, withFixtureMilestones, withFixtureRepo } from '../../scripts/troupe-fixture.mjs';
 
 // The fixture troupe the fixture build runs against (spec: quality-check; design D9).
 const git = (path: string, ...args: string[]) => execFileSync('git', args, { cwd: path, encoding: 'utf8' }).trim();
 
 describe('the fixture troupe', () => {
-  it('has the three release tags, commits after the last one, and no remote', () => {
+  it('has the three release tags and three protocol tags of two majors, commits after the last ones, and no remote', () => {
     const repo = makeFixtureRepo();
     try {
-      expect(git(repo.path, 'tag', '--list').split('\n')).toEqual(['troupe-v0.1.0', 'troupe-v0.1.1', 'troupe-v0.2.0']);
+      expect(git(repo.path, 'tag', '--list').split('\n')).toEqual([
+        'protocol-v0.1.0', 'protocol-v0.2.0', 'protocol-v1.0.0', 'troupe-v0.1.0', 'troupe-v0.1.1', 'troupe-v0.2.0',
+      ]);
       expect(Number(git(repo.path, 'rev-list', '--count', 'troupe-v0.2.0..main'))).toBeGreaterThan(0);
+      expect(Number(git(repo.path, 'rev-list', '--count', 'protocol-v1.0.0..main'))).toBeGreaterThan(0);
+      expect(git(repo.path, 'diff', '--stat', 'protocol-v1.0.0', 'main', '--', 'protocol/')).not.toBe('');
       expect(git(repo.path, 'remote')).toBe('');
     } finally {
       repo.remove();
+    }
+  });
+
+  it('tags one commit with both a docs release and a protocol release, holding both docs/ and protocol/', () => {
+    const repo = makeFixtureRepo();
+    try {
+      const show = (ref: string, path: string) => git(repo.path, 'show', `${ref}:${path}`);
+      expect(show('troupe-v0.1.0', 'protocol/schemas/pinned.schema.json')).toContain('protocol-v0.1.0');
+      expect(git(repo.path, 'ls-tree', '-r', '--name-only', 'troupe-v0.1.0', '--', 'docs/')).not.toBe('');
+      expect(git(repo.path, 'rev-parse', 'troupe-v0.1.0^{commit}')).toBe(git(repo.path, 'rev-parse', 'protocol-v0.1.0^{commit}'));
+    } finally {
+      repo.remove();
+    }
+  });
+
+  it('commits a step with only docs/ or only protocol/ and keeps the other from the step before', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'fixture-steps-'));
+    try {
+      const put = (path: string, text: string) => { mkdirSync(dirname(join(dir, path)), { recursive: true }); writeFileSync(join(dir, path), text); };
+      put('1-troupe-v0.1.0+protocol-v0.1.0/docs/programme/a.md', 'one');
+      put('1-troupe-v0.1.0+protocol-v0.1.0/protocol/schemas/a.schema.json', '{}');
+      put('2-troupe-v0.2.0/docs/programme/a.md', 'two');
+      put('3-main/protocol/schemas/a.schema.json', '{"main": true}');
+      const repo = makeFixtureRepo(dir);
+      try {
+        const show = (ref: string, path: string) => git(repo.path, 'show', `${ref}:${path}`);
+        expect(show('troupe-v0.2.0', 'protocol/schemas/a.schema.json')).toBe('{}');
+        expect(show('main', 'docs/programme/a.md')).toBe('two');
+        expect(show('main', 'protocol/schemas/a.schema.json')).toBe('{"main": true}');
+        expect(git(repo.path, 'tag', '--list', '--points-at', 'HEAD~2').split('\n')).toEqual(['protocol-v0.1.0', 'troupe-v0.1.0']);
+      } finally {
+        repo.remove();
+      }
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
     }
   });
 

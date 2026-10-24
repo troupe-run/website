@@ -3,20 +3,24 @@ import starlight from '@astrojs/starlight';
 import starlightBlog from 'starlight-blog';
 import { isSatteriProcessor } from '@astrojs/markdown-satteri';
 import { fileURLToPath } from 'node:url';
+import { rmSync } from 'node:fs';
 import { sync } from './scripts/troupe-docs-lib.mjs';
+import { MARKER as PROTOCOL_MARKER } from './scripts/protocol-lib.mjs';
 import { syncRoadmap } from './scripts/roadmap-lib.mjs';
 import { loadRoadmapInputs, roadmapPlugin } from './scripts/roadmap-plugin.mjs';
 import { troupeLinks } from './scripts/troupe-links.mjs';
 import { CONTRIBUTING, firstPage, pageUrl } from './src/lib/docs-nav.ts';
 
-// Writes /docs's pages from troupe-run/troupe before Astro reads content, for every command (dev, check, build,
-// sync), redirects each version's root to its first page, and rewrites the pages' .md links to the site's URLs
+// Writes /docs's pages, and /protocol/'s schemas into public/protocol/, from troupe-run/troupe before Astro reads
+// content, for every command (dev, check, build, sync; spec: protocol-schemas), redirects each version's root to its first page, and rewrites the pages' .md links to the site's URLs
 // (spec: versioned-docs; design D2, D5, D6). Then reads the release milestones from troupe-run/infrastructure for
 // /status/, marked against the release tags /docs was built from (spec: roadmap).
 function troupeDocs() {
   return {
     name: 'troupe-docs',
     hooks: {
+      // public/protocol/'s marker is for the sync, not the site (protocol-schemas design D6).
+      'astro:build:done': ({ dir }) => rmSync(new URL(`protocol/${PROTOCOL_MARKER}`, dir), { force: true }),
       'astro:config:setup': ({ command, config, updateConfig, logger }) => {
         // Preview serves a finished build, so it mustn't rewrite the pages another command may be building from.
         if (command === 'preview') return;
@@ -28,6 +32,7 @@ function troupeDocs() {
           if (first) redirects[v.base.slice(0, -1)] = pageUrl(v.base, first.path);
           logger.info(`${v.base} from ${v.ref}, ${v.pages.length} pages`);
         }
+        logger.info(`/protocol/ has ${manifest.protocol.copies.length} copies, the latest from ${manifest.protocol.copies[0].ref}`);
         const roadmap = syncRoadmap({ root, tags: manifest.releases });
         logger.info(`/status/ lists ${roadmap.releases.length} releases, the latest released ${roadmap.latest ?? 'none yet'}`);
         // The pages the website keeps moved out of /docs (design D10). troupe's "What is troupe?" links the first.

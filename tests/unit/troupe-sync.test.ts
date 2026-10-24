@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parse } from 'yaml';
 import { sync } from '../../scripts/troupe-docs-lib.mjs';
-import { makeRepo, page, type Repo } from './support/git-repo';
+import { makeRepo, page, SCHEMAS, type Repo } from './support/git-repo';
 
 // What the sync writes for each version (spec: versioned-docs; design D4, D7, D8), from a throwaway troupe:
 //   troupe-v0.1.0  a, gone      troupe-v0.2.0  a, removed      main  a, added
@@ -14,7 +14,7 @@ afterEach(() => cleanup.splice(0).forEach((f) => f()));
 function troupe(): Repo {
   const r = makeRepo();
   cleanup.push(r.remove);
-  r.commit({ 'docs/programme/a.md': page('A'), 'docs/programme/gone.md': page('Gone') }, '2026-01-01T00:00:00Z', ['troupe-v0.1.0']);
+  r.commit({ ...SCHEMAS, 'docs/programme/a.md': page('A'), 'docs/programme/gone.md': page('Gone') }, '2026-01-01T00:00:00Z', ['troupe-v0.1.0']);
   r.commit({ 'docs/programme/gone.md': null, 'docs/backstage/removed.md': page('Removed') }, '2026-02-01T00:00:00Z', ['troupe-v0.2.0']);
   r.commit({ 'docs/backstage/removed.md': null, 'docs/stagecraft/added.md': page('Added') }, '2026-03-01T00:00:00Z');
   return r;
@@ -92,7 +92,7 @@ describe('sync', () => {
   it('before any release, main is at the root, editable and in search', () => {
     const r = makeRepo();
     cleanup.push(r.remove);
-    r.commit({ 'docs/programme/a.md': page('A') }, '2026-01-01T00:00:00Z');
+    r.commit({ ...SCHEMAS, 'docs/programme/a.md': page('A') }, '2026-01-01T00:00:00Z');
     const root = site();
     const manifest = sync({ env: {}, root, remote: r.path });
     expect(manifest.versions.map((v: { role: string }) => v.role)).toEqual(['current']);
