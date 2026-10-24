@@ -11,7 +11,9 @@ schema: spec-driven
 context: |
   This repo is troupe.run: the landing page, the docs at /docs and the blog. It is troupe's public face, not the
   product. The text of /docs lives in troupe-run/troupe's docs/ and is built from there, one version per release
-  (spec: versioned-docs); this repo owns how it looks and everything outside /docs. troupe itself lives in troupe-run/troupe, and the org and its development workflow are run from
+  (spec: versioned-docs); this repo owns how it looks and everything outside /docs. troupe's protocol schemas are
+  served at /protocol/ from its protocol/schemas/, one copy per protocol-v* tag (spec: protocol-schemas); this repo
+  holds none of them. troupe itself lives in troupe-run/troupe, and the org and its development workflow are run from
   troupe-run/infrastructure. The site exists so that someone landing on it can say in one sentence what troupe
   does, follow the build on GitHub, see where the docs are heading, and fix a docs page in two clicks.
 

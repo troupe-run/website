@@ -29,21 +29,24 @@ anything else.
 
 - `npm run dev` serves the site at http://localhost:4321.
 - Every Astro command (`dev`, `check`, `build`) first fetches troupe-run/troupe into `.cache/` and writes `/docs`'s
-  pages into `src/content/docs/docs/`, one folder per version. Both are git-ignored and rewritten on each run, so an
-  edit there is lost: edit the page in troupe. `npm run docs:sync` does just that step.
+  pages into `src/content/docs/docs/`, one folder per version, and `/protocol/`'s schemas, from troupe's
+  `protocol/schemas/`, into `public/protocol/`, one folder per copy. All three are git-ignored and rewritten on each
+  run, so an edit there is lost: edit the page or the schema in troupe. `npm run docs:sync` does just that step.
   - To preview troupe edits you haven't pushed, or to work offline, set `TROUPE_DOCS` to your troupe checkout:
-    `TROUPE_DOCS=../troupe npm run dev`. Its working tree is `main`, and its tags are the releases.
+    `TROUPE_DOCS=../troupe npm run dev`. Its working tree is `main`, for the docs and the schemas alike, and its tags
+    are the releases (`troupe-v*` for the docs, `protocol-v*` for the schemas).
 - The same step fetches troupe-run/infrastructure's `main` into `.cache/` and reads `tofu/milestones.json`, the
   release list on `/status/`. A release's wording is changed there, not here.
   - To preview a milestone edit, or to work offline, set `TROUPE_MILESTONES` to your infrastructure checkout:
     `TROUPE_MILESTONES=../infrastructure npm run dev`. Its working tree is read, uncommitted edits included.
 - `uv run scripts/check.py` runs every check CI runs, in the same order: `npm ci`, Playwright's browser,
-  `astro check`, the unit tests, the build, the fixture build, the brand-asset check, the internal link check of
-  both builds and the end-to-end tests. It stops at the first failure and says which one. `npm ci` reinstalls
-  `node_modules`, so a dev server that's running at the time may need a restart.
+  `astro check`, the unit tests, the build, the fixture build, the brand-asset check, the internal link check of both
+  builds (with the check of every reference in `/protocol/`'s schemas) and the end-to-end tests. It stops at the first
+  failure and says which one. `npm ci` reinstalls `node_modules`, so a dev server that's running at the time may need
+  a restart.
 - The fixture build (`npm run build:fixture`) builds the site into `dist-fixture/` against a throwaway troupe with
-  releases, made from `tests/fixtures/troupe-docs/`, so `/docs/next/`, earlier versions and the version menu are
-  tested before troupe has a release. It's never published.
+  releases, made from `tests/fixtures/troupe-docs/`, so `/docs/next/`, earlier versions, the version menu and every
+  `/protocol/` copy are tested before troupe has a release. It's never published.
 - `npm run test:unit` and `npm run test:e2e` run the tests on their own. The e2e suite builds the site and serves it
   on a port that's free at the time (`E2E_PORT` chooses one), so it never reuses your dev server or another
   worktree's. It serves `dist-fixture/` on a second port (`E2E_FIXTURE_PORT`), so run `npm run build:fixture` first.

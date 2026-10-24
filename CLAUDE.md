@@ -2,9 +2,10 @@
 
 This repository is the troupe.run website: the landing page, the docs at /docs and the blog. troupe itself lives in
 troupe-run/troupe, and so does the text of /docs (`docs/` there), which every build fetches and renders one version per
-release. Change a docs page in troupe, never in `src/content/docs/docs/`, which is generated. See
-[openspec/config.yaml](openspec/config.yaml) for the constraints every change respects, and
-[CONTRIBUTING.md](CONTRIBUTING.md) for setting up.
+release. Change a docs page in troupe, never in `src/content/docs/docs/`, which is generated. The same goes for the
+schemas at /protocol/: they come from troupe's `protocol/schemas/`, one copy per protocol release, and
+`public/protocol/` is generated. See [openspec/config.yaml](openspec/config.yaml) for the constraints every change
+respects, and [CONTRIBUTING.md](CONTRIBUTING.md) for setting up.
 
 ## How work happens here
 
