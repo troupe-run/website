@@ -7,9 +7,13 @@ See proposal.md for why. Since #4, CI and the weekly link check use `actions/set
 `node-version`. `tests/unit/workflow-node-version.test.ts` fails if any workflow names a version of its own. So the
 workflows need no edit: changing `.nvmrc` moves all three.
 
-What nothing checks yet is the two copies written for people: `engines.node` (`>=22.12.0`) and `CONTRIBUTING.md`
+What nothing checks yet is the two copies written for people: `engines.node` (`>=22.12.0`) and `README.md`
 ("Node 22 or later (the version in `.nvmrc`)"). `scripts/check.py` already reads `.nvmrc` for its "install Node N or
 later" message, so it needs no change.
+
+The issue names `CONTRIBUTING.md`, and so did this change's first draft. While it was being applied, `main` replaced
+that file with the org's contributing guide and moved the set-up notes, Node line included, to `README.md` (149a489).
+The branch was rebased onto that `main`, and the change now targets `README.md`.
 
 Observed on 2026-10-26: the maintainer's machine runs Node v26.12.1, so local runs of the check are already on 26.
 No `.npmrc` exists, so npm treats `engines` as a warning, not a refusal.
@@ -18,7 +22,7 @@ No `.npmrc` exists, so npm treats `engines` as a warning, not a refusal.
 
 **Goals:**
 - One edit to `.nvmrc` moves CI, the deploy and the weekly link check to 26, as it should since #4.
-- The next move can't leave `engines.node` or `CONTRIBUTING.md` behind without a failing test.
+- The next move can't leave `engines.node` or `README.md` behind without a failing test.
 
 **Non-Goals:**
 - Upgrading Astro, Starlight, starlight-blog, Playwright or anything else. If something fails on 26, that's a finding
@@ -39,17 +43,23 @@ precision.
 highest floor in `package-lock.json` is `>=22.19.0` (undici). The current `>=22.12.0` exists because Astro needed 22.12;
 26.0.0 is already above every floor. It stays open-ended (`>=`), as now, so a contributor on a newer Node isn't warned.
 
-**D3. `CONTRIBUTING.md` keeps a number, and a test holds it to `.nvmrc`.** Dropping the number ("the version in
+**D3. `README.md` keeps a number, and a test holds it to `.nvmrc`.** Dropping the number ("the version in
 `.nvmrc` or later") would leave nothing to fall behind, but a reader setting up would have to open a dotfile to learn
 what to install. The issue asks for the number to change, and the contributing spec already says "at the version in
 `.nvmrc` or later". The test keeps the convenience honest.
+
+Since a test now reads `README.md`, it comes off the skip list in `scripts/check-paths.toml`, which may only list
+paths no gate reads (spec: quality-check). The check's own tests refused the change until it did. A commit that
+touches only `README.md` now runs the full check instead of none. The owner chose this on 2026-10-26, over dropping
+the number, when the line was in `CONTRIBUTING.md`, and confirmed it for `README.md` the same day, knowing the README
+changes more often.
 
 **D4. The agreement test reads closed shapes and refuses anything else.** A new `tests/unit/node-version-copies.test.ts`
 reads the major from `.nvmrc` with `readNvmrc()` from `scripts/node-version.mjs`, the same reader the deploy uses.
 - `engines.node` must match `>=MAJOR[.MINOR[.PATCH]]`. Any other shape (`^26`, `26.x`, a `||` range, missing) fails
   and says what it found and what shape is expected, rather than being parsed approximately. Adding a range parser,
   or `semver` as a direct dependency, isn't worth it for one field we write ourselves.
-- `CONTRIBUTING.md` must contain exactly one "Node N or later". None, or more than one, fails and says so.
+- `README.md` must contain exactly one "Node N or later". None, or more than one, fails and says so.
 - Each mismatch names the file, what it says and what `.nvmrc` holds. The test's own logic is a pure function given
   the three texts, with cases for each scenario in the spec, so it can be shown to fail without editing real files.
 - It's a separate file from `workflow-node-version.test.ts` because that one is about workflows reading `.nvmrc`,
@@ -75,7 +85,7 @@ LTS slips, hold the merge and say so on the issue, rather than shipping on a Cur
   change this proposal says it doesn't make.
 - [The weekly link check isn't run by the pull request.] → It reads `.nvmrc` the same way CI does, and the workflow
   test covers its wiring. Its first scheduled run after the merge is checked for "26" in its setup-node step.
-- [Contributors still on 22 get an npm warning and may hit real failures.] → `CONTRIBUTING.md` says 26, and the check's
+- [Contributors still on 22 get an npm warning and may hit real failures.] → `README.md` says 26, and the check's
   message names it. That's the intended outcome.
 
 ## Migration Plan
