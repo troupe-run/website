@@ -7,7 +7,7 @@ import { readFileSync, appendFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const VALID = 'A valid .nvmrc is one line holding one Node version, such as 22.';
+const VALID = 'A valid .nvmrc is one line holding one Node version, such as 26.';
 
 // setup-node's rule for one line: an optional "node " or "nodejs " and an optional "v", then the version.
 const LINE = /^(?:node(?:js)?\s+)?v?(\S+)$/;

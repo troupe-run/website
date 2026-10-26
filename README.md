@@ -16,7 +16,7 @@ Brand: `docs/brand-guide.md`.
 ## Setting up
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/), which runs the check (`brew install uv` on a Mac).
-- Node 22 or later (the version in `.nvmrc`), then `npm ci`, which installs exactly what `package-lock.json` lists.
+- Node 26 or later (the version in `.nvmrc`), then `npm ci`, which installs exactly what `package-lock.json` lists.
 - git, and a network connection: every build fetches troupe-run/troupe for `/docs` (below).
 
 ## Running it locally
