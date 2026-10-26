@@ -39,13 +39,13 @@ describe('parseNvmrc', () => {
   });
 
   it('says what a valid .nvmrc looks like when it refuses one', () => {
-    expect(() => parseNvmrc('')).toThrow('A valid .nvmrc is one line holding one Node version, such as 22.');
+    expect(() => parseNvmrc('')).toThrow('A valid .nvmrc is one line holding one Node version, such as 26.');
   });
 });
 
 describe('readNvmrc', () => {
-  it('reads the version from the project root .nvmrc (22 today)', () => {
-    expect(readNvmrc()).toBe('22');
+  it('reads the version from the project root .nvmrc (26 today)', () => {
+    expect(readNvmrc()).toBe('26');
   });
 
   it('refuses a missing .nvmrc, saying it is missing', () => {

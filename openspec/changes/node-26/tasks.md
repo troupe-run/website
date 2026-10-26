@@ -18,19 +18,24 @@
 
 ## 2. Move to 26
 
-- [ ] 2.1 Set `.nvmrc` to `26`, `engines.node` to `>=26.0.0` (design D2) and `README.md` to "Node 26 or later
+- [x] 2.1 Set `.nvmrc` to `26`, `engines.node` to `>=26.0.0` (design D2) and `README.md` to "Node 26 or later
   (the version in `.nvmrc`)". Update the root `engines` in `package-lock.json` to match, and verify `git diff
   package-lock.json` changes nothing else. Verify the test from 1.1 passes on the real files and
-  `workflow-node-version.test.ts` passes with no workflow file edited (`git diff --stat .github/` is empty)
-- [ ] 2.2 Change `VALID` in `scripts/node-version.mjs` to "such as 26" and its assertion in
+  `workflow-node-version.test.ts` passes with no workflow file edited (`git diff --stat .github/` is empty).
+  Recorded 2026-10-26: the lockfile's `engines` line was edited by hand, `git diff` shows only it. `npm install
+  --package-lock-only`, tried first, also dropped `starlight-blog/node_modules/@astrojs/markdown-satteri` (an
+  optional peer), so it was reverted (design, Risks); `.github/` unchanged
+- [x] 2.2 Change `VALID` in `scripts/node-version.mjs` to "such as 26" and its assertion in
   `tests/unit/node-version.test.ts` (design D5). Verify `npm run test:unit` passes and `node scripts/node-version.mjs`
-  prints `26`
+  prints `26`. Recorded 2026-10-26: the same file's "reads the version from the project root .nvmrc (22 today)"
+  read the real `.nvmrc`, so it now says and expects 26; 454 unit tests passed; the reader printed `26`
 
 ## 3. Run everything on 26
 
-- [ ] 3.1 With `node --version` showing v26, run `rm -rf node_modules && npm ci`, then `uv run scripts/check.py`, and
+- [x] 3.1 With `node --version` showing v26, run `rm -rf node_modules && npm ci`, then `uv run scripts/check.py`, and
   verify it passes in full; record `node --version` and the check's last line. If any gate fails, stop and report the
-  output rather than changing a dependency (design, Non-Goals)
+  output rather than changing a dependency (design, Non-Goals). Recorded 2026-10-26: v26.12.1; `npm ci` added 500 packages;
+  `check: all gates passed` (e2e 265 passed, 29.8s)
 - [ ] 3.2 Open the pull request with `Closes #8` and verify CI's `test` job passes, and that its setup-node step's log
   shows a 26.x version. Record both
 
