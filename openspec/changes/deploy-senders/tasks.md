@@ -25,7 +25,8 @@
 
 - [x] 2.1 Run `uv run scripts/check.py` and verify it passes; record the output. Recorded 2026-10-26, rebased on
   main at 5d876c7 (which carries infrastructure#155's `guard.yml`): `check: all gates passed` (e2e 265 passed)
-- [ ] 2.2 Open the pull request with `Closes #47` and verify CI's `test` job passes
+- [x] 2.2 Open the pull request with `Closes #47` and verify CI's `test` job passes. Recorded 2026-10-26: PR #50;
+  `test` passed (2m7s), `guard` passed
 
 ## Workflow follow-up
 
