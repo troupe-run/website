@@ -36,8 +36,9 @@
   verify it passes in full; record `node --version` and the check's last line. If any gate fails, stop and report the
   output rather than changing a dependency (design, Non-Goals). Recorded 2026-10-26: v26.12.1; `npm ci` added 500 packages;
   `check: all gates passed` (e2e 265 passed, 29.8s)
-- [ ] 3.2 Open the pull request with `Closes #8` and verify CI's `test` job passes, and that its setup-node step's log
-  shows a 26.x version. Record both
+- [x] 3.2 Open the pull request with `Closes #8` and verify CI's `test` job passes, and that its setup-node step's log
+  shows a 26.x version. Record both. Recorded 2026-10-26: PR #52; `test` passed (run 40315502776,
+  `check: all gates passed`, e2e 265 passed); setup-node logged `node: v26.12.1`
 
 ## 4. Before the merge
 
