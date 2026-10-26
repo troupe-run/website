@@ -45,7 +45,8 @@
   reviewed it before the pull request is opened
   Done 2026-10-26: the owner read the README's new sections and CLAUDE.md's opening as text and asked for no
   changes.
-- [ ] 4.3 Open the pull request with `Closes #31` and verify CI's `test` job passes
+- [x] 4.3 Open the pull request with `Closes #31` and verify CI's `test` job passes
+  Done 2026-10-26: #49, with `Closes #31`. CI's `test` job and the `guard` check passed.
 
 ## Workflow follow-up
 
