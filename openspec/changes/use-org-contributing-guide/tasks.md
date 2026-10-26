@@ -41,8 +41,10 @@
   Blocked 2026-10-26 by the delivered `guard.yml` naming its own Node version (troupe-run/infrastructure#155),
   fixed in infrastructure#156 and delivered in 32042b3. Done 2026-10-26 after rebasing onto it: all gates passed,
   `check.py tests` 25 (the 6 new ones among them), unit 442, e2e 265.
-- [ ] 4.2 Show the owner the README's new sections as text (the rendered README on the branch), and verify they've
+- [x] 4.2 Show the owner the README's new sections as text (the rendered README on the branch), and verify they've
   reviewed it before the pull request is opened
+  Done 2026-10-26: the owner read the README's new sections and CLAUDE.md's opening as text and asked for no
+  changes.
 - [ ] 4.3 Open the pull request with `Closes #31` and verify CI's `test` job passes
 
 ## Workflow follow-up
