@@ -8,6 +8,6 @@ version = 1
 # guard_pytest does, so scripts/tests/test_check.py fails if a gate's source names one (design D5). The brand guide
 # isn't skipped: tests/unit/vocabulary.test.ts reads it (spec: vocabulary).
 [skip]
-paths = ["openspec/**", ".claude/**", "docs/superpowers/**", "CLAUDE.md", "CONTRIBUTING.md", "README.md"]
+paths = ["openspec/**", ".claude/**", "docs/superpowers/**", "CLAUDE.md", "README.md"]
 
 # No scopes: the guard's tag check has no adapter for this site's JavaScript test runners.

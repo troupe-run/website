@@ -5,7 +5,9 @@ troupe-run/troupe, and so does the text of /docs (`docs/` there), which every bu
 release. Change a docs page in troupe, never in `src/content/docs/docs/`, which is generated. The same goes for the
 schemas at /protocol/: they come from troupe's `protocol/schemas/`, one copy per protocol release, and
 `public/protocol/` is generated. See [openspec/config.yaml](openspec/config.yaml) for the constraints every change
-respects, and [CONTRIBUTING.md](CONTRIBUTING.md) for setting up.
+respects, [README.md](README.md) for setting up and running the site, and the org's
+[contributing guide](https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md), which applies here as in every
+troupe-run repository.
 
 ## How work happens here
 
