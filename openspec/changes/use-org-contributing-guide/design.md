@@ -71,7 +71,7 @@ becomes the README for setting up and the org guide for contributing.
 2. No file git would commit links to `CONTRIBUTING.md` by a relative path. Markdown link targets and `href`s ending in
    `CONTRIBUTING.md` that aren't `https://` URLs are reported, with the file's path. `docs/superpowers/` and
    `openspec/changes/` are left out: they record what was true when written, and the change in flight quotes the
-   old file.
+   old file. The test file itself is left out by its path, since its fixtures are the links it looks for.
 
 Each part is shown to fail first: (1) while `CONTRIBUTING.md` still exists, (2) against the current `README.md` and
 `CLAUDE.md`.

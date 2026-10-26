@@ -69,7 +69,7 @@ to their fix next.
 ### Requirement: The repository has no contributing guide of its own
 The repository SHALL hold no `CONTRIBUTING.md` (at its root, in `.github/` or in `docs/`), so GitHub shows the org's
 guide from troupe-run/.github for it. No committed file outside the historical records (`docs/superpowers/` and
-archived OpenSpec changes) SHALL link to a `CONTRIBUTING.md` other than the org guide's URL.
+OpenSpec changes) and the test that checks this SHALL link to a `CONTRIBUTING.md` other than the org guide's URL.
 
 #### Scenario: GitHub shows the org's guide
 - **WHEN** a contributor opens the repository's contributing link on GitHub
