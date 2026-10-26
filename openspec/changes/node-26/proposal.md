@@ -9,14 +9,14 @@ to it now buys two and a half years before the next move. We skip 24, which went
 
 Since #4, `.nvmrc` is the only place CI, the deploy and the weekly link check take their Node version from. Two
 other places still repeat it for people: `engines.node` in `package.json` (`>=22.12.0`) and "Node 22 or later" in
-`CONTRIBUTING.md`. Nothing checks they agree with `.nvmrc`, so a move like this one can leave either behind.
+`README.md`. Nothing checks they agree with `.nvmrc`, so a move like this one can leave either behind.
 
 ## What Changes
 
 - `.nvmrc` goes from `22` to `26`. Every workflow follows it with no workflow file edited (spec: build-and-deploy).
 - `engines.node` in `package.json` goes from `>=22.12.0` to `>=26.0.0`.
-- `CONTRIBUTING.md` says "Node 26 or later".
-- A unit test fails when `engines.node`'s lowest major or the version `CONTRIBUTING.md` names differs from the major in
+- `README.md` says "Node 26 or later".
+- A unit test fails when `engines.node`'s lowest major or the version `README.md` names differs from the major in
   `.nvmrc`, and names the file that's behind. The next move then has a test that says where to change it.
 - The example in `.nvmrc`'s refusal message ("such as 22") becomes "such as 26", so it shows the version in use.
 - No dependency changes. Every pinned package's `engines` range in `package-lock.json` admits 26 (Astro 7.3.6 and
@@ -33,11 +33,13 @@ None.
 ### Modified Capabilities
 
 - `build-and-deploy`: adds a requirement that the copies of the Node version written for people (`engines.node` and
-  `CONTRIBUTING.md`) agree with `.nvmrc`, and that a check fails when they don't.
+  `README.md`) agree with `.nvmrc`, and that a check fails when they don't.
 
 ## Impact
 
-- Files: `.nvmrc`, `package.json`, `CONTRIBUTING.md`, `scripts/node-version.mjs` (message only),
+- `README.md` comes off the guard's skip list in `scripts/check-paths.toml`, because a test now reads it. A
+  commit touching only it runs the full check.
+- Files: `.nvmrc`, `package.json`, `README.md`, `scripts/check-paths.toml`, `scripts/node-version.mjs` (message only),
   `tests/unit/node-version.test.ts`, a new unit test beside `tests/unit/workflow-node-version.test.ts`.
 - `package-lock.json`'s root `engines` mirrors `package.json` and changes with it. Nothing else in it should.
 - Contributors need Node 26. npm only warns on an `engines` mismatch (there's no `engine-strict`), and

@@ -2,17 +2,23 @@
 
 ## 1. Hold the copies of the Node version to .nvmrc
 
-- [ ] 1.1 Add `tests/unit/node-version-copies.test.ts` (design D4): a pure function that takes the texts of `.nvmrc`,
-  `package.json` and `CONTRIBUTING.md` and returns the mismatches, with a case for each scenario in the spec delta
-  (engines behind, CONTRIBUTING behind, no version in CONTRIBUTING, all agree) plus `engines.node` in a shape it
+- [x] 1.1 Add `tests/unit/node-version-copies.test.ts` (design D4): a pure function that takes the texts of `.nvmrc`,
+  `package.json` and `README.md` and returns the mismatches, with a case for each scenario in the spec delta
+  (engines behind, README behind, no version in README, all agree) plus `engines.node` in a shape it
   refuses (`^26`, `26.x`, `>=22 || >=26`, missing), and one test that runs it on the real files. Write it while
   `.nvmrc` is still `22`: verify every case passes and the real-files test passes on main's state (22, `>=22.12.0`,
   "Node 22 or later"). Then set only `.nvmrc` to `26` and verify the real-files test fails naming both `package.json`
-  and `CONTRIBUTING.md`; put `.nvmrc` back
+  and `README.md`; put `.nvmrc` back. Recorded 2026-10-26, after the rebase onto main (design, Context): 12 passed
+  on 22 / `>=22.12.0` / "Node 22 or later"; with only `.nvmrc` at 26, the real-files test failed naming
+  `package.json` (`>=22.12.0`, 26) and `README.md` (22, 26)
+- [x] 1.2 Take `README.md` off the skip list in `scripts/check-paths.toml` and say why in the comment above it, since
+  a gate now reads it (design D3). Verify `python3 -m unittest scripts/tests/test_check.py` fails with
+  "tests/unit/node-version-copies.test.ts names README.md" while `README.md` is still listed, then passes once it
+  isn't. Recorded 2026-10-26: listed, `FAILED (failures=1)` with that message; unlisted, `OK`
 
 ## 2. Move to 26
 
-- [ ] 2.1 Set `.nvmrc` to `26`, `engines.node` to `>=26.0.0` (design D2) and `CONTRIBUTING.md` to "Node 26 or later
+- [ ] 2.1 Set `.nvmrc` to `26`, `engines.node` to `>=26.0.0` (design D2) and `README.md` to "Node 26 or later
   (the version in `.nvmrc`)". Update the root `engines` in `package-lock.json` to match, and verify `git diff
   package-lock.json` changes nothing else. Verify the test from 1.1 passes on the real files and
   `workflow-node-version.test.ts` passes with no workflow file edited (`git diff --stat .github/` is empty)
