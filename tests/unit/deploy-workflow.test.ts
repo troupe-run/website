@@ -2,8 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 
-// The deploy starts after CI on a push to main, or on troupe's notice, and checks links before it publishes (spec:
-// build-and-deploy; versioned-docs design D11). troupe-run/infrastructure#110's token can only dispatch it.
+// The deploy starts after CI on a push to main, or on troupe's or infrastructure's notice, and checks links before it
+// publishes (spec: build-and-deploy; versioned-docs design D11). Both notices use the troupe-run-docs App's token
+// (troupe-run/infrastructure#110), which can only dispatch it.
 const TEXT = readFileSync('.github/workflows/deploy.yml', 'utf8');
 type Step = { uses?: string; run?: string; with?: Record<string, unknown> };
 type Job = { if?: string; needs?: string; concurrency?: { group: string; 'cancel-in-progress': boolean }; environment?: { name: string }; steps?: Step[] };

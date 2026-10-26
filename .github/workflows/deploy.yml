@@ -1,7 +1,11 @@
 name: Deploy
-# Publishes main after CI passes on a push, and again whenever troupe-run/troupe's release workflow dispatches it, on
-# every push to troupe's main, so /docs follows troupe (spec: build-and-deploy; versioned-docs design D11). The
-# dispatch takes no inputs: nothing from the sender reaches the build. Only main is built, and github-pages is
+# Publishes main after CI passes on a push, and again whenever one of two workflows dispatches it (spec:
+# build-and-deploy):
+#   - troupe-run/troupe's release workflow, on every push to troupe's main, so /docs follows troupe (versioned-docs
+#     design D11);
+#   - troupe-run/infrastructure's milestones-notice workflow, on a push to its main that changes tofu/milestones.json,
+#     so /status/ shows the new release list.
+# The dispatch takes no inputs: nothing from either sender reaches the build. Only main is built, and github-pages is
 # limited to main (troupe-run/infrastructure), so a dispatch on another ref publishes nothing.
 on:
   workflow_run:
