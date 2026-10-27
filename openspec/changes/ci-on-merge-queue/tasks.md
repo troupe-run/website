@@ -10,7 +10,7 @@
   queue's commit gets the full check. Verify `npx vitest run tests/unit/ci-workflow.test.ts` passes.
 - [x] 1.3 Verify the deploy still can't start from a queue run: `npx vitest run tests/unit/deploy-workflow.test.ts`
   passes unchanged, and its "builds only after CI passed on a push" test is the one that pins it (design D3).
-- [ ] 1.4 Run `uv run scripts/check.py` and verify it exits 0, then confirm on the pull request that CI's `test` passes.
+- [x] 1.4 Run `uv run scripts/check.py` and verify it exits 0, then confirm on the pull request that CI's `test` passes.
 
 ## Workflow follow-up
 
