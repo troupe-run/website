@@ -3,6 +3,10 @@ on:
   pull_request:
   push:
     branches: [main]
+  # The merge queue's commit: main plus the pull requests queued ahead, a tree no pull request tested. `test` runs the
+  # whole check on it, as on a push to main, and the queue lands it only if `test` passes (spec: quality-check). The
+  # deploy follows CI only on a push to main, so a queue run publishes nothing (spec: build-and-deploy).
+  merge_group:
 permissions:
   contents: read
 jobs:
