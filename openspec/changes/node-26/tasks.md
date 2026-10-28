@@ -42,9 +42,11 @@
 
 ## 4. Before the merge
 
-- [ ] 4.1 On or after 2026-10-28, verify `https://nodejs.org/dist/index.json` lists a 26.x release with an `lts`
+- [x] 4.1 On or after 2026-10-28, verify `https://nodejs.org/dist/index.json` lists a 26.x release with an `lts`
   codename, and record the version and codename (design D6). If it doesn't, comment on #8 that the merge is held, and
-  leave this unticked
+  leave this unticked. Recorded 2026-10-29: v26.13.0, `lts` "Lithium", released
+  2026-10-28. Before this, on 2026-10-27 22:10 UTC, the newest was v26.12.1 with `lts=false`. The branch was then rebased
+  onto main (2a81139, which brought the merge queue) and `uv run scripts/check.py` passed (459 unit, e2e passed)
 
 ## Workflow follow-up
 
