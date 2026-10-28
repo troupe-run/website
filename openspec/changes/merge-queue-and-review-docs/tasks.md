@@ -2,10 +2,10 @@
 
 ## 1. CLAUDE.md
 
-- [ ] 1.1 In "How work happens here", add step 5 "Claude's review is acted on" and renumber the archive and
+- [x] 1.1 In "How work happens here", add step 5 "Claude's review is acted on" and renumber the archive and
       after-merge steps to 6 and 7, as design D1 words it, linking development-workflow.md's "Claude's review".
       Verify by reading CLAUDE.md against the scenario "An agent finishes a pull request".
-- [ ] 1.2 Rewrite the archive step's merge sentence: added to the merge queue (`gh pr merge <n>` or **Merge when
+- [x] 1.2 Rewrite the archive step's merge sentence: added to the merge queue (`gh pr merge <n>` or **Merge when
       ready**), landed by rebase once `test` and `guard (workflow rules)` pass on the queued commit, and
       `gh pr merge <n> --rebase --admin` only for emergencies such as a stuck queue. Verify by reading CLAUDE.md
       against the scenarios "An agent merges a pull request" and "An agent starts a session", and that README.md
@@ -13,10 +13,10 @@
 
 ## 2. openspec/config.yaml
 
-- [ ] 2.1 Add infrastructure's review line at the end of the `context`'s **Working** list, as design D2 says. Verify
+- [x] 2.1 Add infrastructure's review line at the end of the `context`'s **Working** list, as design D2 says. Verify
       `python3 -c "import yaml;yaml.safe_load(open('openspec/config.yaml'))"` (or `uv run`) parses it and
       `openspec validate merge-queue-and-review-docs` passes.
-- [ ] 2.2 Verify the line reaches a proposal: `openspec instructions tasks --change merge-queue-and-review-docs --json`
+- [x] 2.2 Verify the line reaches a proposal: `openspec instructions tasks --change merge-queue-and-review-docs --json`
       prints a `context` containing "wait for Claude's review of the last push".
 
 ## 3. Check and pull request
