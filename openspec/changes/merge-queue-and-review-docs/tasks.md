@@ -21,7 +21,7 @@
 
 ## 3. Check and pull request
 
-- [ ] 3.1 `uv run scripts/check.py` passes, and the owner has the CLAUDE.md and config.yaml diff to review as text.
+- [x] 3.1 `uv run scripts/check.py` passes, and the owner has the CLAUDE.md and config.yaml diff to review as text.
 - [ ] 3.2 Open the pull request with `Closes #71` and `Closes #72`; CI's `test` and `guard (workflow rules)` pass.
 - [ ] 3.3 Wait for Claude's review of the last push and act on each finding by its tier: fix or answer every
       must-fix and nit, resolve only nits, and raise decisions and disputed must-fixes with the owner. Verify no
