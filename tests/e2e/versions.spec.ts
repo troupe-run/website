@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import AxeBuilder from '@axe-core/playwright';
+import { seriousViolations } from './axe';
 
 // The versions, on the fixture build: troupe-v0.1.0, troupe-v0.1.1, troupe-v0.2.0 and main, from
 // tests/fixtures/troupe-docs/ (spec: versioned-docs; quality-check; design D9). Each fixture page says which ref it's
@@ -236,9 +236,7 @@ for (const theme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
       await page.goto(url);
       await menu(page).locator('summary').click();
-      const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
-      const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-      expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
+      expect(await seriousViolations(page)).toEqual([]);
     });
   }
 }
