@@ -8,13 +8,16 @@
   names, page lists and setup. Verify, still on 4.13.0, that `uv run scripts/check.py` passes and the e2e test count
   matches main's, so the refactor changed nothing. Recorded 2026-10-29: on 4.13.0, `check: all gates passed`, 459
   unit and 265 e2e passed, the same 265 as main's last CI run (40815480960)
-- [ ] 1.2 Add `tests/unit/e2e-axe.test.ts`. It runs the filter on hand-made results, one case per scenario in the
+- [x] 1.2 Add `tests/unit/e2e-axe.test.ts`. It runs the filter on hand-made results, one case per scenario in the
   spec's "An accepted axe finding names one rule on one node" requirement: an exact match is dropped; the same rule on
   another node is kept; another rule on the excepted node is kept; a changed selector is kept; a violation with the
   excepted node and another keeps the other; a violation left empty is dropped. It also fails when a file under
   `tests/e2e/` other than `axe.ts` imports `@axe-core/playwright`. Verify `npm run test:unit` passes. Then add
   `import AxeBuilder from '@axe-core/playwright'` to a copy of a spec file under `tests/e2e/`, verify the test fails
-  and names that file, and remove the copy.
+  and names that file, and remove the copy. Recorded 2026-10-29: 9 passed (7 filter cases, the six above plus a
+  framed target joined with spaces and minor/moderate ignored, and 2 for the import check); `npm run test:unit` 468
+  passed. With `zz-bypass.spec.ts` importing
+  it, the test failed naming `zz-bypass.spec.ts`; with the copy removed, 9 passed
 
 ## 2. Move to 4.14 and accept the search button's finding
 
