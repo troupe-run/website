@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import AxeBuilder from '@axe-core/playwright';
+import { seriousViolations } from './axe';
 
 const PAGES = [
   ['landing page', '/'],
@@ -23,11 +23,7 @@ for (const theme of ['light', 'dark'] as const) {
       // for it, so axe sees the page a reader gets; if the script never runs, this times out and the test fails.
       await page.waitForFunction(() =>
         [...document.querySelectorAll('.expressive-code pre')].every((p) => p.scrollWidth <= p.clientWidth || p.hasAttribute('tabindex')));
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-        .analyze();
-      const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-      expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
+      expect(await seriousViolations(page)).toEqual([]);
     });
   }
 }

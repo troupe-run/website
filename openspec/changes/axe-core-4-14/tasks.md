@@ -2,11 +2,12 @@
 
 ## 1. One axe helper, on 4.13, with no change in behaviour
 
-- [ ] 1.1 Add `tests/e2e/axe.ts` (design D3) with the WCAG tags, an empty `ACCEPTED` list, the pure filter (D2), and
+- [x] 1.1 Add `tests/e2e/axe.ts` (design D3) with the WCAG tags, an empty `ACCEPTED` list, the pure filter (D2), and
   a function that runs axe on a page and returns the serious and critical `rule: targets` strings after the filter.
   Move `tests/e2e/a11y.spec.ts` and the version-menu block of `tests/e2e/versions.spec.ts` onto it, keeping their test
   names, page lists and setup. Verify, still on 4.13.0, that `uv run scripts/check.py` passes and the e2e test count
-  matches main's, so the refactor changed nothing.
+  matches main's, so the refactor changed nothing. Recorded 2026-10-29: on 4.13.0, `check: all gates passed`, 459
+  unit and 265 e2e passed, the same 265 as main's last CI run (40815480960)
 - [ ] 1.2 Add `tests/unit/e2e-axe.test.ts`. It runs the filter on hand-made results, one case per scenario in the
   spec's "An accepted axe finding names one rule on one node" requirement: an exact match is dropped; the same rule on
   another node is kept; another rule on the excepted node is kept; a changed selector is kept; a violation with the
