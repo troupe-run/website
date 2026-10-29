@@ -50,3 +50,9 @@ export async function seriousViolations(page: Page): Promise<string[]> {
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   return unaccepted(results.violations);
 }
+
+/** The nodes axe reports for one rule on the page, whatever their impact and whether or not they're accepted. */
+export async function reportedTargets(page: Page, rule: string): Promise<string[]> {
+  const results = await new AxeBuilder({ page }).withRules([rule]).analyze();
+  return results.violations.flatMap((v) => v.nodes.map(targetOf));
+}

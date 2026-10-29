@@ -34,14 +34,21 @@
   `/docs/programme/what-is-troupe/`, and a `why` that cites withastro/starlight#4260 and the owner's decision of
   2026-10-29. Verify every axe test in both builds passes. Recorded 2026-10-29: 22 passed (18 in `a11y.spec.ts`, 4 in
   the fixture build)
-- [ ] 2.3 Add the reason test (design D4) to `tests/e2e/a11y.spec.ts`, named for exactly what it checks. Verify it
+- [x] 2.3 Add the reason test (design D4) to `tests/e2e/a11y.spec.ts`, named for exactly what it checks. Verify it
   passes. Then break each condition in turn, by editing the button in the page through `page.evaluate` in a
   throwaway copy of the test: change the aria-hidden span's text, remove `aria-keyshortcuts`, and add a word to the
-  `<kbd>`. Verify each one fails with a message naming what it found, and delete the copy.
-- [ ] 2.4 Add the stale-entry test (design D5), one per `ACCEPTED` entry, with its axe run in `tests/e2e/axe.ts`.
+  `<kbd>`. Verify each one fails with a message naming what it found, and delete the copy. Recorded 2026-10-29 (macOS,
+  so `⌘ K` and `Meta+K`; CI's Linux run covers `Ctrl K`): unbroken it read label "Search", hint "⌘ K"; span "Find"
+  failed with Expected "Search", Received "Find"; a `docs` kbd failed with 'the hint reads "⌘ K docs"'; no
+  `aria-keyshortcuts` first failed as a TypeError on `null` without the message, so it now reads "(none)" and fails
+  with "aria-keyshortcuts: without it the hint is conveyed only visually"
+- [x] 2.4 Add the stale-entry test (design D5), one per `ACCEPTED` entry, with its axe run in `tests/e2e/axe.ts`.
   Verify it passes. Then change the entry's target to `button[data-open-modal="x"]` locally and verify it fails,
   saying the entry is no longer reported and can be removed, and that the axe tests fail naming the real selector
-  (spec, "The node's selector changes"). Restore it.
+  (spec, "The node's selector changes"). Restore it. Recorded 2026-10-29: passed; with the target `="x"`, it failed
+  with "axe no longer reports label-content-name-mismatch on button[data-open-modal="x"]: its entry in ACCEPTED
+  (tests/e2e/axe.ts) can be removed", and the written docs page's axe test failed naming
+  `label-content-name-mismatch: button[data-open-modal=""]`; restored
 
 ## 3. Verify
 

@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { seriousViolations } from './axe';
+import { ACCEPTED, reportedTargets, seriousViolations } from './axe';
 
 const PAGES = [
   ['landing page', '/'],
@@ -26,6 +26,38 @@ for (const theme of ['light', 'dark'] as const) {
       expect(await seriousViolations(page)).toEqual([]);
     });
   }
+}
+
+// The search button's accepted finding (axe.ts) holds only while the visible text beyond its name is a shortcut hint
+// that it also exposes as aria-keyshortcuts (spec: accessibility; axe-core-4-14 design D4). Whether that serves
+// speech-input users is Starlight's judgement, which the owner accepted (#67); no test here can check it.
+test('the search button\'s visible text, without its Ctrl K or ⌘ K hint, is its accessible name "Search", and the hint is exposed as aria-keyshortcuts', async ({ page }) => {
+  await page.goto('/docs/programme/what-is-troupe/');
+  const button = page.locator('button[data-open-modal]');
+  await expect(button).toHaveAccessibleName('Search');
+  const seen = await button.evaluate((b: HTMLElement) => {
+    const squash = (s: string) => s.replace(/\s+/g, ' ').trim();
+    const hint = b.querySelector<HTMLElement>(':scope > kbd');
+    return {
+      label: squash(hint ? b.innerText.replace(hint.innerText, ' ') : b.innerText),
+      hint: hint && squash([...hint.querySelectorAll<HTMLElement>('kbd')].map((k) => k.innerText).join(' ')),
+      keys: b.getAttribute('aria-keyshortcuts') ?? '(none)',
+    };
+  });
+  expect(seen.label, 'the visible text without the hint, against the accessible name').toBe('Search');
+  expect(['Ctrl K', '⌘ K'], `the hint reads ${JSON.stringify(seen.hint)}, not a shortcut alone`).toContain(seen.hint);
+  expect(seen.keys, 'aria-keyshortcuts: without it the hint is conveyed only visually').toMatch(/^(Control|Meta)\+K$/);
+});
+
+// An accepted finding that axe no longer reports can go (design D5). Light only: the rule doesn't depend on colour.
+for (const accepted of ACCEPTED) {
+  test(`axe still reports ${accepted.rule} on ${accepted.target} at ${accepted.page}, so its accepted finding is still needed`, async ({ page }) => {
+    await page.goto(accepted.page);
+    expect(
+      await reportedTargets(page, accepted.rule),
+      `axe no longer reports ${accepted.rule} on ${accepted.target}: its entry in ACCEPTED (tests/e2e/axe.ts) can be removed`,
+    ).toContain(accepted.target);
+  });
 }
 
 test('every interactive element on the landing page is reachable by Tab', async ({ page }) => {
