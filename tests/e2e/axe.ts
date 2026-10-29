@@ -18,7 +18,18 @@ export type Accepted = {
 
 // The axe findings the site accepts. Each excuses one rule on one node, and nothing else (design D2). It grows only by
 // the owner's decision.
-export const ACCEPTED: readonly Accepted[] = [];
+export const ACCEPTED: readonly Accepted[] = [
+  {
+    rule: 'label-content-name-mismatch',
+    target: 'button[data-open-modal=""]',
+    page: '/docs/programme/what-is-troupe/',
+    why:
+      "Starlight's search button. Its visible text beyond its name, \"Search\", is the Ctrl K (or ⌘ K) shortcut hint, " +
+      'which it also exposes as aria-keyshortcuts. Starlight closed this as not planned ' +
+      '(https://github.com/withastro/starlight/issues/4260), and the owner accepted it on 2026-10-29 ' +
+      '(troupe-run/website#67). a11y.spec.ts checks the reason still holds.',
+  },
+];
 
 type Violation = { id: string; impact?: string | null; nodes: { target: unknown[] }[] };
 
