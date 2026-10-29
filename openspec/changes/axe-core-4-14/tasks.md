@@ -21,14 +21,19 @@
 
 ## 2. Move to 4.14 and accept the search button's finding
 
-- [ ] 2.1 Run `npm install --save-exact @axe-core/playwright@4.14.0` (design D1). Verify `package.json` says
+- [x] 2.1 Run `npm install --save-exact @axe-core/playwright@4.14.0` (design D1). Verify `package.json` says
   `"4.14.0"` and that `git diff package-lock.json` moves only `@axe-core/playwright` and `axe-core`, to 4.14.0. With
   `ACCEPTED` still empty, run the e2e tests and verify the axe tests fail on `label-content-name-mismatch:
   button[data-open-modal=""]`, and on nothing else, in both builds. Record the counts. If anything else fails, stop
-  and report it to the owner rather than adding an entry (design, Risks).
-- [ ] 2.2 Add the one `ACCEPTED` entry: rule `label-content-name-mismatch`, target `button[data-open-modal=""]`, page
+  and report it to the owner rather than adding an entry (design, Risks). Recorded 2026-10-29: `npm install` also
+  dropped `starlight-blog`'s optional peer `@astrojs/markdown-satteri` from the lockfile, so that was reverted and
+  #58's own diff applied instead (`gh pr diff 58 | git apply`); `npm ci` installed 4.14.0 of both. With `ACCEPTED`
+  empty: 20 failed (16 in `a11y.spec.ts`, 4 in the fixture build's version-menu tests), every one on
+  `label-content-name-mismatch: button[data-open-modal=""]` alone; 245 passed
+- [x] 2.2 Add the one `ACCEPTED` entry: rule `label-content-name-mismatch`, target `button[data-open-modal=""]`, page
   `/docs/programme/what-is-troupe/`, and a `why` that cites withastro/starlight#4260 and the owner's decision of
-  2026-10-29. Verify every axe test in both builds passes.
+  2026-10-29. Verify every axe test in both builds passes. Recorded 2026-10-29: 22 passed (18 in `a11y.spec.ts`, 4 in
+  the fixture build)
 - [ ] 2.3 Add the reason test (design D4) to `tests/e2e/a11y.spec.ts`, named for exactly what it checks. Verify it
   passes. Then break each condition in turn, by editing the button in the page through `page.evaluate` in a
   throwaway copy of the test: change the aria-hidden span's text, remove `aria-keyshortcuts`, and add a word to the
