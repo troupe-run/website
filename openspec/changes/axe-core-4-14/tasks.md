@@ -52,7 +52,9 @@
 
 ## 3. Verify
 
-- [ ] 3.1 Run `uv run scripts/check.py` and verify it passes in full. Record its last line and the e2e count.
+- [x] 3.1 Run `uv run scripts/check.py` and verify it passes in full. Record its last line and the e2e count.
+  Recorded 2026-10-29, run by the guard on eb1a9a2: `check: all gates passed`, 468 unit, 267 e2e (main's 265 plus
+  the reason and stale-entry tests)
 - [ ] 3.2 Open the pull request with `Closes #67`, saying it supersedes #58, and verify CI's `test` job passes.
 
 ## Workflow follow-up
