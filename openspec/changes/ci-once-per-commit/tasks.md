@@ -27,7 +27,7 @@
 
 ## 3. The workflow docs
 
-- [ ] 3.1 Update CLAUDE.md's steps 4 and 5 (design D6): a draft pull request (`gh pr create --draft`) that Claude
+- [x] 3.1 Update CLAUDE.md's steps 4 and 5 (design D6): a draft pull request (`gh pr create --draft`) that Claude
   reviews while `test` waits, and `gh pr ready <n>` once the review of the last push leaves no must-fix or decision
   open. Verify by reading it against infrastructure's `docs/development-workflow.md` ("A pull request opens as a
   draft…") and against each scenario of the contributing delta spec.
