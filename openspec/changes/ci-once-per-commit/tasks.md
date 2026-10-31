@@ -14,14 +14,14 @@
 
 ## 2. CI decides once per event
 
-- [ ] 2.1 Update `tests/unit/ci-workflow.test.ts` first: `pull_request` types are exactly `opened`, `synchronize`,
+- [x] 2.1 Update `tests/unit/ci-workflow.test.ts` first: `pull_request` types are exactly `opened`, `synchronize`,
   `reopened`, `ready_for_review`; the jobs are `changes` and `test`; `changes` doesn't run on a merge group, has
   `actions: read`, answers `test=false` on a draft with a notice, runs `scripts/queue_passed.py` with the repository
   and `github.sha` on a push and only then checks out, and answers `test=true` on a ready pull request; `test` needs
   `changes`, runs unless `changes` said `false` (and when `changes` was skipped or failed), and its only run step is
   still `uv run scripts/check.py`. Verify `npx vitest run tests/unit/ci-workflow.test.ts` fails on the current
   `ci.yml`.
-- [ ] 2.2 Change `.github/workflows/ci.yml` (design D1, D5): the types, the `changes` job and `test`'s `needs` and
+- [x] 2.2 Change `.github/workflows/ci.yml` (design D1, D5): the types, the `changes` job and `test`'s `needs` and
   `if`, and a header comment saying what each event runs. Verify the workflow tests pass and
   `uv run scripts/check.py` passes.
 
