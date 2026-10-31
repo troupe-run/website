@@ -2,13 +2,13 @@
 
 ## 1. The merge-queue lookup
 
-- [ ] 1.1 Write `scripts/tests/test_queue_passed.py` first, with a fake `gh`, clock and sleep, covering: a successful
+- [x] 1.1 Write `scripts/tests/test_queue_passed.py` first, with a fake `gh`, clock and sleep, covering: a successful
   merge-queue run answers `test=false`; no runs, and only failed or cancelled runs, answer `test=true`; a run still
   waiting is polled and then succeeds; a run that's still waiting after two minutes, a failed read, output that isn't
   JSON or isn't a list of runs, and an unknown status each answer `test=true` with a `::warning::` naming why; the
   `gh run list` call names `ci.yml`, the commit and `--event merge_group`; and the script exits 0 in every case.
   Verify they fail before the script exists.
-- [ ] 1.2 Write `scripts/queue_passed.py` (design D2 to D4), following troupe-run/infrastructure's
+- [x] 1.2 Write `scripts/queue_passed.py` (design D2 to D4), following troupe-run/infrastructure's
   `scripts/queue_passed.py` with this repository's one output, and verify `python3 -m unittest discover -s
   scripts/tests` passes.
 
