@@ -26,9 +26,11 @@ Every change, however small, follows one path.
    runs and passes. A merge needs every conversation resolved
    ([development-workflow.md, "Claude's review"](https://github.com/troupe-run/infrastructure/blob/main/docs/development-workflow.md#claudes-review)).
 6. **`/opsx:archive`** runs on the branch before merging, so the pull request lands code, tests and specs together.
-   Then it's added to the merge queue (`gh pr merge <n>`, or **Merge when ready**), which lands it by rebase once
-   `test` and `guard (workflow rules)` pass on the queued commit. `gh pr merge <n> --rebase --admin` skips the queue;
-   it's for emergencies, such as clearing a stuck queue.
+   Once `test` has passed and every conversation is resolved, **ask the owner to merge**. The owner merges by rebase,
+   through the merge queue (`gh pr merge <n>`, or **Merge when ready**), which lands it once `test` and
+   `guard (workflow rules)` pass on the queued commit. Merging, queueing and auto-merge are the owner's: the guard
+   refuses them from an agent as `owner-only`. The owner's `gh pr merge <n> --rebase --admin` skips the queue; it's
+   for emergencies, such as clearing a stuck queue.
 7. **After the merge**, comment on the issue with the pull request and the archived change.
 
 Commits are Conventional Commits (`feat(docs): ...`), with **no sign-off**: this repository takes no DCO and no
