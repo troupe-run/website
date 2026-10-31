@@ -26,9 +26,9 @@ and brand assets.
 ### Requirement: The contributor docs describe the workflow
 CLAUDE.md SHALL describe the path every change follows: an issue, an OpenSpec change on a branch named exactly after
 it, a draft pull request that closes the issue, Claude's review of the last push acted on, the pull request marked
-ready once that review is clean, the change archived on the branch, and a rebase merge through the merge queue.
-CLAUDE.md SHALL link the org's development-workflow guide, and README.md the org's contributing guide, rather than
-restate them.
+ready once that review is clean, the change archived on the branch, and the owner's rebase merge through the merge
+queue. CLAUDE.md SHALL link the org's development-workflow guide, and README.md the org's contributing guide, rather
+than restate them.
 
 #### Scenario: An agent starts a session
 - **WHEN** a coding agent reads CLAUDE.md
@@ -48,10 +48,12 @@ restate them.
   with the org's development-workflow guide linked for the tiers
 
 #### Scenario: An agent merges a pull request
-- **WHEN** a coding agent reads CLAUDE.md's merge step
-- **THEN** it finds that the pull request is added to the merge queue (`gh pr merge <n>`, or **Merge when ready**),
-  which lands it by rebase once `test` and `guard (workflow rules)` pass on the queued commit, and that
-  `gh pr merge <n> --rebase --admin` skips the queue and is for emergencies only
+- **WHEN** a coding agent reads CLAUDE.md's merge step, with the change archived on the branch, `test` passed and
+  every conversation resolved
+- **THEN** it finds that it asks the owner to merge, and that the owner adds the pull request to the merge queue,
+  which lands it by rebase once `test` and `guard (workflow rules)` pass on the queued commit
+- **AND** it finds no merge command for it to run: `gh pr merge` and **Merge when ready** are named only as the
+  owner's, and `gh pr merge <n> --rebase --admin`, which skips the queue, as the owner's route for emergencies
 
 #### Scenario: A person looks for how work flows
 - **WHEN** a contributor reads README.md
