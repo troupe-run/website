@@ -1,18 +1,68 @@
 name: CI
+# The check runs once for each version of the code that matters (troupe-run/infrastructure#227; spec: quality-check,
+# "CI runs the same check"; ci-once-per-commit design):
+# - a pull request that's ready for review, on every update. A draft runs no check: an agent marks it ready once
+#   Claude's review of its last push is clean, and `ready_for_review` runs it then.
+# - the merge queue's commit: main plus the pull requests queued ahead, a tree no pull request tested. `test` runs the
+#   whole check on it, and the queue lands it only if `test` passes.
+# - a push to main, unless the merge queue already passed that exact commit (scripts/queue_passed.py). Then `test`
+#   skips and the run still concludes success, because `changes` ran. A commit the queue didn't pass, such as the
+#   App's guard deliveries, runs the whole check.
+# The deploy follows CI only on a successful push to main, so a queue run publishes nothing (spec: build-and-deploy).
 on:
   pull_request:
+    # GitHub's default types, written out because naming one replaces them, and ready_for_review: marking a draft
+    # ready runs the check a draft skipped (design D5).
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
-  # The merge queue's commit: main plus the pull requests queued ahead, a tree no pull request tested. `test` runs the
-  # whole check on it, as on a push to main, and the queue lands it only if `test` passes (spec: quality-check). The
-  # deploy follows CI only on a push to main, so a queue run publishes nothing (spec: build-and-deploy).
   merge_group:
 permissions:
   contents: read
 jobs:
+  # Decides whether `test` runs (design D1). Exactly one answering step runs. A merge group skips this job, and a skipped
+  # or failed one leaves `test` empty, so `test` runs: only a `changes` that succeeded and said false skips it.
+  changes:
+    name: does it need testing?
+    if: github.event_name != 'merge_group'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      # queue_passed.py reads CI's merge-queue runs.
+      actions: read
+    outputs:
+      test: ${{ steps.draft.outputs.test || steps.main.outputs.test || steps.ready.outputs.test }}
+    steps:
+      - name: A draft runs no check until it's ready
+        id: draft
+        if: github.event_name == 'pull_request' && github.event.pull_request.draft
+        run: |
+          echo "::notice::A draft: test runs the check when the pull request is marked ready for review."
+          echo 'test=false' >> "$GITHUB_OUTPUT"
+      - name: A pull request that's ready for review runs the check
+        id: ready
+        if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+        run: echo 'test=true' >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        if: github.event_name == 'push'
+      # It always exits 0: a failed read answers test=true, with a warning, since a red run here would stop the deploy
+      # (design D3).
+      - name: Did the merge queue pass this commit?
+        id: main
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          python3 scripts/queue_passed.py --repository "$GITHUB_REPOSITORY" --sha "$SHA" >> "$GITHUB_OUTPUT"
+          cat "$GITHUB_OUTPUT"
   # The required check is this job's name, `test`. Every gate is in scripts/check.py, which
   # contributors and the guard's commit hook run too, so CI and local checks can't diverge.
   test:
+    needs: changes
+    # !cancelled() keeps it running when `changes` was skipped (a merge group) or failed.
+    if: ${{ !cancelled() && needs.changes.outputs.test != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
