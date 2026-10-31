@@ -34,7 +34,7 @@
 
 ## 4. Live check on this pull request
 
-- [ ] 4.1 Open the pull request as a draft and verify CI's run: `changes` logs the draft notice, `test` is skipped,
+- [x] 4.1 Open the pull request as a draft and verify CI's run: `changes` logs the draft notice, `test` is skipped,
   and the run concludes success (`gh run view <id>`).
 - [ ] 4.2 Once Claude's review of the last push is clean, `gh pr ready <n>` and verify `test` runs the check and
   passes, and no review run starts.
