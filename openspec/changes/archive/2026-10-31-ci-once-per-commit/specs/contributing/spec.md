@@ -2,10 +2,10 @@
 
 ### Requirement: The contributor docs describe the workflow
 CLAUDE.md SHALL describe the path every change follows: an issue, an OpenSpec change on a branch named exactly after
-the change, a draft pull request that closes the issue, Claude's review of the last push acted on, the pull request
-marked ready once that review is clean, the change archived on the branch, and a rebase merge through the merge queue.
-CLAUDE.md SHALL link the org's development-workflow guide rather than restate its rules, and README.md SHALL link the
-org's contributing guide for the workflow rather than restate it.
+it, a draft pull request that closes the issue, Claude's review of the last push acted on, the pull request marked
+ready once that review is clean, the change archived on the branch, and a rebase merge through the merge queue.
+CLAUDE.md SHALL link the org's development-workflow guide, and README.md the org's contributing guide, rather than
+restate them.
 
 #### Scenario: An agent starts a session
 - **WHEN** a coding agent reads CLAUDE.md

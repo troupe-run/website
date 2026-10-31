@@ -1,11 +1,10 @@
 ## MODIFIED Requirements
 
 ### Requirement: CI runs the same check
-CI's `test` job SHALL run `uv run scripts/check.py` for every pull request that's ready for review, every commit the
-merge queue tests, and every push to `main` the merge queue didn't pass, and SHALL NOT run any of its gates as a
-separate step. The job SHALL keep the name `test`. On a merge-queue commit, and on a push to `main` that runs it, it
-SHALL run every gate. It SHALL be skipped on a draft pull request and on a push to `main` of a commit whose CI
-merge-queue run succeeded, and CI's run SHALL still conclude success.
+CI's `test` job SHALL run `uv run scripts/check.py`, every gate of it, for every pull request that's ready for
+review, every merge-queue commit, and every push to `main` the merge queue didn't pass. It SHALL keep the name `test`
+and run no gate as a separate step. It SHALL be skipped on a draft and on a push to `main` of a commit CI's
+merge-queue run passed, and CI's run SHALL still conclude success.
 
 #### Scenario: A pull request's CI
 - **WHEN** a pull request that's ready for review is opened or updated
