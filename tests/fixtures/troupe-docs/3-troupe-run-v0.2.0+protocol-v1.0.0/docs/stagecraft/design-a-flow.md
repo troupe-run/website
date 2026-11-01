@@ -5,4 +5,4 @@ status: written
 prerelease: true
 ---
 
-Design a flow, at troupe-v0.2.0.
+Design a flow, at troupe-run-v0.2.0.

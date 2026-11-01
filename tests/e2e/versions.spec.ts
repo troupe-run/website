@@ -1,9 +1,10 @@
 import { test, expect } from './fixtures';
 import { seriousViolations } from './axe';
 
-// The versions, on the fixture build: troupe-v0.1.0, troupe-v0.1.1, troupe-v0.2.0 and main, from
+// The versions, on the fixture build: troupe-run-v0.1.0, troupe-run-v0.1.1, troupe-run-v0.2.0 and main, from
 // tests/fixtures/troupe-docs/ (spec: versioned-docs; quality-check; design D9). Each fixture page says which ref it's
-// at ("Theatres, at troupe-v0.1.1."), so a test can tell which version a URL served.
+// at ("Theatres, at troupe-run-v0.1.1."), so a test can tell which version a URL served. Core's tags, troupe-v0.1.0 and
+// troupe-v0.3.0 (on troupe-run-v0.1.1's commit), aren't releases (bundle-tag-is-the-release design D3).
 const EDIT = 'https://github.com/troupe-run/troupe/edit/main/docs/';
 const menu = (page: import('@playwright/test').Page) => page.locator('[data-version-menu]');
 const sidebarHrefs = (page: import('@playwright/test').Page) =>
@@ -11,8 +12,8 @@ const sidebarHrefs = (page: import('@playwright/test').Page) =>
 
 test.describe('which troupe each URL serves', () => {
   for (const [url, text] of [
-    ['/docs/the-company/theatres/', 'Theatres, at troupe-v0.2.0.'],
-    ['/docs/v0.1/the-company/theatres/', 'Theatres, at troupe-v0.1.1.'],
+    ['/docs/the-company/theatres/', 'Theatres, at troupe-run-v0.2.0.'],
+    ['/docs/v0.1/the-company/theatres/', 'Theatres, at troupe-run-v0.1.1.'],
     ['/docs/next/the-company/theatres/', 'Theatres, at main.'],
   ]) {
     test(`${url} serves "${text}"`, async ({ page }) => {
@@ -24,6 +25,13 @@ test.describe('which troupe each URL serves', () => {
   test('no version is published from an older patch of a minor, or from the latest minor under /docs/vX.Y/', async ({ page }) => {
     expect((await page.goto('/docs/v0.2/the-company/theatres/'))?.status()).toBe(404);
     expect((await page.goto('/docs/v0.1.0/the-company/theatres/'))?.status()).toBe(404);
+  });
+
+  test("publishes no version from core's tag troupe-v0.3.0, though it's higher than every release", async ({ page }) => {
+    expect((await page.goto('/docs/v0.3/the-company/theatres/'))?.status()).toBe(404);
+    await page.goto('/docs/the-company/theatres/');
+    await menu(page).locator('summary').click();
+    await expect(menu(page).getByRole('link')).toHaveText(['next (unreleased)', 'v0.2 (latest)', 'v0.1']);
   });
 
   for (const [root, first] of [
@@ -189,7 +197,7 @@ test.describe('edit links and sources', () => {
     await page.goto('/docs/v0.1/the-company/theatres/');
     await expect(page.getByRole('link', { name: 'Improve this page' })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'View source' }))
-      .toHaveAttribute('href', 'https://github.com/troupe-run/troupe/blob/troupe-v0.1.1/docs/the-company/theatres.md');
+      .toHaveAttribute('href', 'https://github.com/troupe-run/troupe/blob/troupe-run-v0.1.1/docs/the-company/theatres.md');
   });
 
   test('a planned page in next shows its note with a "Help write this page" link to troupe', async ({ page }) => {
@@ -241,8 +249,9 @@ for (const theme of ['light', 'dark'] as const) {
   }
 }
 
-// The roadmap on the fixture build: tests/fixtures/milestones.json against the fixture troupe's tags, troupe-v0.1.0
-// (2026-01-01), troupe-v0.1.1 (2026-02-01) and troupe-v0.2.0 (2026-03-01) (spec: roadmap; quality-check).
+// The roadmap on the fixture build: tests/fixtures/milestones.json against the fixture troupe's release tags,
+// troupe-run-v0.1.0 (2026-01-01), troupe-run-v0.1.1 (2026-02-01) and troupe-run-v0.2.0 (2026-03-01), and core's
+// troupe-v0.3.0 (2026-02-01), which isn't a release (spec: roadmap; quality-check).
 test.describe('the roadmap on /status/', () => {
   // A section's entries: the first list after its heading (Milestones has an introduction before its own).
   const entries = (page: import('@playwright/test').Page, id: string) =>
@@ -264,7 +273,7 @@ test.describe('the roadmap on /status/', () => {
     await expect(released.nth(1).locator('.roadmap-released')).toHaveText('Released 2026-03-01');
     await expect(page.locator('.roadmap-released')).toHaveCount(2);
     const planned = entries(page, 'milestones');
-    await expect(planned.nth(0)).toHaveText('0.3.0 Three: planned, with no tag in the fixture troupe');
+    await expect(planned.nth(0)).toHaveText("0.3.0 Three: planned, with only core's tag in the fixture troupe");
     await expect(planned.locator('.roadmap-released')).toHaveCount(0);
   });
 
@@ -274,6 +283,14 @@ test.describe('the roadmap on /status/', () => {
     expect(headings).toEqual(['Status', 'Releases', 'Milestones']);
     const toc = (await page.locator('starlight-toc a').allInnerTexts()).filter((t) => headings.includes(t));
     expect(toc).toEqual(headings);
+  });
+
+  test("leaves 0.3.0 under Milestones with no date, though core has the tag troupe-v0.3.0", async ({ page }) => {
+    await page.goto('/status/');
+    expect(await versionsIn(page, 'releases')).not.toContain('0.3.0');
+    const three = entries(page, 'milestones').filter({ has: page.locator('> strong', { hasText: /^0\.3\.0$/ }) });
+    await expect(three).toHaveCount(1);
+    await expect(three.locator('.roadmap-released')).toHaveCount(0);
   });
 
   test('names 0.2.0 as the latest release in the status', async ({ page }) => {

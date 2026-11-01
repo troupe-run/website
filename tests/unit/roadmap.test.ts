@@ -39,29 +39,29 @@ describe('readRoadmap: released, with the date of its tag', () => {
   });
 
   it("dates a milestone by its exact tag's day, as YYYY-MM-DD in the tag's own time zone, and leaves the rest undated", () => {
-    const r = readRoadmap(plan, [tag('troupe-v0.1.0', '2026-11-05T23:30:00+10:00')]);
+    const r = readRoadmap(plan, [tag('troupe-run-v0.1.0', '2026-11-05T23:30:00+10:00')]);
     expect(r.releases.map((x) => x.released)).toEqual(['2026-11-05', null, null]);
     expect(r.latest).toBe('0.1.0');
   });
 
   it('adds no entry for a patch tag no milestone declares, and names the highest tag as the latest release', () => {
-    const r = readRoadmap(plan, [tag('troupe-v0.1.0'), tag('troupe-v0.1.1'), tag('troupe-v0.2.0')]);
+    const r = readRoadmap(plan, [tag('troupe-run-v0.1.0'), tag('troupe-run-v0.1.1'), tag('troupe-run-v0.2.0')]);
     expect(versions(r)).toEqual(['0.1.0', '0.2.0', '0.3.0']);
     expect(r.latest).toBe('0.2.0');
   });
 
   it('compares tags as numbers for the latest release', () => {
-    expect(readRoadmap(plan, [tag('troupe-v0.10.0'), tag('troupe-v0.9.0')]).latest).toBe('0.10.0');
+    expect(readRoadmap(plan, [tag('troupe-run-v0.10.0'), tag('troupe-run-v0.9.0')]).latest).toBe('0.10.0');
   });
 
   it('marks nothing as current or in progress: a release is only dated or not', () => {
-    const r = readRoadmap(plan, [tag('troupe-v0.1.0')]);
+    const r = readRoadmap(plan, [tag('troupe-run-v0.1.0')]);
     expect(Object.keys(r).sort()).toEqual(['latest', 'releases']);
     expect(r.releases.map((x) => Object.keys(x).sort())).toEqual(Array(3).fill(['description', 'released', 'version']));
   });
 
   it("ignores a milestone's state: a closed milestone with no tag isn't released, an open one with a tag is", () => {
-    const r = readRoadmap(file([m('0.1.0', 'a: b', { state: 'closed' }), m('0.2.0')]), [tag('troupe-v0.2.0')]);
+    const r = readRoadmap(file([m('0.1.0', 'a: b', { state: 'closed' }), m('0.2.0')]), [tag('troupe-run-v0.2.0')]);
     expect(r.releases.map((x) => x.released)).toEqual([null, '2026-11-05']);
   });
 
@@ -69,8 +69,26 @@ describe('readRoadmap: released, with the date of its tag', () => {
     expect(readRoadmap(plan, [tag('v0.1.0'), tag('website-v0.1.0')]).latest).toBeNull();
   });
 
+  it("marks the bundle's release, not core's, and names the bundle's as the latest when core's tag is higher", () => {
+    const r = readRoadmap(plan, [tag('troupe-run-v0.2.0'), tag('troupe-v0.3.0')]);
+    expect(r.releases.map((x) => [x.version, x.released])).toEqual([['0.1.0', null], ['0.2.0', '2026-11-05'], ['0.3.0', null]]);
+    expect(r.latest).toBe('0.2.0');
+  });
+
+  it("with core's tag and no bundle's, dates nothing and has no latest release", () => {
+    const r = readRoadmap(plan, [tag('troupe-v0.1.0'), tag('troupe-vcs-git-v0.1.0')]);
+    expect(r.releases.map((x) => x.released)).toEqual([null, null, null]);
+    expect(r.latest).toBeNull();
+  });
+
+  it('refuses a malformed bundle tag, naming it and the form that is accepted', () => {
+    expect(() => readRoadmap(plan, [tag('troupe-run-v1.0.0-rc.1')])).toThrow(
+      "troupe-run-v1.0.0-rc.1 isn't a release tag troupe.run can build: use troupe-run-vMAJOR.MINOR.PATCH",
+    );
+  });
+
   it("refuses a release tag's date that isn't an ISO date, naming the tag", () => {
-    expect(() => readRoadmap(plan, [tag('troupe-v0.1.0', 'yesterday')])).toThrow(/^troupe-v0\.1\.0's date "yesterday" isn't a date/);
+    expect(() => readRoadmap(plan, [tag('troupe-run-v0.1.0', 'yesterday')])).toThrow(/^troupe-run-v0\.1\.0's date "yesterday" isn't a date/);
   });
 });
 

@@ -27,9 +27,10 @@ export const ENV = {
 };
 
 /**
- * Commits each step of `fixtureDir` (`1-troupe-v0.1.0+protocol-v0.1.0`, …, `N-main`) in order, tagging each with the
- * tags its name lists after the number, joined by `+`, except main. A step holds `docs/`, `protocol/` or both; each one
- * it holds replaces that folder, and one it doesn't hold is kept from the step before (protocol-schemas design D9).
+ * Commits each step of `fixtureDir` (`1-troupe-run-v0.1.0+troupe-v0.1.0+protocol-v0.1.0`, …, `N-main`) in order,
+ * tagging each with the tags its name lists after the number, joined by `+`, except main. A step holds `docs/`,
+ * `protocol/` or both; each one it holds replaces that folder, and one it doesn't hold is kept from the step before
+ * (protocol-schemas design D9).
  */
 export function makeFixtureRepo(fixtureDir = FIXTURE) {
   const path = mkdtempSync(join(tmpdir(), 'troupe-fixture-'));

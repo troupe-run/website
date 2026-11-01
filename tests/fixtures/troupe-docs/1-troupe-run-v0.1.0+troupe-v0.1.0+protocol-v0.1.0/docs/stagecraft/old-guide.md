@@ -5,4 +5,4 @@ status: written
 prerelease: false
 ---
 
-The old guide, at troupe-v0.1.1. Only v0.1 has it.
+The old guide, at troupe-run-v0.1.0. Only v0.1 has it.

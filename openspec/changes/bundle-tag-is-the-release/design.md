@@ -15,6 +15,9 @@ Two modules each hold their own idea of the release tag (see proposal.md, Why):
 troupe's tags today (2026-11-01): `troupe-run-v0.1.0` at `46f3e9a`, `troupe-v0.1.0` at `399a9e7`, `protocol-v0.1.0`,
 and one `<component>-v0.1.0` per adapter and runner. Component names start `troupe-` (`troupe-runner-scripted`,
 `troupe-vcs-git`, …), so a prefix test has to be exact: `troupe-runner-scripted-v0.1.0` must not read as a bundle tag.
+The old prefix wasn't: `troupe-vcs-files-v0.1.0` starts `troupe-v`, so `chooseVersions` refuses it, and every deploy
+since troupe's component releases (2026-11-01 05:46 UTC) has failed with "troupe-vcs-files-v0.1.0 isn't a release tag
+troupe.run can build". The unit tests name `troupe-vcs-*` tags for that reason.
 
 troupe's release workflow dispatches the deploy after release-please on every push to `main`. The bundle is released by
 release-please on the push that merges the pin pull request (troupe-run/troupe#218, point 3), so that push dispatches a
@@ -87,8 +90,10 @@ when only one kind exists, and the property this change is for would go unchecke
 - [The next deploy changes `/docs/`'s content with no version change: both are 0.1.0, but the bundle's commit is
   later.] → That's the fix. The pull request says so, and the deploy after merging is checked by opening `/docs/` and
   its install page.
-- [A future component named so its tag starts `troupe-run-v`.] → The prefix includes the `v`, so only a component named
-  exactly `troupe-run` collides, which is the bundle. A malformed one would stop the build by name, not pass silently.
+- [A future component named so its tag starts `troupe-run-v`, as `troupe-vcs-*` starts `troupe-v` today.] → Only a
+  component whose name starts `troupe-run-v` would collide, such as a hypothetical `troupe-run-vscode`. That would stop
+  the build by name, not pass silently, as the old prefix did with `troupe-vcs-files`. If such a component appears, the
+  release form here needs changing with it.
 - [Test fixtures hand-written in the unit tests drift from troupe's real tags.] → They copy the real names seen on
   troupe today (`troupe-run-v0.1.0`, `troupe-v0.1.0`, `troupe-runner-scripted-v0.1.0`).
 

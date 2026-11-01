@@ -28,7 +28,7 @@ Brand: `docs/brand-guide.md`.
   run, so an edit there is lost: edit the page or the schema in troupe. `npm run docs:sync` does just that step.
   - To preview troupe edits you haven't pushed, or to work offline, set `TROUPE_DOCS` to your troupe checkout:
     `TROUPE_DOCS=../troupe npm run dev`. Its working tree is `main`, for the docs and the schemas alike, and its tags
-    are the releases (`troupe-v*` for the docs, `protocol-v*` for the schemas).
+    are the releases (the bundle's `troupe-run-v*` for the docs, `protocol-v*` for the schemas).
 - The same step fetches troupe-run/infrastructure's `main` into `.cache/` and reads `tofu/milestones.json`, the
   release list on `/status/`. A release's wording is changed there, not here.
   - To preview a milestone edit, or to work offline, set `TROUPE_MILESTONES` to your infrastructure checkout:

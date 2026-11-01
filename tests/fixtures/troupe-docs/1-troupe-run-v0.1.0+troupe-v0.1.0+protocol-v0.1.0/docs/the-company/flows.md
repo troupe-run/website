@@ -7,4 +7,4 @@ prerelease: true
 
 ## How work branches
 
-Flows, at troupe-v0.2.0. [Design a flow](../stagecraft/design-a-flow.md) shows how.
+Flows, at troupe-run-v0.1.0. [Build a flow](../stagecraft/build-a-flow.md) shows how.
