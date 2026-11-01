@@ -9,13 +9,14 @@ import { rerenderGeneratedPages } from '../scripts/generated-pages.mjs';
 const link = z.object({ label: z.string(), href: z.string() });
 const cta = z.object({ label: z.string(), href: z.string().optional() });
 import { TOPIC_ICONS } from './lib/topic-icons';
+import { sitePath } from './lib/site-path';
 
 const copySchema = z.discriminatedUnion('section', [
   z.object({ section: z.literal('header'), nav: z.array(link).min(1) }),
   z.object({
     section: z.literal('hero'),
     title: z.string(), subtitle: z.string(),
-    primary: cta.extend({ href: z.string().url() }), secondary: cta,
+    primary: cta.extend({ href: z.string().url() }), secondary: cta.extend({ href: sitePath }),
   }),
   z.object({
     section: z.literal('how'),

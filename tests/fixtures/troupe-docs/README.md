@@ -3,7 +3,9 @@ commit, oldest first, holding the whole of `docs/`, of `protocol/` or of both; `
 them in order into a throwaway git repository, keeps a folder a step doesn't hold from the step before, and tags each
 with the tags its name lists after the number, joined by `+`, except `main`. Between versions a page is removed
 (`old-guide`), one is renamed (`build-a-flow` to `design-a-flow`), one is added (`roles-and-actors`, planned) and one
-exists only on main (`new-guide`, which the site's sidebar order doesn't name).
+exists only on main (`new-guide`, which the site's sidebar order doesn't name). `opening-night/install` is in the
+last release and on main because the landing page links to `/docs/opening-night/install/`, and the fixture build's
+link check would otherwise find it broken (troupe-run/website#83).
 
 The releases are the bundle's tags, `troupe-run-v*`, as on troupe-run/troupe (bundle-tag-is-the-release design D3).
 Core's `troupe-v*` tags disagree with them on purpose: `troupe-v0.3.0`, higher than any bundle release, is on

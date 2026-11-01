@@ -28,9 +28,29 @@ test('both "Watch on GitHub" links point at the troupe.run repo', async ({ page 
   for (const l of await links.all()) await expect(l).toHaveAttribute('href', REPO);
 });
 
-test('"Install: coming" is a disabled button', async ({ page }) => {
+// spec: landing-calls-to-action (troupe-run/website#83).
+const INSTALL = '/docs/opening-night/install/';
+
+test('the hero links "Install (pre-alpha)" to the install page, and has no disabled button', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('button', { name: 'Install: coming' })).toBeDisabled();
+  await expect(page.locator('#top').getByRole('link', { name: 'Install (pre-alpha)' })).toHaveAttribute('href', INSTALL);
+  await expect(page.locator('#top button:disabled')).toHaveCount(0);
+});
+
+test('following "Install (pre-alpha)" loads the page headed "Install"', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#top').getByRole('link', { name: 'Install (pre-alpha)' }).click();
+  await expect(page).toHaveURL(INSTALL);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Install');
+});
+
+test('Tab from "Watch on GitHub" focuses "Install (pre-alpha)", which draws an outline', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#top').getByRole('link', { name: 'Watch on GitHub' }).focus();
+  await page.keyboard.press('Tab');
+  const install = page.locator('#top').getByRole('link', { name: 'Install (pre-alpha)' });
+  await expect(install).toBeFocused();
+  expect(await install.evaluate((el) => getComputedStyle(el).outlineStyle)).not.toBe('none');
 });
 
 test('hero cast is human, agent, troupe, agent, human', async ({ page }) => {
