@@ -62,7 +62,7 @@ B3, a sunflower badge with a cream ring, and a prop for each App.
 
 ## 6. Integration
 
-- [ ] 6.1 Run `uv run scripts/check.py` and verify it passes, then commit with Conventional Commits and no sign-off.
+- [x] 6.1 Run `uv run scripts/check.py` and verify it passes, then commit with Conventional Commits and no sign-off.
 
 ## Workflow follow-up
 
