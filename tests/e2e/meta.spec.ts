@@ -14,7 +14,7 @@ test("landing page's title and og:title are the brand guide's page title", async
 
 test("landing page's description and og:description are the one-line description, then the status line", async ({ page }) => {
   const description = 'Your agents need a director. troupe runs your development process with a team of agents, ' +
-    "asking only when it needs you. Pre-alpha: there's nothing to install yet.";
+    'asking only when it needs you. Pre-alpha: you can install it with uv.';
   await page.goto('/');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description);
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', description);

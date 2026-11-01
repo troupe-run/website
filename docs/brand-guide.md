@@ -247,8 +247,8 @@ check.
     no record kept;
   - label anything unbuilt as intent ("pre-alpha", "illustrative");
   - allow one wry line per section at most;
-  - write principles in the present tense, as what troupe does, with no commitments caveat. "Install: coming"
-    is the landing page's pre-alpha signal (owner review, 2026-10-08).
+  - write principles in the present tense, as what troupe does, with no commitments caveat. "Install (pre-alpha)"
+    is the landing page's pre-alpha signal (owner review, 2026-10-08; relabelled when 0.1.0 shipped, 2026-11-01).
   - say "theatre" for a theatre, in headings and body copy alike, never mixed with "project". "Project" appears
     only to explain what a theatre is ("a theatre is a project directory with troupe config"). Say what it is in
     plain words, not "repo", "YAML" or "config", except where the technical term is genuinely necessary (owner
@@ -267,7 +267,8 @@ check.
 
 ### How troupe is described
 
-Agreed with the owner on 2026-10-20 (troupe-run/infrastructure#108). GitHub (the org's description, troupe's
+Agreed with the owner on 2026-10-20 (troupe-run/infrastructure#108). The status line changed on 2026-11-01, when
+troupe-run-v0.1.0 made troupe installable (troupe-run/website#83). GitHub (the org's description, troupe's
 repository description and the org profile), troupe's README and this site all describe troupe with this set, and
 this table is the reference they follow.
 
@@ -276,7 +277,7 @@ this table is the reference they follow.
 | Tagline | Your agents need a director. |
 | Sentence | troupe runs your development process with a team of agents, asking only when it needs you. |
 | Paragraph | troupe runs your development process with a team of agents, asking only when it needs you. Work branches and loops, decisions go to whoever owns them, and every decision records who made it. |
-| Status line | Pre-alpha: there's nothing to install yet. |
+| Status line | Pre-alpha: you can install it with uv. |
 | One-line description | Your agents need a director. troupe runs your development process with a team of agents, asking only when it needs you. |
 | Page title | troupe: your agents need a director |
 
@@ -285,7 +286,7 @@ description. The landing page's description is the one-line description followed
 
 Deliberate variants:
 
-- the hero's "Install: coming" button, which is the landing page's pre-alpha signal (above);
+- the hero's "Install (pre-alpha)" link, which is the landing page's pre-alpha signal (above);
 - troupe's README, which follows its status line with what exists so far.
 
 ## 8. Assets

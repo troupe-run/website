@@ -12,7 +12,7 @@ const cast = ['human', 'agent', 'troupe', 'agent', 'human'] as const;
     <p class="sub">{copy.subtitle}</p>
     <div class="ctas">
       <a class="btn primary" href={copy.primary.href}>{star && <span class="star" aria-hidden="true">★</span>}<span class="label">{star ? copy.primary.label.slice(2) : copy.primary.label}</span></a>
-      <button class="btn secondary" type="button" disabled>{copy.secondary.label}</button>
+      <a class="btn secondary" href={copy.secondary.href}>{copy.secondary.label}</a>
     </div>
   </div>
 </section>
@@ -59,5 +59,5 @@ const cast = ['human', 'agent', 'troupe', 'agent', 'human'] as const;
   .btn { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 46px; font: inherit; font-weight: 600; font-size: 15px; line-height: 1.2; padding: 0 18px; border-radius: 12px; text-decoration: none; }
   .star { margin-right: .4em; position: relative; top: 1px; line-height: 1; }
   .primary { background: var(--tomato); color: var(--on-accent); box-shadow: 0 3px 0 var(--tomato-shadow); }
-  .secondary { background: var(--surface); color: var(--ink); border: 2px solid var(--ink); opacity: .75; cursor: not-allowed; }
+  .secondary { background: var(--surface); color: var(--ink); border: 2px solid var(--ink); }
 </style>

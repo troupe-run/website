@@ -33,7 +33,7 @@ All are recorded with times in the brainstorm's decisions log.
 | Area | Decision |
 |---|---|
 | Claims | Principles and intent only. Nothing unbuilt is described as working |
-| Calls to action | GitHub (watch or star) now. Install when something ships, shown as "Install: coming" |
+| Calls to action | GitHub (watch or star) now. Install when something ships, shown as "Install: coming". Replaced when 0.1.0 shipped by the `landing-calls-to-action` spec: an "Install (pre-alpha)" link to the install page (troupe-run/website#83) |
 | Licence statements | The site shows its own licences (MIT for code, CC BY 4.0 for content). The product's licence (Apache-2.0 plus a CLA) is stated only in docs → Licensing, as intent, until the core repo is published |
 | Theatre metaphor | Theatre in headings and visuals, plain words in body copy. One stage device per section |
 | Voice | Dry and precise, with a thread of warm wry humour |

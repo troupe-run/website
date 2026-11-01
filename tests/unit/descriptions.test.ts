@@ -22,7 +22,7 @@ const AGREED: DescriptionSet = {
   Sentence: 'troupe runs your development process with a team of agents, asking only when it needs you.',
   Paragraph: 'troupe runs your development process with a team of agents, asking only when it needs you. ' +
     'Work branches and loops, decisions go to whoever owns them, and every decision records who made it.',
-  'Status line': "Pre-alpha: there's nothing to install yet.",
+  'Status line': 'Pre-alpha: you can install it with uv.',
   'One-line description': 'Your agents need a director. ' +
     'troupe runs your development process with a team of agents, asking only when it needs you.',
   'Page title': 'troupe: your agents need a director',
@@ -30,7 +30,7 @@ const AGREED: DescriptionSet = {
 const rows = (s: DescriptionSet) => PARTS.map((p) => [p, s[p]] as [string, string]);
 
 describe("the brand guide's record of how troupe is described", () => {
-  it('holds the text agreed on 2026-10-20 (troupe-run/infrastructure#108), part for part', () => {
+  it('holds the text agreed on 2026-10-20 (troupe-run/infrastructure#108), with the status line of 2026-11-01 (troupe-run/website#83), part for part', () => {
     expect(set()).toEqual(AGREED);
   });
 
