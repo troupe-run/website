@@ -184,15 +184,22 @@ folder, SHALL have no remote, and SHALL be deleted after the build. Its output S
 - **WHEN** a change makes the version menu link an archived page to the wrong version
 - **THEN** the end-to-end tests of the fixture build fail, naming the page and the link
 
+#### Scenario: Releases are the bundle's tags
+- **WHEN** the fixture troupe is made
+- **THEN** its releases are tagged `troupe-run-v*`, and it also has core `troupe-v*` tags whose versions and commits
+  disagree with the bundle's, so that a build that read core's tag as the release would publish different versions
+  and fail the version tests
+
 ### Requirement: The fixture build reads fixture milestones
 The fixture build SHALL read the release milestones from a fixture file kept in this repository, never from
 troupe-run/infrastructure, so that the roadmap on `/status/` is tested against releases that don't change. The file
 SHALL be put where the build reads it for the run only, and removed afterwards.
 
 #### Scenario: The roadmap with releases
-- **WHEN** the fixture build runs, with its troupe tagged `troupe-v0.1.0`, `troupe-v0.1.1` and `troupe-v0.2.0`
-- **THEN** its `/status/` lists 0.1.0 and 0.2.0 under "Releases", with their tags' dates, and 0.3.0, 0.10.0 and
-  1.0.0 under "Milestones", in that order and with no date, whatever troupe-run/infrastructure declares
+- **WHEN** the fixture build runs, with its troupe tagged `troupe-run-v0.1.0`, `troupe-run-v0.1.1` and
+  `troupe-run-v0.2.0`, and with core tagged `troupe-v0.1.0` and `troupe-v0.3.0`
+- **THEN** its `/status/` lists 0.1.0 and 0.2.0 under "Releases", with their bundle tags' dates, and 0.3.0, 0.10.0
+  and 1.0.0 under "Milestones", in that order and with no date, whatever troupe-run/infrastructure declares
 
 #### Scenario: Nothing is left behind
 - **WHEN** the fixture build finishes, passing or failing
@@ -254,3 +261,26 @@ make the assertion.
 #### Scenario: A test that installs the clock some other way
 - **WHEN** a file under `tests/e2e/` calls `clock.install` without going through the shared helper that freezes it
 - **THEN** the unit tests fail and name that file
+
+### Requirement: The live build's tests hold whatever releases troupe has
+The end-to-end tests of the live build SHALL pass for any set of release tags troupe-run/troupe has, none or several.
+They SHALL take troupe's releases from what the build recorded, and check the site against them. Behaviour that
+differs with the number of releases SHALL be tested on the fixture build, against fixed tags.
+
+#### Scenario: Before troupe's first protocol release
+- **WHEN** troupe has no `protocol-v*` tag and the site is built from it
+- **THEN** the live `/protocol/` tests check that the page says there is no protocol release yet and has no release
+  list, and they pass
+
+#### Scenario: After troupe's first protocol release
+- **WHEN** troupe has the tag `protocol-v0.1.0` and the site is built from it
+- **THEN** the live `/protocol/` tests check that the page lists 0.1.0 as the latest release and that
+  `/protocol/0.1.0/` is served, and they pass with no change to the tests
+
+#### Scenario: A release the page leaves out
+- **WHEN** the build records the protocol release 0.1.0 but `/protocol/` doesn't list it
+- **THEN** the live `/protocol/` tests fail, naming the release list they expected
+
+#### Scenario: A copy for a tag troupe doesn't have
+- **WHEN** the latest protocol release the build records is 0.1.0
+- **THEN** the live tests check that `/protocol/0.1.1/` and `/protocol/1/` serve nothing

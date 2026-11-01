@@ -14,7 +14,7 @@ belongs to. A page at `docs/<section>/<name>.md` SHALL publish at `/docs/<versio
 repository SHALL hold no `/docs` page content of its own.
 
 #### Scenario: A page on troupe's main before any release
-- **WHEN** troupe has no `troupe-v*` tag and its `main` has `docs/the-company/theatres.md`
+- **WHEN** troupe has no `troupe-run-v*` tag and its `main` has `docs/the-company/theatres.md`
 - **THEN** the site publishes it at `/docs/the-company/theatres/`, rendered in the site's design
 
 #### Scenario: An edit in troupe reaches the site
@@ -26,15 +26,24 @@ repository SHALL hold no `/docs` page content of its own.
 - **THEN** none is a page under `src/content/docs/docs/`
 
 ### Requirement: The latest release is at /docs/
-When troupe has at least one release tag `troupe-vMAJOR.MINOR.PATCH`, `/docs/` SHALL show the docs at the highest such
-tag. Before the first release, `/docs/` SHALL show troupe's `main`.
+A release is the bundle's tag, `troupe-run-vMAJOR.MINOR.PATCH`, the version people install (troupe-run/troupe#218).
+When troupe has at least one, `/docs/` SHALL show the docs at the highest such tag. Before the first release, `/docs/`
+SHALL show troupe's `main`.
 
 #### Scenario: Two releases
-- **WHEN** troupe has tags `troupe-v0.1.1` and `troupe-v0.2.0`
-- **THEN** `/docs/` shows the pages at `troupe-v0.2.0`
+- **WHEN** troupe has tags `troupe-run-v0.1.1` and `troupe-run-v0.2.0`
+- **THEN** `/docs/` shows the pages at `troupe-run-v0.2.0`
 
 #### Scenario: No release yet
-- **WHEN** troupe has no `troupe-v*` tag
+- **WHEN** troupe has no `troupe-run-v*` tag
+- **THEN** `/docs/` shows the pages on `main`, and no `/docs/next/` exists
+
+#### Scenario: Core's tag disagrees with the bundle's
+- **WHEN** troupe has tags `troupe-run-v0.2.0` and `troupe-v0.3.0`, on different commits
+- **THEN** `/docs/` shows the pages at `troupe-run-v0.2.0`, and no version is published from `troupe-v0.3.0`
+
+#### Scenario: Core only, no bundle
+- **WHEN** troupe has a tag `troupe-v0.1.0` and no `troupe-run-v*` tag
 - **THEN** `/docs/` shows the pages on `main`, and no `/docs/next/` exists
 
 ### Requirement: Each earlier minor release has its own version
@@ -42,12 +51,12 @@ For each minor version other than the latest release's, the site SHALL publish t
 `/docs/vMAJOR.MINOR/`. Other patch tags SHALL NOT be published as versions.
 
 #### Scenario: Patches of an earlier minor
-- **WHEN** troupe has tags `troupe-v0.1.0`, `troupe-v0.1.1` and `troupe-v0.2.0`
-- **THEN** `/docs/v0.1/` shows the pages at `troupe-v0.1.1`, and no version is published from `troupe-v0.1.0`
+- **WHEN** troupe has tags `troupe-run-v0.1.0`, `troupe-run-v0.1.1` and `troupe-run-v0.2.0`
+- **THEN** `/docs/v0.1/` shows the pages at `troupe-run-v0.1.1`, and no version is published from `troupe-run-v0.1.0`
 
 #### Scenario: Patches of the latest minor
-- **WHEN** troupe has tags `troupe-v0.2.0` and `troupe-v0.2.1`
-- **THEN** `/docs/` shows `troupe-v0.2.1`, and no `/docs/v0.2/` exists
+- **WHEN** troupe has tags `troupe-run-v0.2.0` and `troupe-run-v0.2.1`
+- **THEN** `/docs/` shows `troupe-run-v0.2.1`, and no `/docs/v0.2/` exists
 
 ### Requirement: troupe's main is at /docs/next/ once a release exists
 When troupe has at least one release tag, the site SHALL publish troupe's `main` at `/docs/next/`, and every page there
@@ -72,16 +81,21 @@ there.
 - **THEN** the link to the latest release goes to its first page
 
 ### Requirement: A malformed release tag stops the build
-A tag that starts `troupe-v` but isn't `troupe-v` followed by three dot-separated whole numbers SHALL stop the build,
-with an error naming the tag and the form that's accepted. Tags of troupe's other components SHALL be ignored.
+A tag that starts `troupe-run-v` but isn't `troupe-run-v` followed by three dot-separated whole numbers SHALL stop the
+build, with an error naming the tag and the form that's accepted. Tags of troupe's other components, core's
+`troupe-v*` among them, SHALL be ignored.
 
 #### Scenario: A pre-release tag
-- **WHEN** troupe has a tag `troupe-v1.0.0-rc.1`
-- **THEN** the build fails, naming `troupe-v1.0.0-rc.1` and the accepted form `troupe-vMAJOR.MINOR.PATCH`
+- **WHEN** troupe has a tag `troupe-run-v1.0.0-rc.1`
+- **THEN** the build fails, naming `troupe-run-v1.0.0-rc.1` and the accepted form `troupe-run-vMAJOR.MINOR.PATCH`
 
 #### Scenario: Another component's tag
-- **WHEN** troupe has a tag `protocol-v0.1.0`
+- **WHEN** troupe has a tag `protocol-v0.1.0`, `troupe-v0.1.0` or `troupe-runner-scripted-v0.1.0`
 - **THEN** the build ignores it
+
+#### Scenario: Core's malformed tag
+- **WHEN** troupe has a tag `troupe-v1.0.0-rc.1`
+- **THEN** the build ignores it, as another component's tag
 
 ### Requirement: Every docs page has a version menu
 Every docs page SHALL have a version menu that names the version being read and lists every published version, newest
@@ -159,8 +173,8 @@ exists on `main`, SHALL show no edit link, and SHALL link "View source" to the p
 #### Scenario: A page of an archived version
 - **WHEN** a reader opens a page under `/docs/v0.1/`
 - **THEN** it has no "Improve this page" link, and if it's planned, its note has no "Help write this page" link
-- **AND** its "View source" link is `https://github.com/troupe-run/troupe/blob/troupe-v0.1.1/docs/<path>` when v0.1 is
-  built from `troupe-v0.1.1`
+- **AND** its "View source" link is `https://github.com/troupe-run/troupe/blob/troupe-run-v0.1.1/docs/<path>` when
+  v0.1 is built from `troupe-run-v0.1.1`
 
 #### Scenario: A released page that was removed from main
 - **WHEN** a reader opens a page of the latest release that `main` no longer has
