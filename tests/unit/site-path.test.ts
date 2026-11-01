@@ -16,6 +16,7 @@ describe('sitePath', () => {
   it.each([
     ['a full URL', 'https://troupe.run/docs/opening-night/install/'],
     ['a protocol-relative URL, which a browser reads as another host', '//troupe.run/docs/'],
+    ['a path starting /\\, which a browser reads as // and so as another host', '/\\troupe.run/docs/'],
     ['a relative path', 'docs/opening-night/install/'],
     ['an empty string', ''],
   ])('refuses %s, saying the link must be a path on this site', (_, value) => {
