@@ -21,7 +21,7 @@ function troupe(): Repo {
   const r = makeRepo();
   cleanup.push(r.remove);
   r.commit({ 'docs/programme/a.md': page('A'), 'protocol/schemas/a.schema.json': schema('a.schema.json', { v: 1 }) },
-    '2026-01-01T00:00:00Z', ['troupe-v0.1.0', 'protocol-v0.1.0']);
+    '2026-01-01T00:00:00Z', ['troupe-run-v0.1.0', 'troupe-v0.1.0', 'protocol-v0.1.0']);
   r.commit({ 'protocol/schemas/a.schema.json': schema('a.schema.json', { v: 2 }) }, '2026-02-01T00:00:00Z', ['protocol-v0.2.0']);
   r.commit({ 'protocol/schemas/a.schema.json': schema('a.schema.json', { v: 3 }) }, '2026-03-01T00:00:00Z');
   return r;

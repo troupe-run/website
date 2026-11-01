@@ -37,7 +37,7 @@ describe('chooseCopies', () => {
   });
 
   it("ignores troupe's other components' tags", () => {
-    expect(copies(['troupe-v0.1.0', 'troupe-runner-scripted-v0.1.0'])).toEqual(copies([]));
+    expect(copies(['troupe-run-v0.1.0', 'troupe-v0.1.0', 'troupe-runner-scripted-v0.1.0'])).toEqual(copies([]));
   });
 
   it.each(['protocol-v1.0.0-rc.1', 'protocol-v01.0.0', 'protocol-v1.0', 'protocol-vnext'])(

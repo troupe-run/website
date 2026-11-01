@@ -9,16 +9,30 @@ import { MILESTONES_FIXTURE, makeFixtureRepo, withFixtureMilestones, withFixture
 const git = (path: string, ...args: string[]) => execFileSync('git', args, { cwd: path, encoding: 'utf8' }).trim();
 
 describe('the fixture troupe', () => {
-  it('has the three release tags and three protocol tags of two majors, commits after the last ones, and no remote', () => {
+  it('has three bundle release tags, two core tags, three protocol tags of two majors, commits after the last ones, and no remote', () => {
     const repo = makeFixtureRepo();
     try {
       expect(git(repo.path, 'tag', '--list').split('\n')).toEqual([
-        'protocol-v0.1.0', 'protocol-v0.2.0', 'protocol-v1.0.0', 'troupe-v0.1.0', 'troupe-v0.1.1', 'troupe-v0.2.0',
+        'protocol-v0.1.0', 'protocol-v0.2.0', 'protocol-v1.0.0',
+        'troupe-run-v0.1.0', 'troupe-run-v0.1.1', 'troupe-run-v0.2.0',
+        'troupe-v0.1.0', 'troupe-v0.3.0',
       ]);
-      expect(Number(git(repo.path, 'rev-list', '--count', 'troupe-v0.2.0..main'))).toBeGreaterThan(0);
+      expect(Number(git(repo.path, 'rev-list', '--count', 'troupe-run-v0.2.0..main'))).toBeGreaterThan(0);
       expect(Number(git(repo.path, 'rev-list', '--count', 'protocol-v1.0.0..main'))).toBeGreaterThan(0);
       expect(git(repo.path, 'diff', '--stat', 'protocol-v1.0.0', 'main', '--', 'protocol/')).not.toBe('');
       expect(git(repo.path, 'remote')).toBe('');
+    } finally {
+      repo.remove();
+    }
+  });
+
+  it("tags core higher than the bundle, on an earlier bundle release's commit, so reading core's tag would publish other versions (design D3)", () => {
+    const repo = makeFixtureRepo();
+    try {
+      const commit = (ref: string) => git(repo.path, 'rev-parse', `${ref}^{commit}`);
+      expect(commit('troupe-v0.3.0')).toBe(commit('troupe-run-v0.1.1'));
+      expect(commit('troupe-v0.3.0')).not.toBe(commit('troupe-run-v0.2.0'));
+      expect(git(repo.path, 'tag', '--list', 'troupe-v*', '--points-at', 'troupe-run-v0.2.0')).toBe('');
     } finally {
       repo.remove();
     }
@@ -28,9 +42,9 @@ describe('the fixture troupe', () => {
     const repo = makeFixtureRepo();
     try {
       const show = (ref: string, path: string) => git(repo.path, 'show', `${ref}:${path}`);
-      expect(show('troupe-v0.1.0', 'protocol/schemas/pinned.schema.json')).toContain('protocol-v0.1.0');
-      expect(git(repo.path, 'ls-tree', '-r', '--name-only', 'troupe-v0.1.0', '--', 'docs/')).not.toBe('');
-      expect(git(repo.path, 'rev-parse', 'troupe-v0.1.0^{commit}')).toBe(git(repo.path, 'rev-parse', 'protocol-v0.1.0^{commit}'));
+      expect(show('troupe-run-v0.1.0', 'protocol/schemas/pinned.schema.json')).toContain('protocol-v0.1.0');
+      expect(git(repo.path, 'ls-tree', '-r', '--name-only', 'troupe-run-v0.1.0', '--', 'docs/')).not.toBe('');
+      expect(git(repo.path, 'rev-parse', 'troupe-run-v0.1.0^{commit}')).toBe(git(repo.path, 'rev-parse', 'protocol-v0.1.0^{commit}'));
     } finally {
       repo.remove();
     }
@@ -40,17 +54,17 @@ describe('the fixture troupe', () => {
     const dir = mkdtempSync(join(tmpdir(), 'fixture-steps-'));
     try {
       const put = (path: string, text: string) => { mkdirSync(dirname(join(dir, path)), { recursive: true }); writeFileSync(join(dir, path), text); };
-      put('1-troupe-v0.1.0+protocol-v0.1.0/docs/programme/a.md', 'one');
-      put('1-troupe-v0.1.0+protocol-v0.1.0/protocol/schemas/a.schema.json', '{}');
-      put('2-troupe-v0.2.0/docs/programme/a.md', 'two');
+      put('1-troupe-run-v0.1.0+protocol-v0.1.0/docs/programme/a.md', 'one');
+      put('1-troupe-run-v0.1.0+protocol-v0.1.0/protocol/schemas/a.schema.json', '{}');
+      put('2-troupe-run-v0.2.0/docs/programme/a.md', 'two');
       put('3-main/protocol/schemas/a.schema.json', '{"main": true}');
       const repo = makeFixtureRepo(dir);
       try {
         const show = (ref: string, path: string) => git(repo.path, 'show', `${ref}:${path}`);
-        expect(show('troupe-v0.2.0', 'protocol/schemas/a.schema.json')).toBe('{}');
+        expect(show('troupe-run-v0.2.0', 'protocol/schemas/a.schema.json')).toBe('{}');
         expect(show('main', 'docs/programme/a.md')).toBe('two');
         expect(show('main', 'protocol/schemas/a.schema.json')).toBe('{"main": true}');
-        expect(git(repo.path, 'tag', '--list', '--points-at', 'HEAD~2').split('\n')).toEqual(['protocol-v0.1.0', 'troupe-v0.1.0']);
+        expect(git(repo.path, 'tag', '--list', '--points-at', 'HEAD~2').split('\n')).toEqual(['protocol-v0.1.0', 'troupe-run-v0.1.0']);
       } finally {
         repo.remove();
       }

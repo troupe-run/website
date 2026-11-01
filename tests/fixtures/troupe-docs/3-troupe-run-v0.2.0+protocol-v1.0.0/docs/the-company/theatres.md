@@ -5,4 +5,4 @@ status: written
 prerelease: true
 ---
 
-Theatres, at troupe-v0.2.0. See [Flows](flows.md#how-work-branches).
+Theatres, at troupe-run-v0.2.0. See [Flows](flows.md#how-work-branches).

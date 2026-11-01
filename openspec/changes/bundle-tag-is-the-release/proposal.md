@@ -12,6 +12,11 @@ troupe-run/troupe#208 switched the documented install to the tag. A bundle relea
 never reach `/docs/` or `/status/`, and as the two numbers drift apart, the status page would name core's version, not
 the one people install. This is troupe-run/website#82.
 
+It's also why troupe.run hasn't deployed since 2026-11-01 05:46 UTC: the `troupe-v` prefix matches core's tag and
+also `troupe-vcs-files-v0.1.0` and `troupe-vcs-git-v0.1.0`, which the build then refuses as malformed release tags.
+Every deploy dispatched since troupe's first component releases has failed on it, and the site serves the last good
+build.
+
 ## What Changes
 
 - **The release tag is `troupe-run-vMAJOR.MINOR.PATCH`**, for `/docs/` and `/status/` alike, read from one place in
@@ -52,6 +57,8 @@ None.
 - `scripts/troupe-fixture.mjs`'s doc comment, `scripts/rebuild-test.mjs`, `tests/fixtures/troupe-docs/` (step folder
   names and the pages' "at <tag>" lines), and the unit and end-to-end tests that name `troupe-v*` as a release.
 - `README.md`'s note on `TROUPE_DOCS`.
-- The published site: on the next deploy, `/docs/` is built from `troupe-run-v0.1.0`'s commit and `/status/` reads the
-  bundle's tags. Today both are `0.1.0`, so the version number shown doesn't change; the docs' content does.
+- The published site: deploys work again, `/docs/` is built from `troupe-run-v0.1.0`'s commit and `/status/` reads the
+  bundle's tags. Today both are `0.1.0`, and `docs/` is the same at both tags, so the pages and the version number
+  don't change. `/status/` dates 0.1.0 by the bundle's tag (2026-11-01). The install page says `@main` until a bundle
+  release includes troupe-run/troupe#208.
 - No change to the version menu's or banners' words, the protocol, the deploy workflow, or troupe and infrastructure.

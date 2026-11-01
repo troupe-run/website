@@ -34,8 +34,8 @@ describe('layoutProblems', () => {
 
 describe('refuse', () => {
   it('names the version and every problem', () => {
-    expect(() => refuse({ ref: 'troupe-v0.1.1' }, ['docs/a.mdx: x', 'docs/b: y'])).toThrow(
-    "troupe-v0.1.1 can't be built into /docs:\n  - docs/a.mdx: x\n  - docs/b: y");
+    expect(() => refuse({ ref: 'troupe-run-v0.1.1' }, ['docs/a.mdx: x', 'docs/b: y'])).toThrow(
+    "troupe-run-v0.1.1 can't be built into /docs:\n  - docs/a.mdx: x\n  - docs/b: y");
   });
 
   it("names troupe's main by name, not as a bare ref", () => {

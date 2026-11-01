@@ -7,15 +7,15 @@ import { sync } from '../../scripts/troupe-docs-lib.mjs';
 import { makeRepo, page, SCHEMAS, type Repo } from './support/git-repo';
 
 // What the sync writes for each version (spec: versioned-docs; design D4, D7, D8), from a throwaway troupe:
-//   troupe-v0.1.0  a, gone      troupe-v0.2.0  a, removed      main  a, added
+//   troupe-run-v0.1.0  a, gone      troupe-run-v0.2.0  a, removed      main  a, added
 const cleanup: (() => void)[] = [];
 afterEach(() => cleanup.splice(0).forEach((f) => f()));
 
 function troupe(): Repo {
   const r = makeRepo();
   cleanup.push(r.remove);
-  r.commit({ ...SCHEMAS, 'docs/programme/a.md': page('A'), 'docs/programme/gone.md': page('Gone') }, '2026-01-01T00:00:00Z', ['troupe-v0.1.0']);
-  r.commit({ 'docs/programme/gone.md': null, 'docs/backstage/removed.md': page('Removed') }, '2026-02-01T00:00:00Z', ['troupe-v0.2.0']);
+  r.commit({ ...SCHEMAS, 'docs/programme/a.md': page('A'), 'docs/programme/gone.md': page('Gone') }, '2026-01-01T00:00:00Z', ['troupe-run-v0.1.0']);
+  r.commit({ 'docs/programme/gone.md': null, 'docs/backstage/removed.md': page('Removed') }, '2026-02-01T00:00:00Z', ['troupe-run-v0.2.0']);
   r.commit({ 'docs/backstage/removed.md': null, 'docs/stagecraft/added.md': page('Added') }, '2026-03-01T00:00:00Z');
   return r;
 }
@@ -104,7 +104,7 @@ describe('sync', () => {
     const root = site();
     sync({ env: {}, root, remote: troupe().path });
     expect(docs(root, 'v0.1/programme/gone.md').body).toMatch(
-      /^<!-- Generated from troupe-run\/troupe troupe-v0\.1\.0:docs\/programme\/gone\.md by npm run docs:sync\. Edit it there, not here\. -->/,
+      /^<!-- Generated from troupe-run\/troupe troupe-run-v0\.1\.0:docs\/programme\/gone\.md by npm run docs:sync\. Edit it there, not here\. -->/,
     );
   });
 
@@ -114,8 +114,8 @@ describe('sync', () => {
     const manifest = JSON.parse(readFileSync(join(root, 'src/generated/troupe-docs.json'), 'utf8'));
     expect(manifest.versions.map((v: { role: string; ref: string; pages: { path: string }[] }) => [v.role, v.ref, v.pages.map((p) => p.path)])).toEqual([
       ['next', 'main', ['programme/a.md', 'stagecraft/added.md']],
-      ['current', 'troupe-v0.2.0', ['backstage/removed.md', 'programme/a.md']],
-      ['archived', 'troupe-v0.1.0', ['programme/a.md', 'programme/gone.md']],
+      ['current', 'troupe-run-v0.2.0', ['backstage/removed.md', 'programme/a.md']],
+      ['archived', 'troupe-run-v0.1.0', ['programme/a.md', 'programme/gone.md']],
     ]);
     expect(manifest.glossary).toBe(join(root, 'src/content/docs/docs/next/prompt-book/glossary.md'));
   });
@@ -124,10 +124,11 @@ describe('sync', () => {
     const root = site();
     const r = troupe();
     r.git('tag', 'not-a-release');
+    r.git('tag', 'troupe-v0.3.0'); // core's tag, on main: another component's, so not a release
     const manifest = sync({ env: {}, root, remote: r.path });
     expect(manifest.releases).toEqual([
-      { tag: 'troupe-v0.1.0', date: '2026-01-01T00:00:00Z' },
-      { tag: 'troupe-v0.2.0', date: '2026-02-01T00:00:00Z' },
+      { tag: 'troupe-run-v0.1.0', date: '2026-01-01T00:00:00Z' },
+      { tag: 'troupe-run-v0.2.0', date: '2026-02-01T00:00:00Z' },
     ]);
     expect(JSON.parse(readFileSync(join(root, 'src/generated/troupe-docs.json'), 'utf8')).releases).toEqual(manifest.releases);
   });
@@ -143,11 +144,11 @@ describe('sync', () => {
 
   it("refuses a version with a bad page, naming the version, the page and the problem, and writes nothing", () => {
     const r = troupe();
-    r.commit({ 'docs/programme/a.md': page('A').replace('status: written', 'staus: written') }, '2026-05-01T00:00:00Z', ['troupe-v0.3.0']);
+    r.commit({ 'docs/programme/a.md': page('A').replace('status: written', 'staus: written') }, '2026-05-01T00:00:00Z', ['troupe-run-v0.3.0']);
     r.commit({ 'docs/programme/a.md': page('A') }, '2026-05-02T00:00:00Z');
     const root = site();
     expect(() => sync({ env: {}, root, remote: r.path })).toThrow(
-      /^troupe-v0\.3\.0 can't be built into \/docs:\n {2}- docs\/programme\/a\.md: `staus` isn't a front-matter key/,
+      /^troupe-run-v0\.3\.0 can't be built into \/docs:\n {2}- docs\/programme\/a\.md: `staus` isn't a front-matter key/,
     );
     expect(existsSync(join(root, 'src/content/docs/docs'))).toBe(false);
   });

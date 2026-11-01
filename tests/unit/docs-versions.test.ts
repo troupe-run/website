@@ -5,7 +5,7 @@ import { ordered, firstPage } from '../../src/lib/docs-nav';
 // Each version's sidebar, pagination and menu links come from that version's own pages (spec: versioned-docs;
 // design D6).
 const v = (role: Version['role'], dir: string, paths: string[]): Version => ({
-  role, version: dir.startsWith('v') ? dir.slice(1) : null, dir, ref: dir || 'troupe-v0.2.0',
+  role, version: dir.startsWith('v') ? dir.slice(1) : null, dir, ref: dir || 'troupe-run-v0.2.0',
   base: dir ? `/docs/${dir}/` : '/docs/',
   pages: paths.map((path) => ({ path, title: path.split('/')[1].replace('.md', '') })),
 });
@@ -131,8 +131,8 @@ describe('versionNotice', () => {
 
 describe('sourceUrl', () => {
   it("links the page's source at its version's tag", () => {
-    expect(sourceUrl({ ...archived, ref: 'troupe-v0.1.1' }, 'stagecraft/build-a-flow.md'))
-      .toBe('https://github.com/troupe-run/troupe/blob/troupe-v0.1.1/docs/stagecraft/build-a-flow.md');
+    expect(sourceUrl({ ...archived, ref: 'troupe-run-v0.1.1' }, 'stagecraft/build-a-flow.md'))
+      .toBe('https://github.com/troupe-run/troupe/blob/troupe-run-v0.1.1/docs/stagecraft/build-a-flow.md');
   });
 });
 

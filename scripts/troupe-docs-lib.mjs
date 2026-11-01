@@ -10,25 +10,21 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 
 import { TroupeDocsError } from './troupe-error.mjs';
 import { buildProtocol, writeProtocol } from './protocol-lib.mjs';
+import { releaseVersion } from './release-tag.mjs';
 
 export { TroupeDocsError };
 
-// Release tags. release-please tags each component, with linked versions, so troupe-vX.Y.Z stands for the release.
-const RELEASE_PREFIX = 'troupe-v';
-const RELEASE = /^troupe-v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-
 /**
- * The versions to publish, in menu order: `next`, `current`, then `archived` minors, newest first (design D3).
+ * The versions to publish, in menu order: `next`, `current`, then `archived` minors, newest first (design D3), from
+ * the bundle's release tags (release-tag.mjs). Every other tag is ignored.
  * Each is `{ role, version, base, dir, ref }`: `version` is `MAJOR.MINOR` (null for main), `base` the URL prefix,
  * `dir` the folder under the generated docs (`''` for /docs/), and `ref` the git ref to read.
  */
 export function chooseVersions(tags) {
   const releases = [];
   for (const tag of tags) {
-    if (!tag.startsWith(RELEASE_PREFIX)) continue;
-    const m = RELEASE.exec(tag);
-    if (!m) throw new TroupeDocsError(`${tag} isn't a release tag troupe.run can build: use troupe-vMAJOR.MINOR.PATCH`);
-    releases.push({ tag, n: m.slice(1, 4).map(Number) });
+    const n = releaseVersion(tag);
+    if (n) releases.push({ tag, n });
   }
   if (releases.length === 0) return [{ role: 'current', version: null, base: '/docs/', dir: '', ref: 'main' }];
 
@@ -414,7 +410,7 @@ export function sync({ env = process.env, root, remote, open = openSource }) {
   const versions = buildVersions(source);
   const protocol = buildProtocol(source);
   const dates = source.tagDates();
-  const releases = source.tags().filter((t) => t.startsWith(RELEASE_PREFIX)).map((tag) => ({ tag, date: dates[tag] }));
+  const releases = source.tags().filter((t) => releaseVersion(t)).map((tag) => ({ tag, date: dates[tag] }));
   const summary = writeProtocol(protocol, join(root, 'public', 'protocol'));
   return writeDocs(versions, join(root, 'src', 'content', 'docs', 'docs'), join(root, 'src', 'generated', 'troupe-docs.json'), releases, summary);
 }

@@ -91,7 +91,7 @@ describe('syncRoadmap', () => {
   it('writes src/generated/roadmap.json from the milestones and the release tags, and returns it', () => {
     const root = tempDir();
     const r = infrastructure(JSON.stringify({ milestones: [{ title: '0.2.0', description: 'b' }, { title: '0.1.0', description: 'a' }] }));
-    const roadmap = syncRoadmap({ env: {}, root, remote: r.path, tags: [{ tag: 'troupe-v0.1.0', date: '2026-11-05T10:00:00+10:00' }] });
+    const roadmap = syncRoadmap({ env: {}, root, remote: r.path, tags: [{ tag: 'troupe-run-v0.1.0', date: '2026-11-05T10:00:00+10:00' }] });
     expect(roadmap).toEqual({
       releases: [
         { version: '0.1.0', description: 'a', released: '2026-11-05' },

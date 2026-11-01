@@ -5,6 +5,11 @@ with the tags its name lists after the number, joined by `+`, except `main`. Bet
 (`old-guide`), one is renamed (`build-a-flow` to `design-a-flow`), one is added (`roles-and-actors`, planned) and one
 exists only on main (`new-guide`, which the site's sidebar order doesn't name).
 
+The releases are the bundle's tags, `troupe-run-v*`, as on troupe-run/troupe (bundle-tag-is-the-release design D3).
+Core's `troupe-v*` tags disagree with them on purpose: `troupe-v0.3.0`, higher than any bundle release, is on
+`troupe-run-v0.1.1`'s commit, and `troupe-run-v0.2.0` has no core tag. A build that read core's tag as the release
+would publish v0.3 at `/docs/` from the wrong commit and mark 0.3.0 released on `/status/`, and the tests would fail.
+
 `protocol/schemas/` (protocol-schemas design D9): `4-main` holds every schema on troupe-run/troupe's `main` at 30402fa
 (2026-10-24), copied verbatim. The tagged steps hold three of them verbatim (`lineage`, `error`, `runner/errors`,
 which use a `$dynamicRef` and cross-folder references with pointers). `pinned.schema.json` is the fixture's own: it

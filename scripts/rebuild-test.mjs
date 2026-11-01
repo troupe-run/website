@@ -78,12 +78,13 @@ function main() {
           `1.0.0, in that order, but lists:\n  ${got1.join('\n  ')}`,
       );
 
-      console.log('==> rebuild 2: only the tags changed (troupe-v0.2.1 and protocol-v1.0.1 added)');
+      console.log('==> rebuild 2: only the tags changed (troupe-run-v0.2.1 and protocol-v1.0.1 added)');
       writeFileSync(file, original);
-      // Lightweight tags on troupe-v0.2.0's commit, made with the fixture's git, which no setting of the machine's touches.
+      // Lightweight tags on troupe-run-v0.2.0's commit, made with the fixture's git, which no setting of the machine's
+      // touches.
       const git = (args) => execFileSync('git', ['-C', troupe, ...args], { env: ENV, encoding: 'utf8' }).trim();
-      const at = git(['rev-list', '-n', '1', 'troupe-v0.2.0']);
-      for (const tag of ['troupe-v0.2.1', 'protocol-v1.0.1']) git(['tag', '--no-sign', tag, at]);
+      const at = git(['rev-list', '-n', '1', 'troupe-run-v0.2.0']);
+      for (const tag of ['troupe-run-v0.2.1', 'protocol-v1.0.1']) git(['tag', '--no-sign', tag, at]);
       const second = build({ troupe, milestones, outDir });
       expect(!CLEARED.test(second), "rebuild 2 didn't use the earlier build's content store: its log says the store was cleared or the config changed");
       const status = page(outDir, 'status');

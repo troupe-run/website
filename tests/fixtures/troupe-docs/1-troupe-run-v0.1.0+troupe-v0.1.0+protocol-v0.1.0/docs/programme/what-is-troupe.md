@@ -5,4 +5,4 @@ status: written
 prerelease: false
 ---
 
-This is the fixture's What is troupe? page, at troupe-v0.2.0.
+This is the fixture's What is troupe? page, at troupe-run-v0.1.0.
