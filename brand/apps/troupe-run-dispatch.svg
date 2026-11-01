@@ -1,10 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <g transform="translate(4 6) scale(2.2)">
+  <!-- troupe-run-dispatch: the system triangle, holding forward chevrons on a badge (brand guide §5, "GitHub Apps") -->
+  <g transform="translate(1 0) scale(2.05)">
     <path d="M16 5.2 L28 26 L4 26 Z" fill="#FF5A3C" stroke="#FF5A3C" stroke-width="4" stroke-linejoin="round"/>
     <circle cx="12.5" cy="19" r="2" fill="#FFFFFF"/>
     <circle cx="19.5" cy="19" r="2" fill="#FFFFFF"/>
   </g>
-  <!-- a paper plane -->
-  <path d="M50 70 L87 53 L70 86 L64 75 Z" fill="#1D1B2F" stroke="#1D1B2F" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M64 75 L87 53" fill="none" stroke="#FFC93C" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="69" cy="69" r="27" fill="#FFF8EE"/>
+  <circle cx="69" cy="69" r="23" fill="#FFC93C"/>
+  <g transform="translate(54 54) scale(1.25)" stroke="#1D1B2F" stroke-width="2.88" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="none" d="M5 6 L11 12 L5 18 M12.5 6 L18.5 12 L12.5 18"/>
+  </g>
 </svg>

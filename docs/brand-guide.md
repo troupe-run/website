@@ -171,8 +171,12 @@ recognisably ours and shows which job it does (decided with the owner on 2026-11
 - **The shape follows what the App is.**
   - An App that runs a fixed workflow is troupe acting by itself, the `system` actor kind: the tomato triangle.
   - An App that is an AI acting as an agent is an agent: the teal square.
-- **An avatar is a head and a prop**, on cream, with two round white eyes and no reflection. The prop is solid
-  `--ink`, with `--sunflower` only as a detail inside it, because sunflower alone disappears on cream and on tomato.
+- **An avatar is a head and a prop on a badge**, on cream, with two round white eyes and no reflection. The head
+  sits top left. The prop is a simple `--ink` line drawing on a `--sunflower` disc, set off from the head by a ring of
+  the cream background, over the head's lower right. Sunflower alone disappears on cream and on tomato, and ink on
+  sunflower is 10.9:1. Keep the prop to a few strokes: nothing may close up or blur into a blob at 40px.
+- **A prop on a badge isn't a topic icon.** Topic icons are 2px lines in `--tomato-text` on surface tiles. A prop is
+  `--ink` on a sunflower disc, never tomato-text, and it's always held by a character's head.
 - **Each avatar is its own image, not a scene.** Several triangles in one pull request's timeline don't break the
   rule that troupe appears once in a scene.
 - **At 20px the prop may blur**, and a workflow App then looks like the org avatar. GitHub prints the App's name
@@ -182,13 +186,13 @@ recognisably ours and shows which job it does (decided with the owner on 2026-11
 
 | App | Kind | Prop |
 |---|---|---|
-| `troupe-run-release` | system | a tag |
-| `troupe-run-review` | agent | a tick on a sunflower disc |
-| `troupe-run-dependabot` | system | two chain links |
-| `troupe-run-infrastructure` | system | a spanner |
-| `troupe-run-docs` | system | a book |
-| `troupe-run-dispatch` | system | a paper plane |
-| `troupe-run-board` | system | a clipboard |
+| `troupe-run-release` | system | a rosette |
+| `troupe-run-review` | agent | a checklist |
+| `troupe-run-dependabot` | system | a pull request to an issue |
+| `troupe-run-infrastructure` | system | layers |
+| `troupe-run-docs` | system | an open book |
+| `troupe-run-dispatch` | system | forward chevrons |
+| `troupe-run-board` | system | a board with three columns |
 
 ## 6. The theatre metaphor
 

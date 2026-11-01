@@ -84,21 +84,27 @@ describe("each App's source uses only its kind's colours", () => {
     expect(checkSource(name, 'agent', svg(SQUARE + EYES + tick))).toEqual([]);
   });
 
+  it('passes a badge: a sunflower disc in a cream ring, with an ink line prop', () => {
+    const badge = '<circle cx="69" cy="69" r="27" fill="#FFF8EE"/><circle cx="69" cy="69" r="23" fill="#FFC93C"/>' +
+      '<path d="M60 70 L68 78 L80 62" fill="none" stroke="#1D1B2F" stroke-width="3.6" stroke-linecap="round"/>';
+    expect(checkSource(name, 'system', svg(TRIANGLE + EYES + badge))).toEqual([]);
+  });
+
   it('names teal in a system source', () => {
     expect(checkSource(name, 'system', svg(TRIANGLE + EYES + '<circle cx="80" cy="80" r="8" fill="#14857D"/>'))).toEqual([
-      `${name} uses #14857D, which isn't in a system App's colours (#FF5A3C, #FFFFFF, #1D1B2F, #FFC93C)`,
+      `${name} uses #14857D, which isn't in a system App's colours (#FF5A3C, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
     ]);
   });
 
   it('names tomato in an agent source', () => {
     expect(checkSource(name, 'agent', svg(SQUARE + EYES + '<circle cx="80" cy="80" r="8" fill="#ff5a3c"/>'))).toEqual([
-      `${name} uses #FF5A3C, which isn't in an agent App's colours (#14857D, #FFFFFF, #1D1B2F, #FFC93C)`,
+      `${name} uses #FF5A3C, which isn't in an agent App's colours (#14857D, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
     ]);
   });
 
   it('names a colour outside every palette', () => {
     expect(checkSource(name, 'system', svg(TRIANGLE + EYES + '<circle cx="80" cy="80" r="8" fill="#000000"/>'))).toEqual([
-      `${name} uses #000000, which isn't in a system App's colours (#FF5A3C, #FFFFFF, #1D1B2F, #FFC93C)`,
+      `${name} uses #000000, which isn't in a system App's colours (#FF5A3C, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
     ]);
   });
 

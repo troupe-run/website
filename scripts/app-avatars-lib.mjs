@@ -3,7 +3,7 @@
 
 const GUIDE = 'docs/brand-guide.md';
 const HEAD = { system: '#FF5A3C', agent: '#14857D' };
-const SHARED = ['#FFFFFF', '#1D1B2F', '#FFC93C']; // eyes, ink and sunflower
+const SHARED = ['#FFFFFF', '#1D1B2F', '#FFC93C', '#FFF8EE']; // eyes, ink, sunflower, and cream for the badge's ring
 const SHAPES = ['path', 'circle', 'rect', 'ellipse', 'polygon', 'polyline', 'line'];
 const NOT_FLAT = 'an App avatar is flat, with no gradient, filter, mask or opacity';
 
