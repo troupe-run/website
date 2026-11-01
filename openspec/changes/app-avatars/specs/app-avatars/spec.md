@@ -24,12 +24,13 @@ App, its kind and its prop. §8's asset table SHALL list the App avatars.
 
 ### Requirement: Each App's shape and colour follow its kind
 An App of kind `system` SHALL be the tomato rounded triangle, and an App of kind agent SHALL be the teal rounded
-square. Each SHALL have two round white eyes, no outline, shadow or gradient, and a prop in `--ink` or `--sunflower`
-only. No other colour SHALL appear in an App's source.
+square. Each SHALL have two round white eyes, no outline, shadow or gradient, and a prop: an `--ink` line drawing on
+a `--sunflower` disc, ringed by the cream background. No other colour SHALL appear in an App's source. The check holds
+which colours appear; where cream is used is judged in the owner's review.
 
 #### Scenario: A source uses a colour outside its kind
 - **WHEN** a `system` App's source fills a shape with teal, or any App's source uses a colour other than its head
-  colour, white, ink or sunflower
+  colour, white, ink, sunflower or cream
 - **THEN** the check fails, naming the App's source and the colour
 
 #### Scenario: A source has a gradient or a stroke of its own colour
