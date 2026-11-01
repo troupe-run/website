@@ -17,6 +17,9 @@ describe('sitePath', () => {
     ['a full URL', 'https://troupe.run/docs/opening-night/install/'],
     ['a protocol-relative URL, which a browser reads as another host', '//troupe.run/docs/'],
     ['a path starting /\\, which a browser reads as // and so as another host', '/\\troupe.run/docs/'],
+    ['a path with a tab after the /, which a browser drops, leaving //', '/\t/troupe.run/docs/'],
+    ['a path with a newline after the /, which a browser drops, leaving //', '/\n/troupe.run/docs/'],
+    ['a link to a host a browser can\'t parse, rather than throwing', '//[troupe.run/'],
     ['a relative path', 'docs/opening-night/install/'],
     ['an empty string', ''],
   ])('refuses %s, saying the link must be a path on this site', (_, value) => {
