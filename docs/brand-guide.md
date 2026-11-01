@@ -163,6 +163,33 @@ would pass as text in dark mode unchanged, but gets a lighter `-text` shade too,
   - Nothing else moves on its own.
   - Every animation is turned off under `prefers-reduced-motion`.
 
+### GitHub Apps
+
+The GitHub Apps that act for troupe-run each have an avatar in the cast's style, so whatever they post is
+recognisably ours and shows which job it does (decided with the owner on 2026-11-01, troupe-run/website#81).
+
+- **The shape follows what the App is.**
+  - An App that runs a fixed workflow is troupe acting by itself, the `system` actor kind: the tomato triangle.
+  - An App that is an AI acting as an agent is an agent: the teal square.
+- **An avatar is a head and a prop**, on cream, with two round white eyes and no reflection. The prop is solid
+  `--ink`, with `--sunflower` only as a detail inside it, because sunflower alone disappears on cream and on tomato.
+- **Each avatar is its own image, not a scene.** Several triangles in one pull request's timeline don't break the
+  rule that troupe appears once in a scene.
+- **At 20px the prop may blur**, and a workflow App then looks like the org avatar. GitHub prints the App's name
+  beside it. The prop has to read from 40px.
+- The list follows troupe-run/infrastructure's `oob/app-installations.json`. `dco` is a third-party App and keeps its
+  own icon.
+
+| App | Kind | Prop |
+|---|---|---|
+| `troupe-run-release` | system | a tag |
+| `troupe-run-review` | agent | a tick on a sunflower disc |
+| `troupe-run-dependabot` | system | two chain links |
+| `troupe-run-infrastructure` | system | a spanner |
+| `troupe-run-docs` | system | a book |
+| `troupe-run-dispatch` | system | a paper plane |
+| `troupe-run-board` | system | a clipboard |
+
 ## 6. The theatre metaphor
 
 **The rule: theatre in headings and visuals, plain words in body copy.** One stage device per section.
@@ -267,6 +294,7 @@ Deliberate variants:
 | Favicon set (triangle with eyes) | SVG, ICO, 180px apple-touch | To make |
 | Social preview for the site | PNG 1200×630 | To make |
 | GitHub org avatar | PNG 500×500 | To make |
+| GitHub App avatars, one per App (§5), in `brand/out/app-<app>.png` | PNG 500×500 | Made |
 | Repo social previews | PNG 1280×640 | To make |
 | README header banner | SVG | To make |
 | Colour and type tokens | CSS custom properties | Defined above; ship with the site |

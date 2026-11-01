@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css"></head>
+<body>
+  <img id="i" width="500" height="500" alt="">
+  <script>
+    // One App's avatar (spec: app-avatars): its source, brand/apps/<app>.svg, at full size on cream. Draws nothing itself.
+    document.getElementById('i').src = `../apps/${new URLSearchParams(location.search).get('app')}.svg`;
+  </script>
+</body></html>

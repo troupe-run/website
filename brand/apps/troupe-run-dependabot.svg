@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <g transform="translate(4 6) scale(2.2)">
+    <path d="M16 5.2 L28 26 L4 26 Z" fill="#FF5A3C" stroke="#FF5A3C" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="12.5" cy="19" r="2" fill="#FFFFFF"/>
+    <circle cx="19.5" cy="19" r="2" fill="#FFFFFF"/>
+  </g>
+  <!-- two chain links -->
+  <g transform="rotate(-40 68 70)">
+    <rect x="47" y="62" width="26" height="15" rx="7.5" fill="none" stroke="#1D1B2F" stroke-width="6"/>
+    <rect x="63" y="62" width="26" height="15" rx="7.5" fill="none" stroke="#1D1B2F" stroke-width="6"/>
+  </g>
+</svg>
