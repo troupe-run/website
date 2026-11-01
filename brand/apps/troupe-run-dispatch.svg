@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <g transform="translate(4 6) scale(2.2)">
+    <path d="M16 5.2 L28 26 L4 26 Z" fill="#FF5A3C" stroke="#FF5A3C" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="12.5" cy="19" r="2" fill="#FFFFFF"/>
+    <circle cx="19.5" cy="19" r="2" fill="#FFFFFF"/>
+  </g>
+  <!-- a paper plane -->
+  <path d="M50 70 L87 53 L70 86 L64 75 Z" fill="#1D1B2F" stroke="#1D1B2F" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M64 75 L87 53" fill="none" stroke="#FFC93C" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

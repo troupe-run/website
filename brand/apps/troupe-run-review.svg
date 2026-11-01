@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect x="12" y="12" width="56" height="56" rx="15.7" fill="#14857D"/>
+  <circle cx="28" cy="37.2" r="4.4" fill="#FFFFFF"/>
+  <circle cx="52" cy="37.2" r="4.4" fill="#FFFFFF"/>
+  <!-- a tick on a sunflower disc -->
+  <circle cx="68" cy="69" r="18" fill="#FFC93C"/>
+  <path d="M59.5 69.5 L66 76 L77.5 62.5" fill="none" stroke="#1D1B2F" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

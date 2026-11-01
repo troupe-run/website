@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <g transform="translate(4 6) scale(2.2)">
+    <path d="M16 5.2 L28 26 L4 26 Z" fill="#FF5A3C" stroke="#FF5A3C" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="12.5" cy="19" r="2" fill="#FFFFFF"/>
+    <circle cx="19.5" cy="19" r="2" fill="#FFFFFF"/>
+  </g>
+  <!-- a book -->
+  <g transform="rotate(-10 68 70)">
+    <rect x="53" y="56" width="30" height="28" rx="3" fill="#1D1B2F"/>
+    <rect x="57" y="76" width="26" height="4.5" fill="#FFC93C"/>
+    <rect x="60" y="62" width="17" height="3.5" rx="1.75" fill="#FFC93C"/>
+  </g>
+</svg>
