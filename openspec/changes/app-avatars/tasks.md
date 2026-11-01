@@ -35,16 +35,34 @@
   only outputs that changed are the seven new ones and the manifest (`git status`). Then confirm verification
   falsifies drift: edit one App source without re-rendering, see `assets:verify` fail naming it, and revert.
 
-## 4. The owner's visual review (spec, "The avatars read at GitHub's sizes")
+## 4. Redraw in the owner's chosen treatment (owner, 2026-11-01, design D2 and D3)
 
-- [ ] 4.1 Build a contact sheet in the scratchpad, not committed: each avatar at 20, 40 and 500px, on GitHub's light
-  and dark backgrounds, next to the org avatar. Screenshot it and show the owner. Redraw any prop the owner rejects
-  (repeat 3.2 and 3.3) until the owner agrees that each avatar reads as its kind at 20px and shows its prop at 40px.
-  This can't be automated: the owner verifies it by eye. Record the owner's agreement in the pull request.
+The first drawings (355bf0a) had solid-ink props that read as clunky. The owner compared four treatments and chose
+B3, a sunflower badge with a cream ring, and a prop for each App.
 
-## 5. Integration
+- [ ] 4.1 Update the brand guide's §5 "GitHub Apps" subsection: the badge (an `--ink` line drawing on a `--sunflower`
+  disc, ringed by the cream background, over the head's lower right), why props here aren't topic icons, and the
+  props table from design D3. Verify the guide's table matches D3 row for row, and that `npm test`'s real-guide tests
+  still pass.
+- [ ] 4.2 In `tests/unit/app-avatars.test.ts`, first add a fixture test that a source with a cream ring passes, and
+  update the palette lists in the expected messages to include `#FFF8EE`. See both fail. Then add cream to the
+  palette in `scripts/app-avatars-lib.mjs`, and verify all the fixture tests pass.
+- [ ] 4.3 Redraw the seven `brand/apps/<app>.svg` from design D2's geometry and D3's props, as on the owner's review
+  sheet: every shape with its own fill, line props with `fill="none"`, and only the palette's colours. Verify
+  `npm test` passes, including the real-file tests.
+- [ ] 4.4 Run `npm run assets:render`. Verify `npm run assets:verify` passes, the seven PNGs are 500×500, and the only
+  changed outputs are the seven App PNGs and the manifest (`git status`).
 
-- [ ] 5.1 Run `uv run scripts/check.py` and verify it passes, then commit with Conventional Commits and no sign-off.
+## 5. The owner's visual review (spec, "The avatars read at GitHub's sizes")
+
+- [ ] 5.1 Build a contact sheet in the scratchpad, not committed: each final avatar at 20, 40 and 500px, on GitHub's
+  light and dark backgrounds, next to the org avatar. Screenshot it and show the owner. Redraw any prop the owner
+  rejects (repeat 4.3 and 4.4) until the owner agrees that each avatar reads as its kind at 20px and shows its prop
+  at 40px. This can't be automated: the owner verifies it by eye. Record the owner's agreement in the pull request.
+
+## 6. Integration
+
+- [ ] 6.1 Run `uv run scripts/check.py` and verify it passes, then commit with Conventional Commits and no sign-off.
 
 ## Workflow follow-up
 

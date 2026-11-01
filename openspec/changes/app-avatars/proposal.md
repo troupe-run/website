@@ -12,20 +12,22 @@ does. This is troupe-run/website#81.
   - The six Apps that run fixed workflows are **troupe acting by itself**, the glossary's `system` actor kind. Each
     is the **tomato rounded triangle with eyes**, holding a prop for its job.
   - `troupe-run-review` is Claude's review, an AI acting as an agent. It's the **teal rounded square with eyes**,
-    holding a tick.
+    holding a checklist.
   - No new shape, colour or actor kind is added. Each shape keeps the meaning the brand guide gives it.
-- **One avatar per App, each with its own prop** in `--ink` or `--sunflower`, as the brand guide's §5 says. The
-  props are listed in the design (D3), and the owner reviews them as images before they're called done:
+- **One avatar per App, each with its own prop.** Each prop is a simple `--ink` line drawing on a `--sunflower`
+  disc, set off from the head by a ring of the cream background, overlapping the head's lower right. The owner chose
+  this (treatment B3) and the props on 2026-11-01, after the first solid-ink props read as clunky (design, D2 and D3).
+  The owner reviews the final set as images before it's called done:
 
   | App | Character | Prop |
   |---|---|---|
-  | `troupe-run-release` | triangle | a tag |
-  | `troupe-run-review` | square | a tick |
-  | `troupe-run-dependabot` | triangle | a chain link |
-  | `troupe-run-infrastructure` | triangle | a spanner |
-  | `troupe-run-docs` | triangle | a book |
-  | `troupe-run-dispatch` | triangle | a paper plane |
-  | `troupe-run-board` | triangle | a clipboard |
+  | `troupe-run-release` | triangle | a rosette |
+  | `troupe-run-review` | square | a checklist |
+  | `troupe-run-dependabot` | triangle | a pull request to an issue |
+  | `troupe-run-infrastructure` | triangle | layers |
+  | `troupe-run-docs` | triangle | an open book |
+  | `troupe-run-dispatch` | triangle | forward chevrons |
+  | `troupe-run-board` | triangle | a board with three columns |
 
 - **They're made by the existing brand pipeline.** Each App has a source SVG in `brand/apps/`, and one template,
   `brand/templates/app-avatar.html`, renders each one to `brand/out/app-<app>.png` at 500×500, as the org avatar is.
@@ -34,7 +36,7 @@ does. This is troupe-run/website#81.
   App's character and prop. §8's asset table gets a row for the App avatars.
 - **A check holds the guide, the sources and the renders together.** Every App in the guide's table has a source
   and a rendered avatar, and nothing else does. Each source uses only its kind's colours: tomato or teal for the
-  head, white for the eyes, and ink or sunflower for the prop.
+  head, white for the eyes, ink and sunflower for the prop, and cream (`#FFF8EE`, the background) for the ring.
 - **The owner sets each App's logo on GitHub by hand.** Each App's settings page takes the image, and there's no
   API for it. It's the last step, and it's owner-only.
 
