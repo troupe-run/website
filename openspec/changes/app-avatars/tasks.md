@@ -66,9 +66,9 @@ B3, a sunflower badge with a cream ring, and a prop for each App.
 
 ## Workflow follow-up
 
-- Open the draft pull request with `Closes #81`, act on Claude's review, mark it ready, archive on the branch, and ask
-  the owner to merge.
-- After the merge, the owner uploads each `brand/out/app-<app>.png` as that App's logo on GitHub (owner-only, no API).
-  Comment on #81 with the pull request and the archived change, and check that #81 is closed and its board card is
-  Done. #81's last "Done when" item is the upload, so if the PR closes the issue before the owner has uploaded the
-  logos, say so in that comment.
+- Open the draft pull request with `Closes #81`, act on Claude's review, mark it ready, and archive on the branch.
+- Before the merge, the owner uploads each `brand/out/app-<app>.png` from this branch as that App's logo on GitHub
+  (owner-only, no API), so #81's last "Done when" item is met by the time the pull request closes it (owner,
+  2026-11-01). Then ask the owner to merge.
+- After the merge, comment on #81 with the pull request and the archived change, and check that #81 is closed and its
+  board card is Done.
