@@ -1,13 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <g transform="translate(4 6) scale(2.2)">
+  <!-- troupe-run-docs: the system triangle, holding an open book on a badge (brand guide §5, "GitHub Apps") -->
+  <g transform="translate(1 0) scale(2.05)">
     <path d="M16 5.2 L28 26 L4 26 Z" fill="#FF5A3C" stroke="#FF5A3C" stroke-width="4" stroke-linejoin="round"/>
     <circle cx="12.5" cy="19" r="2" fill="#FFFFFF"/>
     <circle cx="19.5" cy="19" r="2" fill="#FFFFFF"/>
   </g>
-  <!-- a book -->
-  <g transform="rotate(-10 68 70)">
-    <rect x="53" y="56" width="30" height="28" rx="3" fill="#1D1B2F"/>
-    <rect x="57" y="76" width="26" height="4.5" fill="#FFC93C"/>
-    <rect x="60" y="62" width="17" height="3.5" rx="1.75" fill="#FFC93C"/>
+  <circle cx="69" cy="69" r="27" fill="#FFF8EE"/>
+  <circle cx="69" cy="69" r="23" fill="#FFC93C"/>
+  <g transform="translate(54 54) scale(1.25)" stroke="#1D1B2F" stroke-width="2.88" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="none" d="M12 6.5 C9.5 4.5 6 4.5 3 5.5 V19 C6 18 9.5 18 12 20 C14.5 18 18 18 21 19 V5.5 C18 4.5 14.5 4.5 12 6.5 Z"/>
+    <path fill="none" d="M12 6.5 V20"/>
   </g>
 </svg>
