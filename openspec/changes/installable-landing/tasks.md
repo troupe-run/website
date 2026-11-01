@@ -38,9 +38,9 @@
 - [x] 3.1 Add a one-line note in `docs/superpowers/specs/2026-10-07-troupe-run-site-design.md`, where its calls to
   action first describe "Install: coming", that the `landing-calls-to-action` spec replaced it (troupe-run/website#83).
   Verify by reading the note in place.
-- [ ] 3.2 Build the site and show the owner the hero at 320px, 768px and 1280px, in light and dark, with the new copy
+- [x] 3.2 Build the site and show the owner the hero at 320px, 768px and 1280px, in light and dark, with the new copy
   ("Install (pre-alpha)" and the page description). Verify by the owner's approval, recorded in the PR.
-- [ ] 3.3 Verify `openspec validate installable-landing --strict` and `uv run scripts/check.py` pass before each
+- [x] 3.3 Verify `openspec validate installable-landing --strict` and `uv run scripts/check.py` pass before each
   commit.
 
 ## Workflow follow-up
