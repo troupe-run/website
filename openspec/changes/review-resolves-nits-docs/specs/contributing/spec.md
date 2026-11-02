@@ -27,12 +27,19 @@ than restate them.
   with the org's development-workflow guide linked for the tiers
 - **AND** it finds that the review resolves its own must-fixes once they're addressed, and its own nits once a push has
   fixed them, so a nit fixed by a push needs no reply or resolve
+- **AND** it finds that a must-fix fixed by a push gets no "fixed" reply, and that a reply needing a discussion goes
+  before the push
+- **AND** it finds that the review judges a reply to a must-fix when it's posted, and that the run is re-run
+  (`gh run rerun <id>`) only if it fails
+- **AND** it finds that the pull request is marked ready only once the review of the last push has completed: the
+  required `claude review completed` check passed, or, if it failed, the run it names was re-run and passed
 
 #### Scenario: An agent merges a pull request
 - **WHEN** a coding agent reads CLAUDE.md's merge step, with the change archived on the branch, `test` passed and
   every conversation resolved
 - **THEN** it finds that it asks the owner to merge, and that the owner adds the pull request to the merge queue,
-  which lands it by rebase once `test` and `guard (workflow rules)` pass on the queued commit
+  which lands it by rebase once `test`, `guard (workflow rules)` and `claude review completed` pass on the queued
+  commit, the checks `main`'s ruleset requires
 - **AND** it finds no merge command for it to run: `gh pr merge` and **Merge when ready** are named only as the
   owner's, and `gh pr merge <n> --rebase --admin`, which skips the queue, as the owner's route for emergencies
 
@@ -57,3 +64,26 @@ source of the tiers.
 - **WHEN** an agent reads the context's "Before archiving" bullet after pushing a fix for a nit
 - **THEN** it finds that the review resolves that nit itself, so it needn't be resolved by hand, and that the author
   still resolves only nits
+
+## ADDED Requirements
+
+### Requirement: The context says how the review takes replies and readiness
+The `context` in `openspec/config.yaml` SHALL say, in its "Before archiving" bullet, that the review judges a reply to
+one of its must-fixes when it's posted, re-run only if that run fails; that a must-fix fixed by a push gets no "fixed"
+reply, a reply needing a discussion going before the push; and that the pull request is marked ready only once the
+review of the last push has completed (the required `claude review completed` check passed).
+
+#### Scenario: A must-fix is answered without a push
+- **WHEN** an agent reads the context's "Before archiving" bullet after replying to a must-fix without pushing
+- **THEN** it finds that the review judges the reply when it's posted, and that it re-runs that run
+  (`gh run rerun <id>`) only if it fails
+
+#### Scenario: A must-fix is fixed by a push
+- **WHEN** an agent reads the context's "Before archiving" bullet after pushing a fix for a must-fix
+- **THEN** it finds that the fix gets no "fixed" reply, and that a reply needing a discussion would have gone before
+  the push
+
+#### Scenario: The pull request is marked ready
+- **WHEN** an agent reads the context's "Before archiving" bullet before running `gh pr ready <n>`
+- **THEN** it finds that it waits until the review of the last push has completed, with the required
+  `claude review completed` check passed, or the run it names re-run if it failed
