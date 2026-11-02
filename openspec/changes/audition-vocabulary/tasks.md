@@ -22,7 +22,7 @@
 
 ## 3. Landing
 
-- [ ] 3.1 Once troupe#257's glossary row is on `main`, re-run `npm run docs:sync`, then `uv run scripts/check.py`, and
+- [x] 3.1 Once troupe#257's glossary row is on `main`, re-run `npm run docs:sync`, then `uv run scripts/check.py`, and
   verify both vocabulary tests pass and the check is clean. Then commit the guide row and test, and open the PR.
 - [x] 3.2 Raise design's open question on rehearsal's status with the owner, and record their answer in the PR.
   Verify by the owner's reply. Any change it leads to is a separate issue. (Owner, 2026-11-02: leave it for now.)
