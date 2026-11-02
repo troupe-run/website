@@ -46,6 +46,8 @@ than restate them.
   nits, raises decisions and disputed must-fixes with the owner, marks the pull request ready (`gh pr ready <n>`) once
   the review of the last push leaves no must-fix or decision open, and that a merge needs every conversation resolved,
   with the org's development-workflow guide linked for the tiers
+- **AND** it finds that the review resolves its own must-fixes once they're addressed, and its own nits once a push has
+  fixed them, so a nit fixed by a push needs no reply or resolve
 
 #### Scenario: An agent merges a pull request
 - **WHEN** a coding agent reads CLAUDE.md's merge step, with the change archived on the branch, `test` passed and
@@ -107,10 +109,16 @@ OpenSpec changes) and the test that checks this SHALL link to a `CONTRIBUTING.md
 ### Requirement: Every proposed change plans acting on Claude's review
 The `context` in `openspec/config.yaml` SHALL say that before archiving, the author waits for Claude's review of the
 last push and acts on each finding by its tier: fixes or answers every must-fix and nit, resolves only nits, and
-raises decisions and disputed must-fixes with the owner. It SHALL name troupe-run/infrastructure's
-development-workflow guide as the source of the tiers.
+raises decisions and disputed must-fixes with the owner. It SHALL say that the review resolves its own must-fixes, and
+its own nits once a push has fixed them, and SHALL name troupe-run/infrastructure's development-workflow guide as the
+source of the tiers.
 
 #### Scenario: A change is proposed
 - **WHEN** an agent runs `/opsx:propose` in this repository and reads the context it's given
 - **THEN** the context tells it to wait for Claude's review of the last push and act on each finding by its tier
   before archiving, so the change's tasks plan that step
+
+#### Scenario: A nit is fixed by a push
+- **WHEN** an agent reads the context's "Before archiving" bullet after pushing a fix for a nit
+- **THEN** it finds that the review resolves that nit itself, so it needn't be resolved by hand, and that the author
+  still resolves only nits
