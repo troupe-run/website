@@ -18,7 +18,7 @@
 
 ## 2. Say the rest of what infrastructure says about Claude's review (#101)
 
-- [ ] 2.1 In CLAUDE.md's step 5, in the words of infrastructure's `CLAUDE.md` step 5: say a must-fix fixed by a push
+- [x] 2.1 In CLAUDE.md's step 5, in the words of infrastructure's `CLAUDE.md` step 5: say a must-fix fixed by a push
   gets no "fixed" reply, and to reply only when it needs a discussion, and then before pushing; replace "for a must-fix
   answered without a push, re-run the last `claude review` run" with the review judging a reply to a must-fix when it's
   posted, re-run (`gh run rerun <id>`) only if that run fails; and say the pull request is marked ready only once the
@@ -26,10 +26,10 @@
   run it names). Leave out infrastructure's "CI posts its plan". Verify by reading the step against infrastructure's
   step 5 and against the "An agent finishes a pull request" scenario's AND lines, and that
   `grep -n "re-run the last" CLAUDE.md` finds nothing.
-- [ ] 2.2 In CLAUDE.md's step 6, name `claude review completed` beside `test` and `guard (workflow rules)` as what the
+- [x] 2.2 In CLAUDE.md's step 6, name `claude review completed` beside `test` and `guard (workflow rules)` as what the
   merge queue waits for on the queued commit. Verify against `gh api repos/troupe-run/website/rules/branches/main`'s
   required checks and the "An agent merges a pull request" scenario.
-- [ ] 2.3 In `openspec/config.yaml`'s "Before archiving" bullet: say the review judges a reply to a must-fix when it's
+- [x] 2.3 In `openspec/config.yaml`'s "Before archiving" bullet: say the review judges a reply to a must-fix when it's
   posted, re-run only if that run fails, in the words of infrastructure's `openspec/config.yaml`, replacing "after
   answering a must-fix without a push, re-run the last `claude review` run"; and add, in the words of infrastructure's
   `CLAUDE.md`, that a must-fix fixed by a push gets no "fixed" reply (a reply needing a discussion goes before the
@@ -37,7 +37,7 @@
   sentence and "resolve only nits". Verify against each scenario of "The context says how the review takes replies and
   readiness", and that `openspec instructions proposal --change review-resolves-nits-docs --json` shows the bullet in
   its `context`.
-- [ ] 2.4 Verify `openspec validate review-resolves-nits-docs --strict` and `uv run scripts/check.py` pass before the
+- [x] 2.4 Verify `openspec validate review-resolves-nits-docs --strict` and `uv run scripts/check.py` pass before the
   commit.
 
 ## Workflow follow-up

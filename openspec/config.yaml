@@ -93,10 +93,12 @@ context: |
   - Commit in small steps with messages that say why.
   - Before archiving, wait for Claude's review of the last push and act on each finding by its tier: fix or answer
     every must-fix and nit, resolve only nits, and raise decisions and disputed must-fixes with the owner. The
-    review resolves its own must-fixes (troupe-run/infrastructure docs/development-workflow.md, "Claude's review");
-    after answering a must-fix without a push, re-run the last `claude review` run (`gh run rerun <id>`) so the
-    review judges the reply. It also resolves its own nits once a push has fixed them, so a nit fixed by a push
-    needn't be resolved by hand.
+    review resolves its own must-fixes (troupe-run/infrastructure docs/development-workflow.md, "Claude's review"),
+    and judges a reply to one when it's posted; if that run fails, re-run it (`gh run rerun <id>`). It also resolves
+    its own nits once a push has fixed them, so a nit fixed by a push needn't be resolved by hand. A must-fix fixed by
+    a push gets no "fixed" reply; reply only when it needs a discussion, and then before pushing. Mark the pull
+    request ready only once the review of the last push has completed (the required `claude review completed` check
+    passed; if it failed, re-run the run it names).
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
