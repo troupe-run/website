@@ -36,9 +36,11 @@ today, and troupe#233's outcome doesn't add one. For the motivation, see proposa
 - Plain text, no code font, as every other status cell in the table is written.
 - The row goes straight after rehearsal, so the two are read together.
 
-**D2. Landing order.** The guide row goes in here now, and a new troupe issue asks for the glossary row. The owner
-chose this (2026-11-02) over waiting for troupe first, or folding the row into #233. Until troupe's row is on `main`,
-`test` fails on this pull request, naming audition. The draft stays open, and `test` is re-run once the row lands.
+**D2. Landing order.** troupe's glossary row lands first (troupe-run/troupe#257), and the guide row is committed
+here once it's on `main`. The plan was to land both together, with this pull request's `test` red in between (owner,
+2026-11-02). That turned out not to work: the guard runs the check before every commit and refused the guide row
+while the glossary lacked it. The owner then chose to do #257 first, in its own session, over an override or
+folding the row into #233.
 
 **D3. One named test.** The general check already fails when a kept term has no glossary row. One new test checks
 what's specific to audition: its guide status starts "In use", carries the decision's date, names
@@ -46,8 +48,7 @@ what's specific to audition: its guide status starts "In use", carries the decis
 
 ## Risks / Trade-offs
 
-- [This PR stays red while it waits on troupe] → It stays a draft and isn't marked ready until troupe's row is on
-  `main`. The PR body says what it waits on.
+- [This change waits on troupe] → The guide row and test stay staged on this branch until #257 is on `main`.
 - [troupe's row and the guide row could disagree on what audition is] → The troupe issue quotes this status text, so
   the meaning it writes matches it.
 - ["In use" before 0.2.0 has shipped] → The status names 0.2.0, so it says when the flag arrives, not that it
@@ -56,5 +57,5 @@ what's specific to audition: its guide status starts "In use", carries the decis
 ## Open Questions
 
 - **Rehearsal's status.** The guide still says "Reserved, 2026-10-19", but troupe's glossary describes `--rehearse` as
-  something you run today. That may be stale. It's outside #85, so this change raises it with the owner and doesn't
-  change it.
+  something you run today. That may be stale. It's outside #85. Raised with the owner, who said to leave it for now
+  (2026-11-02).

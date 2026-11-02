@@ -71,6 +71,25 @@ describe('the glossary and the brand guide list the same terms', () => {
     expect(['stage', 'rehearsal', 'system', 'cue'].filter((t) => !glossary.includes(t))).toEqual([]);
   });
 
+  // troupe-run/troupe#232 named the flag; website#85 gives the word its status. "In use" now, with the release named,
+  // so the row needs no edit when 0.2.0 ships (owner, 2026-11-02). The glossary row is troupe-run/troupe#257.
+  it("the brand guide's §6 lists audition as in use, dated 2026-11-01, for troupe init --audition from 0.2.0, apart from rehearsal, and the glossary has a row for it", () => {
+    const status = vocabulary().rows.find((r) => r[0] === 'audition')?.[1] ?? '';
+    expect({
+      'in use, 2026-11-01': /^In use, 2026-11-01\b/.test(status),
+      'names troupe init --audition': status.includes('troupe init --audition'),
+      'names 0.2.0': /\b0\.2\.0\b/.test(status),
+      'says it is not a rehearsal': /\bnot a rehearsal\b/i.test(status) && status.includes('--rehearse'),
+      'has a glossary row': glossaryTerms().includes('audition'),
+    }).toEqual({
+      'in use, 2026-11-01': true,
+      'names troupe init --audition': true,
+      'names 0.2.0': true,
+      'says it is not a rehearsal': true,
+      'has a glossary row': true,
+    });
+  });
+
   it('the glossary marks cue as provisional', () => {
     const cue = table(readFileSync(GLOSSARY, 'utf8')).rows.find((r) => r[0] === 'cue');
     expect(cue?.[1]).toMatch(/provisional/i);
