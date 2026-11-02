@@ -30,7 +30,7 @@
     "starlight-blog": "0.30.2"
   },
   "devDependencies": {
-    "@astrojs/check": "0.9.10",
+    "@astrojs/check": "0.9.12",
     "@axe-core/playwright": "4.14.0",
     "@playwright/test": "1.63.0",
     "linkinator": "8.1.0",
