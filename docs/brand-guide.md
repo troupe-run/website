@@ -217,6 +217,7 @@ product nouns: body copy uses them as plainly as any other word. The rule above 
 | cast | Reserved |
 | performance | In use |
 | rehearsal | Reserved, 2026-10-19: ahead of the feature that builds it |
+| audition | In use, 2026-11-01: troupe init --audition, from 0.2.0, writes a working example actor. Not a rehearsal, which is a dry run (--rehearse) |
 | stage | In use, 2026-10-19 |
 | notes | Landing-page term, 2026-10-07 |
 | gate | In use |
