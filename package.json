@@ -21,7 +21,7 @@
     "test:rebuild": "node scripts/rebuild-test.mjs"
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "0.4.6",
+    "@astrojs/markdown-satteri": "0.4.7",
     "@astrojs/starlight": "0.42.9",
     "@fontsource-variable/bricolage-grotesque": "5.3.0",
     "@fontsource-variable/dm-sans": "5.3.0",
