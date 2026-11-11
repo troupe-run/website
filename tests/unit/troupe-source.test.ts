@@ -140,3 +140,85 @@ describe('openSource with TROUPE_DOCS set', () => {
     expect(() => openSource({ TROUPE_DOCS: v }, { cacheDir: 'unused' })).toThrow(`TROUPE_DOCS is set to ${JSON.stringify(v)}`);
   });
 });
+
+// Whether a link into troupe's repository leads somewhere: the ref it names and the path at that ref (spec:
+// versioned-docs; design D3, D4). Both sources answer the same, except that a local checkout's main is its working tree.
+describe('the source says whether a ref and a path exist, for links into the repository', () => {
+  //   troupe-run-v0.1.0  docs/programme/a.md                 main  + plugins/runner/README.md, CHANGELOG.md
+  function linked(): Repo {
+    const r = repo();
+    r.commit({ 'plugins/runner/README.md': 'r\n', 'CHANGELOG.md': 'c\n' }, '2026-02-01T00:00:00Z');
+    return r;
+  }
+  const sources = [
+    ['the clone', (r: Repo) => openSource({}, { cacheDir: join(tempDir(), 'troupe.git'), remote: r.path })],
+    ['a local checkout', (r: Repo) => openSource({ TROUPE_DOCS: r.path }, { cacheDir: 'unused' })],
+  ] as const;
+
+  describe.each(sources)('from %s', (_, open) => {
+    it('finds a file, a folder and the root at main, and not a missing path', () => {
+      const source = open(linked());
+      expect(
+        source.exists([
+          { ref: 'main', path: 'CHANGELOG.md' },
+          { ref: 'main', path: 'plugins/runner' },
+          { ref: 'main', path: '' },
+          { ref: 'main', path: 'plugins/runner-ollama/CHANGELOG.md' },
+        ]),
+      ).toEqual([true, true, true, false]);
+    });
+
+    it('looks a path up at the tag a link names, not at main', () => {
+      const source = open(linked());
+      expect(
+        source.exists([
+          { ref: 'troupe-run-v0.1.0', path: 'docs/programme/a.md' },
+          { ref: 'troupe-run-v0.1.0', path: 'CHANGELOG.md' },
+        ]),
+      ).toEqual([true, false]);
+    });
+
+    it('looks a path up at a commit a link names', () => {
+      const r = linked();
+      const first = r.git('rev-list', '--max-parents=0', 'main').trim();
+      const source = open(r);
+      expect(source.exists([{ ref: first, path: 'docs/programme/a.md' }, { ref: first, path: 'CHANGELOG.md' }])).toEqual([true, false]);
+    });
+
+    it('knows main, a tag and a commit, and not a branch it lacks or a made-up ref', () => {
+      const r = linked();
+      const source = open(r);
+      expect(source.hasRef('main')).toBe(true);
+      expect(source.hasRef('troupe-run-v0.1.0')).toBe(true);
+      expect(source.hasRef(r.git('rev-parse', 'main').trim())).toBe(true);
+      expect(source.hasRef(r.git('rev-parse', '--short', 'main').trim())).toBe(true);
+      expect(source.hasRef('some-branch')).toBe(false);
+      expect(source.hasRef('--all')).toBe(false);
+    });
+
+    it.each([
+      ['a .. part that leaves the repository', '../outside.md', /an empty, \. or \.\. part/],
+      ['a .. part inside it', 'plugins/../CHANGELOG.md', /an empty, \. or \.\. part/],
+      ['an empty part', 'plugins//runner', /an empty, \. or \.\. part/],
+      ['a newline', 'CHANGELOG.md\nmain:CHANGELOG.md', /a control character/],
+    ])('refuses a path with %s, rather than answering', (_, path, message) => {
+      const source = open(linked());
+      expect(() => source.exists([{ ref: 'main', path }])).toThrow(message);
+      expect(() => source.exists([{ ref: 'troupe-run-v0.1.0', path }])).toThrow(message);
+    });
+  });
+
+  it("counts a file in a local checkout's working tree that isn't committed yet, as the pages do", () => {
+    const r = linked();
+    writeFileSync(join(r.path, 'NEW.md'), 'n\n');
+    const source = openSource({ TROUPE_DOCS: r.path }, { cacheDir: 'unused' });
+    expect(source.exists([{ ref: 'main', path: 'NEW.md' }])).toEqual([true]);
+    // A tag is read from git, so the working tree doesn't count there.
+    expect(source.exists([{ ref: 'troupe-run-v0.1.0', path: 'NEW.md' }])).toEqual([false]);
+  });
+
+  it("doesn't count a local checkout's .git folder, which is on disk but never in the repository", () => {
+    const source = openSource({ TROUPE_DOCS: linked().path }, { cacheDir: 'unused' });
+    expect(source.exists([{ ref: 'main', path: '.git/config' }])).toEqual([false]);
+  });
+});

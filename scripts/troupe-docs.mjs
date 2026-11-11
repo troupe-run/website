@@ -8,7 +8,7 @@ import { RoadmapError, syncRoadmap } from './roadmap-lib.mjs';
 
 try {
   const root = fileURLToPath(new URL('..', import.meta.url));
-  const manifest = sync({ root });
+  const manifest = await sync({ root });
   for (const v of manifest.versions) console.log(`docs:sync: ${v.base} from ${v.ref}, ${v.pages.length} pages`);
   const { copies } = manifest.protocol;
   console.log(`docs:sync: /protocol/ has ${copies.length} copies, the latest from ${copies[0].ref}`);

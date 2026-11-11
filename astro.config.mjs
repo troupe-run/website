@@ -22,11 +22,11 @@ function troupeDocs() {
     hooks: {
       // public/protocol/'s marker is for the sync, not the site (protocol-schemas design D6).
       'astro:build:done': ({ dir }) => rmSync(new URL(`protocol/${PROTOCOL_MARKER}`, dir), { force: true }),
-      'astro:config:setup': ({ command, config, updateConfig, logger }) => {
+      'astro:config:setup': async ({ command, config, updateConfig, logger }) => {
         // Preview serves a finished build, so it mustn't rewrite the pages another command may be building from.
         if (command === 'preview') return;
         const root = fileURLToPath(new URL('.', import.meta.url));
-        const manifest = sync({ root });
+        const manifest = await sync({ root });
         const redirects = {};
         for (const v of manifest.versions) {
           const first = firstPage(v.pages);

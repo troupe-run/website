@@ -5,7 +5,10 @@ with the tags its name lists after the number, joined by `+`, except `main`. Bet
 (`old-guide`), one is renamed (`build-a-flow` to `design-a-flow`), one is added (`roles-and-actors`, planned) and one
 exists only on main (`new-guide`, which the site's sidebar order doesn't name). `opening-night/install` is in the
 last release and on main because the landing page links to `/docs/opening-night/install/`, and the fixture build's
-link check would otherwise find it broken (troupe-run/website#83).
+link check would otherwise find it broken (troupe-run/website#83). `new-guide` links a file and a folder on main by
+their GitHub URLs (`blob/main/protocol/schemas/error.schema.json`, `tree/main/protocol/schemas/events`), so the fixture
+build runs the check that links from main into troupe's repository lead somewhere (troupe-run/website#112). Pointing
+either at a path main doesn't have fails the build.
 
 The releases are the bundle's tags, `troupe-run-v*`, as on troupe-run/troupe (bundle-tag-is-the-release design D3).
 Core's `troupe-v*` tags disagree with them on purpose: `troupe-v0.3.0`, higher than any bundle release, is on
