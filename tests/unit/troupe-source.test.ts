@@ -196,6 +196,21 @@ describe('the source says whether a ref and a path exist, for links into the rep
       expect(source.hasRef('--all')).toBe(false);
     });
 
+    // A clone has only main and the tags, so anything else git could resolve in a checkout would pass on a writer's
+    // machine and fail in CI's clone (review of troupe-run/website#113).
+    it("doesn't take HEAD, a local branch, or a branch spelled out in full, which CI's clone wouldn't have", () => {
+      const r = linked();
+      r.git('branch', 'my-local-branch');
+      r.git('branch', 'cafe123');
+      const source = open(r);
+      expect(source.hasRef('HEAD')).toBe(false);
+      expect(source.hasRef('my-local-branch')).toBe(false);
+      expect(source.hasRef('refs/heads/main')).toBe(false);
+      expect(source.hasRef('main~1')).toBe(false);
+      // A branch named like a commit id is still a branch, not a commit.
+      expect(source.hasRef('cafe123')).toBe(false);
+    });
+
     it.each([
       ['a .. part that leaves the repository', '../outside.md', /an empty, \. or \.\. part/],
       ['a .. part inside it', 'plugins/../CHANGELOG.md', /an empty, \. or \.\. part/],

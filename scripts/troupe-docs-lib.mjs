@@ -208,11 +208,26 @@ function walk(dir) {
 function fromGit(gitArgs) {
   const tagSet = () => new Set(git([...gitArgs, 'tag', '--list']).split('\n').filter(Boolean));
   let tags;
-  // A link's ref as git reads it: main's branch, a tag by its full name, or anything else (a commit) as written.
-  const gitRef = (ref) => {
+  const commits = new Map();
+  // A link's ref as git reads it, or null (design D3): main's branch, a tag by its full name, or a commit by its full
+  // id. Nothing else passes, not HEAD or another branch, which a checkout has and CI's clone doesn't. A commit is
+  // found by --disambiguate, which reads object ids only, so a branch named like one isn't taken for it.
+  const resolve = (ref) => {
     if (ref === 'main') return 'refs/heads/main';
     tags ??= tagSet();
-    return tags.has(ref) ? `refs/tags/${ref}` : ref;
+    if (tags.has(ref)) return `refs/tags/${ref}`;
+    if (!/^[0-9a-f]{7,40}$/i.test(ref)) return null;
+    if (!commits.has(ref)) {
+      let ids = [];
+      try {
+        ids = git([...gitArgs, 'rev-parse', `--disambiguate=${ref.toLowerCase()}`]).split('\n').filter(Boolean);
+      } catch {
+        // no object has that prefix
+      }
+      const found = ids.filter((id) => git([...gitArgs, 'cat-file', '-t', id]).trim() === 'commit');
+      commits.set(ref, found.length === 1 ? found[0] : null);
+    }
+    return commits.get(ref);
   };
   const listTree = (ref, dir) =>
     git([...gitArgs, 'ls-tree', '-r', '--name-only', refName(ref), '--', `${dir}/`])
@@ -227,16 +242,8 @@ function fromGit(gitArgs) {
     readRepo: (ref, path) => git([...gitArgs, 'show', `${refName(ref)}:${path}`]),
     date: (ref, path) => git([...gitArgs, 'log', '-1', '--format=%cI', refName(ref), '--', `docs/${path}`]).trim() || null,
     tags: () => git([...gitArgs, 'tag', '--list']).split('\n').filter(Boolean),
-    /** Whether `ref` is `main`, a tag, or a commit the repository has (design D3). */
-    hasRef: (ref) => {
-      if (ref === 'main') return true;
-      try {
-        git([...gitArgs, 'rev-parse', '--verify', '--quiet', '--end-of-options', `${gitRef(ref)}^{commit}`]);
-        return true;
-      } catch {
-        return false;
-      }
-    },
+    /** Whether `ref` is `main`, a tag, or a commit the repository has, and nothing else (design D3). */
+    hasRef: (ref) => resolve(ref) !== null,
     /**
      * Whether each `{ ref, path }` names a file or folder at its ref, in one `git cat-file --batch-check` (design D4).
      * An empty path is the repository's root.
@@ -244,7 +251,7 @@ function fromGit(gitArgs) {
     exists: (links) => {
       if (links.length === 0) return [];
       for (const { path } of links) refuseOddPath(path);
-      const input = links.map(({ ref, path }) => `${gitRef(ref)}:${path}`).join('\n') + '\n';
+      const input = links.map(({ ref, path }) => `${resolve(ref) ?? 'refs/missing/ref'}:${path}`).join('\n') + '\n';
       const out = execFileSync('git', [...gitArgs, 'cat-file', '--batch-check'], { encoding: 'utf8', input });
       return out.split('\n').slice(0, links.length).map((line) => !line.endsWith(' missing') && !line.endsWith(' ambiguous'));
     },
