@@ -30,7 +30,9 @@ requests them. See proposal.md for why that's too late.
 
 ### D1. Check in the sync, not in the render plugin
 
-The check runs in `buildVersions`, alongside the page contract, and its problems go through `refuse`.
+The check is a step of `sync` of its own, run on each version read from `main` straight after `buildVersions` has
+checked the page contract and before anything is written. Its problems go through `refuse`. (Planned inside
+`buildVersions`; a separate step kept `buildVersions` synchronous, so only `sync` became async, with the same refusal.)
 
 - It fails before any page is written, and names every broken link in the version at once, as the page contract does.
 - `npm run docs:sync` catches it, not only a full build.
@@ -49,8 +51,8 @@ Alternatives: a regular expression over the Markdown would check URLs inside cod
 leave alone. `mdast-util-from-markdown` is in `node_modules` only as a transitive dependency, and would parse
 differently from the renderer in edge cases. Both rejected.
 
-If the processor only parses asynchronously, `sync` and `buildVersions` become async. The Astro hook that calls `sync`
-can be async, and `scripts/troupe-docs.mjs` awaits it. The tests that call `sync` await it too.
+The processor only renders asynchronously, so `sync` is async (`buildVersions` stays synchronous; see D1). The Astro
+hook that calls `sync` can be async, and `scripts/troupe-docs.mjs` awaits it. The tests that call `sync` await it too.
 
 ### D3. Which links, and how a URL becomes a ref and a path
 
@@ -82,7 +84,7 @@ contract's style:
 
 ```
 docs/backstage/changelog.md: the link https://github.com/troupe-run/troupe/blob/main/plugins/runner-ollama/CHANGELOG.md
-  names plugins/runner-ollama/CHANGELOG.md, which isn't in troupe's main: link it once it exists, or link a path that does
+  names plugins/runner-ollama/CHANGELOG.md, which isn't at main: link it once it exists, or link a path that does
 ```
 
 The exact wording is set by the tests in task group 2. These are build errors for troupe's writers, not site copy.

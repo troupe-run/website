@@ -194,7 +194,6 @@ function git(args, options = {}) {
 const gitError = (error) => (error.stderr || error.message).trim();
 const refName = (ref) => (ref === 'main' ? 'refs/heads/main' : `refs/tags/${ref}`);
 
-
 function walk(dir) {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
