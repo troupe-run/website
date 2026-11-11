@@ -11,6 +11,7 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { TroupeDocsError } from './troupe-error.mjs';
 import { buildProtocol, writeProtocol } from './protocol-lib.mjs';
 import { releaseVersion } from './release-tag.mjs';
+import { refuseOddPath, repoLinkProblems } from './troupe-repo-links.mjs';
 
 export { TroupeDocsError };
 
@@ -193,6 +194,7 @@ function git(args, options = {}) {
 const gitError = (error) => (error.stderr || error.message).trim();
 const refName = (ref) => (ref === 'main' ? 'refs/heads/main' : `refs/tags/${ref}`);
 
+
 function walk(dir) {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
@@ -205,6 +207,14 @@ function walk(dir) {
  * text, a page's last commit date, and the tags.
  */
 function fromGit(gitArgs) {
+  const tagSet = () => new Set(git([...gitArgs, 'tag', '--list']).split('\n').filter(Boolean));
+  let tags;
+  // A link's ref as git reads it: main's branch, a tag by its full name, or anything else (a commit) as written.
+  const gitRef = (ref) => {
+    if (ref === 'main') return 'refs/heads/main';
+    tags ??= tagSet();
+    return tags.has(ref) ? `refs/tags/${ref}` : ref;
+  };
   const listTree = (ref, dir) =>
     git([...gitArgs, 'ls-tree', '-r', '--name-only', refName(ref), '--', `${dir}/`])
       .split('\n').filter(Boolean).map((p) => p.slice(dir.length + 1));
@@ -218,6 +228,27 @@ function fromGit(gitArgs) {
     readRepo: (ref, path) => git([...gitArgs, 'show', `${refName(ref)}:${path}`]),
     date: (ref, path) => git([...gitArgs, 'log', '-1', '--format=%cI', refName(ref), '--', `docs/${path}`]).trim() || null,
     tags: () => git([...gitArgs, 'tag', '--list']).split('\n').filter(Boolean),
+    /** Whether `ref` is `main`, a tag, or a commit the repository has (design D3). */
+    hasRef: (ref) => {
+      if (ref === 'main') return true;
+      try {
+        git([...gitArgs, 'rev-parse', '--verify', '--quiet', '--end-of-options', `${gitRef(ref)}^{commit}`]);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    /**
+     * Whether each `{ ref, path }` names a file or folder at its ref, in one `git cat-file --batch-check` (design D4).
+     * An empty path is the repository's root.
+     */
+    exists: (links) => {
+      if (links.length === 0) return [];
+      for (const { path } of links) refuseOddPath(path);
+      const input = links.map(({ ref, path }) => `${gitRef(ref)}:${path}`).join('\n') + '\n';
+      const out = execFileSync('git', [...gitArgs, 'cat-file', '--batch-check'], { encoding: 'utf8', input });
+      return out.split('\n').slice(0, links.length).map((line) => !line.endsWith(' missing') && !line.endsWith(' ambiguous'));
+    },
     /** Each tag's date: an annotated tag's tagger date, or a lightweight tag's commit date (spec: roadmap). */
     tagDates: () =>
       Object.fromEntries(
@@ -276,11 +307,22 @@ function local(value) {
     return walk(at).map((p) => relative(at, p).split(sep).join('/')).sort();
   };
   const readFile = (ref, path) => (ref === 'main' ? readFileSync(join(root, path), 'utf8') : tagged.readFile(ref, path));
+  // main's links are looked up in the working tree, uncommitted files included; other refs in git (design D4). .git
+  // is on disk but never in the repository. (On a case-insensitive disk a wrongly-cased path passes here; the clone,
+  // which CI builds from, is exact.)
+  const exists = (links) => {
+    for (const { path } of links) refuseOddPath(path);
+    const fromGit = tagged.exists(links.filter((l) => l.ref !== 'main'));
+    return links.map((l) =>
+      l.ref === 'main' ? l.path.split('/')[0] !== '.git' && existsSync(join(root, l.path)) : fromGit.shift(),
+    );
+  };
   return {
     kind: 'local',
     ...tagged,
     listTree,
     readFile,
+    exists,
     list: (ref) => listTree(ref, 'docs'),
     read: (ref, path) => readFile(ref, `docs/${path}`),
     date: (ref, path) => {
@@ -303,6 +345,9 @@ function local(value) {
  * @property {(ref: string, path: string) => string} read
  * @property {(ref: string, path: string) => string} readRepo
  * @property {(ref: string, path: string) => string | null} date
+ * @property {(ref: string) => boolean} hasRef whether `ref` is `main`, a tag or a commit the source has
+ * @property {(links: { ref: string, path: string }[]) => boolean[]} exists whether each path is a file or folder at its
+ *   ref; a local checkout's `main` is its working tree
  */
 
 /**
@@ -401,13 +446,15 @@ export function writeDocs(versions, outDir, manifestPath, releases = [], protoco
 }
 
 /**
- * Fetches troupe once, checks every docs version and every /protocol/ copy, and only then writes the pages, the
- * schemas (in public/protocol/) and the manifest under `root`. `open` is openSource, replaced only by the tests.
+ * Fetches troupe once, checks every docs version (main's links into troupe's repository too) and every /protocol/ copy,
+ * and only then writes the pages, the schemas (in public/protocol/) and the manifest under `root`. `open` is openSource, replaced only by the tests.
  * @param {{ env?: Record<string, string | undefined>, root: string, remote?: string, open?: typeof openSource }} options
  */
-export function sync({ env = process.env, root, remote, open = openSource }) {
+export async function sync({ env = process.env, root, remote, open = openSource }) {
   const source = open(env, { cacheDir: join(root, '.cache', 'troupe.git'), remote });
   const versions = buildVersions(source);
+  // Links into troupe's repository, on the versions read from main only: a tag can't be fixed (design D1).
+  for (const version of versions.filter((v) => v.ref === 'main')) refuse(version, await repoLinkProblems(source, version));
   const protocol = buildProtocol(source);
   const dates = source.tagDates();
   const releases = source.tags().filter((t) => releaseVersion(t)).map((tag) => ({ tag, date: dates[tag] }));

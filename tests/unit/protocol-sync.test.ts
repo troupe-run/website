@@ -30,10 +30,10 @@ const read = (root: string, path: string) => JSON.parse(readFileSync(join(root, 
 const list = (dir: string): string[] => (existsSync(dir) ? readdirSync(dir).sort() : []);
 
 describe('sync and /protocol/', () => {
-  it('writes every copy under public/protocol/, each with its own ids', () => {
+  it('writes every copy under public/protocol/, each with its own ids', async () => {
     const r = troupe();
     const root = temp();
-    sync({ env: { TROUPE_DOCS: r.path }, root });
+    await sync({ env: { TROUPE_DOCS: r.path }, root });
     expect(list(join(root, 'public', 'protocol'))).toEqual(['.troupe-protocol', '0', '0.1.0', '0.2.0', 'a.schema.json', 'next']);
     expect(read(root, 'a.schema.json')).toEqual({ $id: `${BASE}a.schema.json`, v: 2 });
     expect(read(root, '0/a.schema.json')).toEqual({ $id: `${BASE}0/a.schema.json`, v: 2 });
@@ -41,40 +41,40 @@ describe('sync and /protocol/', () => {
     expect(read(root, '0.1.0/a.schema.json')).toEqual({ $id: `${BASE}0.1.0/a.schema.json`, v: 1 });
   });
 
-  it("leaves no copy for a tag that's gone on the next run", () => {
+  it("leaves no copy for a tag that's gone on the next run", async () => {
     const r = troupe();
     const root = temp();
-    sync({ env: { TROUPE_DOCS: r.path }, root });
+    await sync({ env: { TROUPE_DOCS: r.path }, root });
     r.git('tag', '-d', 'protocol-v0.2.0');
-    sync({ env: { TROUPE_DOCS: r.path }, root });
+    await sync({ env: { TROUPE_DOCS: r.path }, root });
     expect(existsSync(join(root, 'public', 'protocol', '0.2.0'))).toBe(false);
     expect(read(root, 'a.schema.json').v).toBe(1);
   });
 
-  it("refuses to clear a public/protocol/ it didn't write, naming the folder", () => {
+  it("refuses to clear a public/protocol/ it didn't write, naming the folder", async () => {
     const r = troupe();
     const root = temp();
     mkdirSync(join(root, 'public', 'protocol'), { recursive: true });
     writeFileSync(join(root, 'public', 'protocol', 'mine.json'), '{}');
-    expect(() => sync({ env: { TROUPE_DOCS: r.path }, root })).toThrow(
+    await expect(sync({ env: { TROUPE_DOCS: r.path }, root })).rejects.toThrow(
       `${join(root, 'public', 'protocol')} holds files the docs sync didn't write, so it won't replace them`,
     );
     expect(existsSync(join(root, 'public', 'protocol', 'mine.json'))).toBe(true);
   });
 
-  it('writes nothing when a ref refuses, /docs included', () => {
+  it('writes nothing when a ref refuses, /docs included', async () => {
     const r = troupe();
     r.commit({ 'protocol/schemas/b.txt': 'x' }, '2026-04-01T00:00:00Z');
     const root = temp();
-    expect(() => sync({ env: { TROUPE_DOCS: r.path }, root })).toThrow(/troupe's main can't be built into \/protocol\/:\n.*b\.txt/s);
+    await expect(sync({ env: { TROUPE_DOCS: r.path }, root })).rejects.toThrow(/troupe's main can't be built into \/protocol\/:\n.*b\.txt/s);
     expect(existsSync(join(root, 'public', 'protocol'))).toBe(false);
     expect(existsSync(join(root, 'src', 'content', 'docs', 'docs'))).toBe(false);
   });
 
-  it("records the copies and the releases, newest first, in the manifest", () => {
+  it("records the copies and the releases, newest first, in the manifest", async () => {
     const r = troupe();
     const root = temp();
-    const manifest = sync({ env: { TROUPE_DOCS: r.path }, root });
+    const manifest = await sync({ env: { TROUPE_DOCS: r.path }, root });
     const written = JSON.parse(readFileSync(join(root, 'src', 'generated', 'troupe-docs.json'), 'utf8'));
     expect(written.protocol).toEqual(manifest.protocol);
     expect(manifest.protocol.releases).toEqual(['0.2.0', '0.1.0']);
@@ -83,12 +83,12 @@ describe('sync and /protocol/', () => {
     ]);
   });
 
-  it('opens one source for /docs and /protocol/, so a clone is fetched once per run', () => {
+  it('opens one source for /docs and /protocol/, so a clone is fetched once per run', async () => {
     const r = troupe();
     const root = temp();
     let opened = 0;
     const counting: typeof openSource = (...args) => { opened += 1; return openSource(...args); };
-    sync({ env: {}, root, remote: r.path, open: counting });
+    await sync({ env: {}, root, remote: r.path, open: counting });
     expect(opened).toBe(1);
     expect(read(root, 'next/a.schema.json').v).toBe(3);
   });
