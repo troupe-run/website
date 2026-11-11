@@ -26,12 +26,13 @@ against troupe's real `main`, which has the three broken links until then (group
       that isn't committed. See the tests pass.
 - [x] 2.2 Resolve a link's ref (design D3): `main`, a listed tag or a commit pass, and anything else is a problem that
       names the ref and says to link `main`, a tag or a commit. Test each case and see them pass.
-- [x] 2.3 Check the links of each page in versions read from `main` in `buildVersions`, through `refuse` (design D1,
-      D5). In `tests/unit/troupe-sync.test.ts`: a missing file fails naming troupe's main, the page, the link and the
-      fix; two broken links on two pages are named in one failure; a link at a tag is checked at that tag; a page
-      from a release tag with a broken link doesn't fail; a link in a code block isn't checked; and nothing is written
-      when the check fails. If 1.3 found the processor async, make `sync` async and await it in `astro.config.mjs`,
-      `scripts/troupe-docs.mjs` and the tests. See `npx vitest run` and `npm run check` pass.
+- [x] 2.3 Check the links of each page in versions read from `main` in a step of `sync` after `buildVersions`,
+      through `refuse` (design D1, D5). In `tests/unit/troupe-sync.test.ts`: a missing file fails naming troupe's
+      main, the page, the link and the fix; two broken links on two pages are named in one failure; a link at a tag
+      is checked at that tag; a page from a release tag with a broken link doesn't fail; a link in a code block isn't
+      checked; and nothing is written when the check fails. If 1.3 found the processor async, make `sync` async and
+      await it in `astro.config.mjs`, `scripts/troupe-docs.mjs` and the tests. See `npx vitest run` and
+      `npm run check` pass.
 - [x] 2.4 In `tests/fixtures/troupe-docs/4-main/docs/`, link a file the fixture has on main with a `blob/main` URL and
       a folder with a `tree/main` URL, and say why in the fixture's README. See `npm run build:fixture` pass.
 - [x] 2.5 Show the fixture check can fail: point the 2.4 link at a path the fixture doesn't have, run
