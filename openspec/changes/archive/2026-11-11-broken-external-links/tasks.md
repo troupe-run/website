@@ -19,13 +19,14 @@ against troupe's real `main`, which has the three broken links until then (group
 
 ## 2. Checking the links in the sync
 
-- [x] 2.1 Add `exists(ref, path)` to both sources in `scripts/troupe-docs-lib.mjs` (design D4), one
+- [x] 2.1 Add `exists(links)` to both sources in `scripts/troupe-docs-lib.mjs` (design D4), one
       `git cat-file --batch-check` per version for git refs and the working tree for a local `main`. Test it in
       `tests/unit/troupe-source.test.ts` with `makeRepo`: a file, a folder, a missing path, a path with `..` that
       leaves the checkout (a problem, not `false`), a tag, a commit, and a file in a local checkout's working tree
       that isn't committed. See the tests pass.
 - [x] 2.2 Resolve a link's ref (design D3): `main`, a listed tag or a commit pass, and anything else is a problem that
-      names the ref and says to link `main`, a tag or a commit. Test each case and see them pass.
+      names the ref and says to link `main`, a tag or a commit. `HEAD` and other branches are refused too (review of
+      #113). Test each case and see them pass.
 - [x] 2.3 Check the links of each page in versions read from `main` in a step of `sync` after `buildVersions`,
       through `refuse` (design D1, D5). In `tests/unit/troupe-sync.test.ts`: a missing file fails naming troupe's
       main, the page, the link and the fix; two broken links on two pages are named in one failure; a link at a tag

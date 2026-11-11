@@ -61,21 +61,26 @@ case, as GitHub does), and the third is `blob` or `tree`. The fourth segment is 
 percent-decoded, with a trailing `/` removed. The query and anchor are ignored.
 
 - **The ref is one segment.** A branch name with a `/` can't be told apart from the path, so the check doesn't try:
-  the ref must be `main`, a tag the source lists, or a commit the source has (`git rev-parse --verify <ref>^{commit}`).
-  Anything else is a problem naming the ref ("link `main`, a tag or a commit"). This follows the rule that an input
-  the check can't read is an error, not a pass.
+  the ref must be `main`, a tag the source lists, or 7 to 40 hex digits naming exactly one commit, found with
+  `git rev-parse --disambiguate`, which reads object ids only. Anything else is a problem naming the ref ("link
+  `main`, a tag or a commit"), `HEAD` and other branches included: a checkout has them and CI's clone doesn't, so a
+  link at one would pass on a writer's machine and fail in CI. A branch named like a commit id isn't taken for one.
+  This follows the rule that an input the check can't read is an error, not a pass.
 - **`blob` and `tree` are treated alike.** GitHub redirects a `blob` URL for a folder to `tree`, and the reverse, so a
   path that exists as either passes.
 - **An empty path** (`/tree/main`) is the repository's root, and passes.
 
 ### D4. Whether a path exists at a ref
 
-The source gains `exists(ref, path)`:
+The source gains `hasRef(ref)`, which applies D3's rule, and `exists(links)`, which takes a version's
+`{ ref, path }` links together and says for each whether the path is a file or folder at its ref:
 
-- **Clone, or a local checkout at a tag or commit:** `git cat-file -e <ref>:<path>`, which is true for a file or a
-  folder. The many links are checked in one `git cat-file --batch-check` per version rather than one process each.
-- **Local checkout at `main`:** the working tree, as `listTree` and `readFile` already treat it. A path that resolves
-  outside the checkout (`..` segments) is a problem, not a lookup.
+- **Clone, or a local checkout at a tag or commit:** one `git cat-file --batch-check` per version, with each ref
+  resolved by D3's rule, rather than one process per link.
+- **Local checkout at `main`:** the working tree, as `listTree` and `readFile` already treat it. `.git` is on disk but
+  never in the repository, so it doesn't count.
+- **A path with an empty, `.` or `..` part, or a control character,** is a problem, not a lookup. A link's path is
+  percent-decoded, so `%2F..` or `%0A` could otherwise reach git.
 
 ### D5. The problem's words
 
