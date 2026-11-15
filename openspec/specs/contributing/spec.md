@@ -121,7 +121,7 @@ its own nits once a push has fixed them, and SHALL name troupe-run/infrastructur
 source of the tiers.
 
 #### Scenario: A change is proposed
-- **WHEN** an agent runs `/opsx:propose` in this repository and reads the context it's given
+- **WHEN** an agent runs `/openspec-propose` in this repository and reads the context it's given
 - **THEN** the context tells it to wait for Claude's review of the last push and act on each finding by its tier
   before archiving, so the change's tasks plan that step
 
