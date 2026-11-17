@@ -30,12 +30,11 @@ SHALL list the App avatars.
 - **THEN** the check fails, naming the App, its kind and its head
 
 ### Requirement: Each App's shape and colour follow its kind
-An App's head SHALL follow its kind: the tomato rounded triangle for kind `system`, the teal rounded square for an
-agent. The one exception SHALL be the `bug` head, a teal bug-like shape, which the guide records for
-`troupe-run-test-quality`, a `system` App. Each App SHALL have two round white eyes, no outline, shadow or gradient,
-and a prop: an `--ink` line drawing on a `--sunflower` disc, ringed by the cream background. No colour other than its
-head's SHALL appear in an App's source besides white, ink, sunflower and cream. The check holds which colours appear;
-where cream is used, and whether a shape reads as its head, are judged in the owner's review.
+An App's head SHALL follow its kind (a tomato triangle for `system`, a teal square for an agent), except the
+teal `bug` head the guide records for `troupe-run-test-quality`, a `system` App. Each App SHALL have two round white
+eyes, no outline, shadow or gradient, and a prop: `--ink` lines on a `--sunflower` disc in a cream ring. A source
+SHALL use no colour but its head's, white, ink, sunflower and cream. Where cream goes, and whether a shape reads as its
+head, are judged in the owner's review.
 
 #### Scenario: A source uses a colour outside its kind
 - **WHEN** a `triangle` App's source fills a shape with teal, a `square` or `bug` App's source fills one with
