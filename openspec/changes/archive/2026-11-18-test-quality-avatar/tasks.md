@@ -32,14 +32,16 @@
 
 ## 4. The owner's visual review (spec, "The avatars read at GitHub's sizes"; design D4)
 
-- [ ] 4.1 Build a contact sheet in the scratchpad (not committed): the new avatar at 500, 40 and 20px on light and
+- [x] 4.1 Build a contact sheet in the scratchpad (not committed): the new avatar at 500, 40 and 20px on light and
   dark, beside `troupe-run-review`. Send the PNG at full size and at 40px, and the sheet, to the owner through the
   orchestrator. Redraw (repeat 3.1 and 3.2) until the owner agrees the bug head and the magnifier read at 40px.
-  Verified by the owner's reply, recorded here with its date.
+  Verified by the owner's reply, recorded here with its date. **Owner, 2026-11-18: approved the committed drawing
+  (variant B: curved antennae with round tips, bent legs) over a straight-legged one, which read as a germ, and one
+  with a separate head segment.**
 
 ## 5. Before merging
 
-- [ ] 5.1 Run `uv run scripts/check.py`, and verify it passes.
+- [x] 5.1 Run `uv run scripts/check.py`, and verify it passes.
 
 ## Workflow follow-up
 
