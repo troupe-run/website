@@ -9,14 +9,14 @@ troupe-run/infrastructure#323: ESLint, Prettier and `tsc --noEmit`, blocking, lo
 
 ## What Changes
 
-- **Three gates join the check**, after `npm ci` and before `astro check`, so a lint error fails in seconds:
-  `eslint` (lint), `prettier --check` (format) and `tsc --noEmit` (types).
+- **Three gates join the check**: `eslint` (lint) and `prettier --check` (format) right after `npm ci`, so a lint or
+  format error fails in seconds, and `tsc --noEmit` (types) right after `astro check`, whose generated types it reads.
 - **ESLint** (`eslint.config.js`): ESLint's recommended rules, typescript-eslint's recommended rules for `.ts`, and
   eslint-plugin-astro's recommended rules for `.astro`, over `src/`, `scripts/`, `tests/` and the root config files.
 - **Prettier** (`.prettierrc.json`, `.prettierignore`): the repository's existing style (single quotes, semicolons,
   120 columns), with prettier-plugin-astro for `.astro`. It covers code and styles; Markdown and MDX prose, generated
   and delivered files are left out.
-- **Existing code is brought into line**: one formatting commit from `prettier --write`, and each ESLint finding fixed,
+- **Existing code is brought into line**: one formatting-only commit from `prettier --write`, and each ESLint finding fixed,
   or turned off in `eslint.config.js` with the reason beside it (the recorded baseline #323 allows).
 - New dev dependencies, pinned exactly at versions at least a week old (the org's Dependabot cooldown): `eslint`,
   `@eslint/js`, `typescript-eslint`, `eslint-plugin-astro`, `globals`, `prettier`, `prettier-plugin-astro`.

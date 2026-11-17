@@ -35,13 +35,15 @@ off carries its reason beside it; that's the baseline #323 allows.
 
 ### D3. Prettier keeps the existing style, over code and styles only
 
-`.prettierrc.json`: `singleQuote`, `semi`, `printWidth: 120`, prettier-plugin-astro. `.prettierignore`: Markdown and
-MDX, generated and synced content (`src/content/docs/docs/`, `src/generated/`, `public/protocol/`), the lockfile,
-`dist*`, and the guard's delivered files (`.github/workflows/guard.yml`, `claude-review.yml`, `dependabot-dispatch.yml`,
-`.claude/settings.json`), which are written in infrastructure and would be reformatted on every delivery. Also the brand images' render inputs
-(`brand/`, `scripts/assets.config.mjs`): the asset check records their hashes against the committed images, so a
-reformat would read as a change needing a re-render (found when the first reformat failed that check). The first
-`prettier --write` lands as its own commit, with nothing else in it, so the reformat is easy to review.
+`.prettierrc.json`: `singleQuote`, `semi`, `printWidth: 120`, prettier-plugin-astro. Prettier's scope is set by the
+`format:check` script's glob, which names only code and styles (`ts`, `mts`, `mjs`, `js`, `astro`, `css`), so Markdown,
+MDX, the lockfile and the guard's delivered workflows and settings are never read. `.prettierignore`, whose header
+says why, then leaves out what the glob would otherwise reach: build output, generated and synced content
+(`src/content/docs/docs/`, `src/generated/`, `public/`), and the brand images' render inputs (`brand/`,
+`scripts/assets.config.mjs`), whose hashes the asset check records against the committed images, so a reformat would
+read as a change needing a re-render (found when the first reformat failed that check). The first
+`prettier --write` lands as its own commit, with only `.prettierignore` and this change's own files beside it, so the
+reformat is easy to review.
 
 *Alternative:* Prettier's defaults (80 columns, double quotes): rejected, it would rewrite nearly every line.
 
@@ -64,7 +66,7 @@ and their own dependencies change.
 ESLint found five problems. Two are fixed: a rethrown error now carries its `cause`, and a test's `any` became the
 shape it reads. Three are exempted on the line, with the reason beside them: `document` in code Playwright runs in the
 page, a regular expression that matches control characters because refusing them is its job, and the triple-slash
-reference in `src/env.d.ts`, since an ambient declaration file has no import to use. Prettier reformats 109 files.
+reference in `src/env.d.ts`, since an ambient declaration file has no import to use. Prettier reformats 107 files.
 
 ## Risks / Trade-offs
 
