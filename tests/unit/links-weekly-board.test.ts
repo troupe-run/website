@@ -11,7 +11,8 @@ type Job = {
   needs?: string | string[]; if?: string; environment?: unknown; permissions?: unknown;
   outputs?: Record<string, string>; steps?: Step[];
 };
-type Workflow = { on: Record<string, any>; permissions?: unknown; jobs: Record<string, Job> };
+type Trigger = { inputs: Record<string, unknown> };
+type Workflow = { on: Record<string, Trigger>; permissions?: unknown; jobs: Record<string, Job> };
 
 const workflow: Workflow = parse(readFileSync('.github/workflows/links-weekly.yml', 'utf8'));
 const { links, board } = workflow.jobs;

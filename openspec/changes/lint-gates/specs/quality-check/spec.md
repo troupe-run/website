@@ -2,7 +2,7 @@
 
 ### Requirement: The check runs CI's gates in CI's order
 `uv run scripts/check.py` SHALL run, in this order: its own tests, install dependencies from the lockfile, ESLint,
-Prettier's format check, `tsc --noEmit`, install Playwright's Chromium, `astro check`, the unit tests, the build, the
+Prettier's format check, install Playwright's Chromium, `astro check`, `tsc --noEmit`, the unit tests, the build, the
 fixture build, the rebuild test, the brand-asset verification, the internal link check of both builds, and the
 end-to-end tests of both builds. It SHALL need only uv, Node, npm and git, and no Python package beyond the standard
 library.

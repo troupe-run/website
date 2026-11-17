@@ -13,6 +13,7 @@ try {
     const page = await browser.newPage({ viewport: { width: a.width, height: a.height }, deviceScaleFactor: 1 });
     const url = pathToFileURL(resolve(root, 'brand/templates', a.template)).href + (a.query ? `?${a.query}` : '');
     await page.goto(url);
+    // eslint-disable-next-line no-undef -- runs in the page, where `document` exists.
     await page.evaluate(() => document.fonts.ready);
     mkdirSync(dirname(resolve(root, a.out)), { recursive: true });
     await page.screenshot({ path: resolve(root, a.out), omitBackground: !!a.transparent });

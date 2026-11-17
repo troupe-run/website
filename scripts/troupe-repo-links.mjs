@@ -38,6 +38,7 @@ export function repoLink(url) {
  * characters (design D4). A link's path comes from a URL, so `%2e%2e` or `%0A` can reach here after decoding.
  */
 export function refuseOddPath(path) {
+  // eslint-disable-next-line no-control-regex -- matching control characters is the point: they are refused.
   if (/[\x00-\x1f\x7f]/.test(path)) {
     throw new TroupeDocsError(`${JSON.stringify(path)} isn't a path in troupe's repository: it has a control character`);
   }

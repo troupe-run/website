@@ -1,0 +1,14 @@
+# Prettier formats the site's code and styles: scripts/check.py names the extensions it checks
+# (spec: quality-check; lint-gates design D3). Prose (Markdown, MDX) keeps the brand guide's own
+# wrapping, and nothing below is source written here.
+dist/
+dist-fixture/
+.astro/
+node_modules/
+test-results/
+playwright-report/
+public/
+src/generated/
+src/content/docs/docs/
+.cache/
+package-lock.json
