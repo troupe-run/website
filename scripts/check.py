@@ -48,8 +48,14 @@ def gates(env: Mapping[str, str] = os.environ) -> list[tuple[str, list[str]]]:
     return [
         ("check.py tests", [sys.executable, "-m", "unittest", "discover", "-s", "scripts/tests"]),
         ("npm ci", [npm, "ci"]),
+        # ESLint and Prettier need only what npm ci installed, so they fail fast, before Chromium's
+        # download (spec: quality-check; lint-gates design D1).
+        ("eslint", [npm, "run", "lint"]),
+        ("prettier", [npm, "run", "format:check"]),
         ("playwright chromium", chromium),
         ("astro check", [npm, "run", "check"]),
+        # tsc reads the types astro check generates (.astro/), so it runs after it (design D1, D4).
+        ("tsc", [npm, "run", "typecheck"]),
         ("unit tests", [npm, "run", "test:unit"]),
         ("build", [npm, "run", "build"]),
         # The site again, against a throwaway troupe with releases, so the versions are tested before troupe has

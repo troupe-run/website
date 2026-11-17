@@ -23,9 +23,8 @@ types); formatting Markdown or MDX (the docs and blog prose follow the brand gui
 ESLint and Prettier need only `node_modules` and take seconds, so they go before Playwright's download and `astro
 check`: a lint or format error fails fast. `tsc` needs the types Astro generates (`.astro/types.d.ts`, the content
 collections), which `astro check` writes, so it runs right after it (a trial on 2026-11-18 found 17 errors from
-missing generated types before, none after). Each runs through `npx --no-install`, so nothing is fetched that the
-lockfile doesn't hold, and each is an npm script (`lint`, `format:check`, `typecheck`), so a contributor can run one
-alone.
+missing generated types before, none after). Each is an npm script (`lint`, `format:check`, `typecheck`), run with `npm run` like the check's
+other gates, so it runs only what `npm ci` installed from the lockfile, and a contributor can run one alone.
 
 ### D2. ESLint: the recommended presets, flat config
 
