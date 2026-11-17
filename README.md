@@ -34,10 +34,10 @@ Brand: `docs/brand-guide.md`.
   - To preview a milestone edit, or to work offline, set `TROUPE_MILESTONES` to your infrastructure checkout:
     `TROUPE_MILESTONES=../infrastructure npm run dev`. Its working tree is read, uncommitted edits included.
 - `uv run scripts/check.py` runs every check CI runs, in the same order: `npm ci`, ESLint, Prettier's format check,
-  Playwright's browser, `astro check`, `tsc --noEmit`, the unit tests, the build, the fixture build, the rebuild test, the brand-asset check, the internal
-  link check of both builds (with the check of every reference in `/protocol/`'s schemas) and the end-to-end tests.
-  It stops at the first failure and says which one. `npm ci` reinstalls `node_modules`, so a dev server that's
-  running at the time may need a restart.
+  Playwright's browser, `astro check`, `tsc --noEmit`, the unit tests, the build, the fixture build, the rebuild test,
+  the brand-asset check, the internal link check of both builds (with the check of every reference in `/protocol/`'s
+  schemas) and the end-to-end tests. It stops at the first failure and says which one. `npm ci` reinstalls
+  `node_modules`, so a dev server that's running at the time may need a restart.
 - The fixture build (`npm run build:fixture`) builds the site into `dist-fixture/` against a throwaway troupe with
   releases, made from `tests/fixtures/troupe-docs/`, so `/docs/next/`, earlier versions, the version menu and every
   `/protocol/` copy are tested before troupe has a release. It's never published.
