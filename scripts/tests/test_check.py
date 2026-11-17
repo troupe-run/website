@@ -23,8 +23,11 @@ import check  # noqa: E402
 LABELS = [
     "check.py tests",
     "npm ci",
+    "eslint",
+    "prettier",
     "playwright chromium",
     "astro check",
+    "tsc",
     "unit tests",
     "build",
     "fixture build",
@@ -68,6 +71,11 @@ class Gates(unittest.TestCase):
         self.assertEqual(commands["npm ci"], [npm, "ci"])
         self.assertEqual(commands["playwright chromium"], [npx, "playwright", "install", "chromium"])
         self.assertEqual(commands["astro check"], [npm, "run", "check"])
+        # The lint gates (spec: quality-check; lint-gates design D1): npm scripts, which run only
+        # what npm ci installed.
+        self.assertEqual(commands["eslint"], [npm, "run", "lint"])
+        self.assertEqual(commands["prettier"], [npm, "run", "format:check"])
+        self.assertEqual(commands["tsc"], [npm, "run", "typecheck"])
         self.assertEqual(commands["unit tests"], [npm, "run", "test:unit"])
         self.assertEqual(commands["build"], [npm, "run", "build"])
         self.assertEqual(commands["assets verify"], [npm, "run", "assets:verify"])

@@ -18,12 +18,12 @@ Load rule: check `uptime` before `npm ci` or the full check; start only under a 
 
 ## 3. The gates
 
-- [ ] 3.1 Tests first in `scripts/tests/`: `gates()` lists `eslint` and `prettier` right after `npm ci` and `tsc`
-      right after `astro check`, each through `npx --no-install`. Verify they fail on the base code, then add the gates to `scripts/check.py`
-- [ ] 3.2 Verify each spec scenario by hand: an unused variable fails `eslint`, a double-quoted `.ts` fails
+- [x] 3.1 Tests first in `scripts/tests/`: `gates()` lists `eslint` and `prettier` right after `npm ci` and `tsc`
+      right after `astro check`, each as `npm run <script>`. Verify they fail on the base code, then add the gates to `scripts/check.py`
+- [x] 3.2 Verify each spec scenario by hand: an unused variable fails `eslint`, a double-quoted `.ts` fails
       `prettier`, a string assigned to a number fails `tsc`; revert each
-- [ ] 3.3 The full check passes (`uv run scripts/check.py`), under the load rule
-- [ ] 3.4 README's contributing notes name the three scripts
+- [x] 3.3 The full check passes (`uv run scripts/check.py`), under the load rule: run by this commit's hook
+- [x] 3.4 README's contributing notes name the three scripts
 
 ## Workflow follow-up
 
