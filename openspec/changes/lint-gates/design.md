@@ -22,7 +22,7 @@ types); formatting Markdown or MDX (the docs and blog prose follow the brand gui
 
 ESLint and Prettier need only `node_modules` and take seconds, so they go before Playwright's download and `astro
 check`: a lint or format error fails fast. `tsc` needs the types Astro generates (`.astro/types.d.ts`, the content
-collections), which `astro check` writes, so it runs right after it (a trial on 2026-11-18 found 17 errors from
+collections), which `astro check` writes, so it runs right after it (a trial on 2026-11-18, local time, found 17 errors from
 missing generated types before, none after). Each is an npm script (`lint`, `format:check`, `typecheck`), run with `npm run` like the check's
 other gates, so it runs only what `npm ci` installed from the lockfile, and a contributor can run one alone.
 
@@ -30,7 +30,7 @@ other gates, so it runs only what `npm ci` installed from the lockfile, and a co
 
 `eslint.config.js`: `@eslint/js` recommended, `typescript-eslint`'s `recommended` (not type-checked, D-non-goal),
 eslint-plugin-astro's `recommended`, and `globals` for Node in `scripts/` and the configs and for the browser in
-`src/scripts/`. Ignores what `.gitignore` ignores plus `public/`, `brand/` output and `src/generated/`. A rule turned
+`src/scripts/`. Ignores what `.gitignore` ignores plus `public/`, `src/generated/` and the synced docs (`src/content/docs/docs/`). A rule turned
 off carries its reason beside it; that's the baseline #323 allows.
 
 ### D3. Prettier keeps the existing style, over code and styles only
@@ -61,7 +61,7 @@ components themselves; tsc catches errors in `.ts` files with the compiler's own
 Dependabot cooldown. Added with `npm install -D -E` after `npm ci`, and the lockfile checked by package so only these
 and their own dependencies change.
 
-### D6. Today's findings: fixed, or exempted on the line with the reason (trial, 2026-11-18)
+### D6. Today's findings: fixed, or exempted on the line with the reason (trial, 2026-11-18, local time)
 
 ESLint found five problems. Two are fixed: a rethrown error now carries its `cause`, and a test's `any` became the
 shape it reads. Three are exempted on the line, with the reason beside them: `document` in code Playwright runs in the
