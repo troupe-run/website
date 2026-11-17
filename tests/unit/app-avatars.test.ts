@@ -5,13 +5,13 @@ import { readAppTable, checkSource, checkAppSet } from '../../scripts/app-avatar
 import { APPS, ASSETS } from '../../scripts/assets.config.mjs';
 
 // Each GitHub App that acts for troupe-run has an avatar (troupe-run/website#81, spec: app-avatars). The brand guide's
-// §5 table is the list of Apps and says each one's kind; this holds the sources in brand/apps/ and the render config to
-// it, and each source to its kind's colours. Whether a prop reads at 20 and 40px can't be tested: the owner judges it
+// §5 table is the list of Apps and says each one's kind and head; this holds the sources in brand/apps/ and the render
+// config to it, and each source to its head's colours. Whether a prop reads at 20 and 40px can't be tested: the owner judges it
 // by eye (tasks.md, group 4).
 const GUIDE = readFileSync('docs/brand-guide.md', 'utf8');
 
 const guide = (rows: string) =>
-  `## 5. Characters\n\n### GitHub Apps\n\n| App | Kind | Prop |\n|---|---|---|\n${rows}\n\n## 6. The theatre metaphor\n`;
+  `## 5. Characters\n\n### GitHub Apps\n\n| App | Kind | Head | Prop |\n|---|---|---|---|\n${rows}\n\n## 6. The theatre metaphor\n`;
 const svg = (body: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\n${body}\n</svg>\n`;
 const TRIANGLE =
   '<path d="M50 20 L80 72 L20 72 Z" fill="#FF5A3C" stroke="#FF5A3C" stroke-width="10" stroke-linejoin="round"/>';
@@ -19,18 +19,46 @@ const EYES = '<circle cx="42" cy="56" r="4" fill="#FFFFFF"/><circle cx="58" cy="
 const SQUARE = '<rect x="20" y="20" width="56" height="56" rx="15.7" fill="#14857D"/>';
 
 describe("the brand guide's App table", () => {
-  it('reads each row as the App, its kind and its prop', () => {
+  it('reads each row as the App, its kind, its head and its prop', () => {
     expect(
-      readAppTable(guide('| `troupe-run-docs` | system | a book |\n| `troupe-run-review` | agent | a tick |')),
+      readAppTable(
+        guide(
+          '| `troupe-run-docs` | system | triangle | a book |\n' +
+            '| `troupe-run-review` | agent | square | a tick |\n' +
+            '| `troupe-run-test-quality` | system | bug | a magnifier |',
+        ),
+      ),
     ).toEqual([
-      { app: 'troupe-run-docs', kind: 'system', prop: 'a book' },
-      { app: 'troupe-run-review', kind: 'agent', prop: 'a tick' },
+      { app: 'troupe-run-docs', kind: 'system', head: 'triangle', prop: 'a book' },
+      { app: 'troupe-run-review', kind: 'agent', head: 'square', prop: 'a tick' },
+      { app: 'troupe-run-test-quality', kind: 'system', head: 'bug', prop: 'a magnifier' },
     ]);
   });
 
   it('refuses a kind other than system or agent, naming the App and the kind', () => {
-    expect(() => readAppTable(guide('| `troupe-run-docs` | crew | a book |'))).toThrow(
+    expect(() => readAppTable(guide('| `troupe-run-docs` | crew | triangle | a book |'))).toThrow(
       'docs/brand-guide.md §5 "GitHub Apps": troupe-run-docs has kind "crew"; the kind is system or agent',
+    );
+  });
+
+  it('refuses a head the check does not know, naming the App, the head and the heads it knows', () => {
+    expect(() => readAppTable(guide('| `troupe-run-docs` | system | circle | a book |'))).toThrow(
+      'docs/brand-guide.md §5 "GitHub Apps": troupe-run-docs has head "circle"; the head is triangle, square or bug',
+    );
+  });
+
+  it('refuses the square on a system App, naming the App, its kind and its head', () => {
+    expect(() => readAppTable(guide('| `troupe-run-docs` | system | square | a book |'))).toThrow(
+      'docs/brand-guide.md §5 "GitHub Apps": troupe-run-docs is kind system with head "square", which is only for agent',
+    );
+  });
+
+  it('refuses the triangle and the bug on an agent App, naming the App, its kind and its head', () => {
+    expect(() => readAppTable(guide('| `troupe-run-review` | agent | triangle | a tick |'))).toThrow(
+      'docs/brand-guide.md §5 "GitHub Apps": troupe-run-review is kind agent with head "triangle", which is only for system',
+    );
+    expect(() => readAppTable(guide('| `troupe-run-review` | agent | bug | a tick |'))).toThrow(
+      'docs/brand-guide.md §5 "GitHub Apps": troupe-run-review is kind agent with head "bug", which is only for system',
     );
   });
 
@@ -40,9 +68,9 @@ describe("the brand guide's App table", () => {
     );
   });
 
-  it('refuses a table whose columns are not App, Kind and Prop', () => {
-    expect(() => readAppTable(guide('').replace('| App | Kind | Prop |', '| App | Prop |'))).toThrow(
-      'docs/brand-guide.md §5 "GitHub Apps": the table\'s columns are App | Prop, expected App | Kind | Prop',
+  it('refuses a table whose columns are not App, Kind, Head and Prop', () => {
+    expect(() => readAppTable(guide('').replace('| App | Kind | Head | Prop |', '| App | Kind | Prop |'))).toThrow(
+      'docs/brand-guide.md §5 "GitHub Apps": the table\'s columns are App | Kind | Prop, expected App | Kind | Head | Prop',
     );
   });
 });
@@ -74,60 +102,76 @@ describe('every App in the guide has a source and an avatar, and nothing else do
   });
 });
 
-describe("each App's source uses only its kind's colours", () => {
+describe("each App's source uses only its head's colours", () => {
   const name = 'brand/apps/troupe-run-docs.svg';
 
-  it('passes a system triangle with white eyes and an ink and sunflower prop', () => {
+  it('passes a triangle with white eyes and an ink and sunflower prop', () => {
     const prop =
       '<rect x="60" y="60" width="30" height="24" rx="3" fill="#1D1B2F"/><rect x="64" y="64" width="22" height="4" fill="#FFC93C"/>';
-    expect(checkSource(name, 'system', svg(TRIANGLE + EYES + prop))).toEqual([]);
+    expect(checkSource(name, 'triangle', svg(TRIANGLE + EYES + prop))).toEqual([]);
   });
 
-  it('passes an agent square, and a line drawn as a stroke with no fill', () => {
+  it('passes a square, and a line drawn as a stroke with no fill', () => {
     const tick =
       '<path d="M60 70 L68 78 L84 60" fill="none" stroke="#1D1B2F" stroke-width="6" stroke-linecap="round"/>';
-    expect(checkSource(name, 'agent', svg(SQUARE + EYES + tick))).toEqual([]);
+    expect(checkSource(name, 'square', svg(SQUARE + EYES + tick))).toEqual([]);
   });
 
   it('passes a badge: a sunflower disc in a cream ring, with an ink line prop', () => {
     const badge =
       '<circle cx="69" cy="69" r="27" fill="#FFF8EE"/><circle cx="69" cy="69" r="23" fill="#FFC93C"/>' +
       '<path d="M60 70 L68 78 L80 62" fill="none" stroke="#1D1B2F" stroke-width="3.6" stroke-linecap="round"/>';
-    expect(checkSource(name, 'system', svg(TRIANGLE + EYES + badge))).toEqual([]);
+    expect(checkSource(name, 'triangle', svg(TRIANGLE + EYES + badge))).toEqual([]);
   });
 
-  it('names teal in a system source', () => {
+  it('names teal in a triangle source', () => {
     expect(
-      checkSource(name, 'system', svg(TRIANGLE + EYES + '<circle cx="80" cy="80" r="8" fill="#14857D"/>')),
+      checkSource(name, 'triangle', svg(TRIANGLE + EYES + '<circle cx="80" cy="80" r="8" fill="#14857D"/>')),
     ).toEqual([
-      `${name} uses #14857D, which isn't in a system App's colours (#FF5A3C, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
+      `${name} uses #14857D, which isn't in a triangle App's colours (#FF5A3C, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
     ]);
   });
 
-  it('names tomato in an agent source', () => {
-    expect(checkSource(name, 'agent', svg(SQUARE + EYES + '<circle cx="80" cy="80" r="8" fill="#ff5a3c"/>'))).toEqual([
-      `${name} uses #FF5A3C, which isn't in an agent App's colours (#14857D, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
+  it('names tomato in a square source', () => {
+    expect(checkSource(name, 'square', svg(SQUARE + EYES + '<circle cx="80" cy="80" r="8" fill="#ff5a3c"/>'))).toEqual([
+      `${name} uses #FF5A3C, which isn't in a square App's colours (#14857D, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
+    ]);
+  });
+
+  it('passes a teal bug with white eyes, teal legs as strokes, and an ink prop on the badge', () => {
+    const body =
+      '<ellipse cx="40" cy="42" rx="24" ry="26" fill="#14857D"/>' +
+      '<path d="M30 18 L24 8" fill="none" stroke="#14857D" stroke-width="4" stroke-linecap="round"/>' +
+      EYES +
+      '<circle cx="69" cy="69" r="27" fill="#FFF8EE"/><circle cx="69" cy="69" r="23" fill="#FFC93C"/>' +
+      '<circle cx="66" cy="66" r="6" fill="none" stroke="#1D1B2F" stroke-width="3.6"/>';
+    expect(checkSource(name, 'bug', svg(body))).toEqual([]);
+  });
+
+  it('names tomato in a bug source', () => {
+    expect(checkSource(name, 'bug', svg('<ellipse cx="40" cy="42" rx="24" ry="26" fill="#FF5A3C"/>' + EYES))).toEqual([
+      `${name} uses #FF5A3C, which isn't in a bug App's colours (#14857D, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
     ]);
   });
 
   it('names a colour outside every palette', () => {
     expect(
-      checkSource(name, 'system', svg(TRIANGLE + EYES + '<circle cx="80" cy="80" r="8" fill="#000000"/>')),
+      checkSource(name, 'triangle', svg(TRIANGLE + EYES + '<circle cx="80" cy="80" r="8" fill="#000000"/>')),
     ).toEqual([
-      `${name} uses #000000, which isn't in a system App's colours (#FF5A3C, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
+      `${name} uses #000000, which isn't in a triangle App's colours (#FF5A3C, #FFFFFF, #1D1B2F, #FFC93C, #FFF8EE)`,
     ]);
   });
 
   it('names a gradient', () => {
     const grad = '<defs><linearGradient id="g"><stop offset="0" stop-color="#FFFFFF"/></linearGradient></defs>';
-    expect(checkSource(name, 'system', svg(grad + TRIANGLE + EYES))).toEqual([
+    expect(checkSource(name, 'triangle', svg(grad + TRIANGLE + EYES))).toEqual([
       `${name} has a <linearGradient>: an App avatar is flat, with no gradient, filter, mask or opacity`,
     ]);
   });
 
   it('names a filter and an opacity', () => {
     const body = '<filter id="f"/>' + TRIANGLE + '<circle cx="42" cy="56" r="4" fill="#FFFFFF" opacity="0.5"/>';
-    expect(checkSource(name, 'system', svg(body))).toEqual([
+    expect(checkSource(name, 'triangle', svg(body))).toEqual([
       `${name} has a <filter>: an App avatar is flat, with no gradient, filter, mask or opacity`,
       `${name} has opacity="0.5": an App avatar is flat, with no gradient, filter, mask or opacity`,
     ]);
@@ -135,13 +179,13 @@ describe("each App's source uses only its kind's colours", () => {
 
   it('names a stroke that differs from its own fill, which would be an outline', () => {
     const outlined = '<circle cx="80" cy="80" r="8" fill="#FFC93C" stroke="#1D1B2F" stroke-width="2"/>';
-    expect(checkSource(name, 'system', svg(TRIANGLE + EYES + outlined))).toEqual([
+    expect(checkSource(name, 'triangle', svg(TRIANGLE + EYES + outlined))).toEqual([
       `${name} has a <circle> with stroke #1D1B2F on fill #FFC93C, an outline: give the stroke its fill's colour, or fill="none" for a line`,
     ]);
   });
 
   it('names a shape with no fill of its own, which SVG would draw black', () => {
-    expect(checkSource(name, 'system', svg(TRIANGLE + EYES + '<circle cx="80" cy="80" r="8"/>'))).toEqual([
+    expect(checkSource(name, 'triangle', svg(TRIANGLE + EYES + '<circle cx="80" cy="80" r="8"/>'))).toEqual([
       `${name} has a <circle> with no fill, which draws black: give every shape its own fill`,
     ]);
   });
@@ -152,7 +196,7 @@ describe("each App's source uses only its kind's colours", () => {
       '<circle cx="42" cy="56" r="4" fill="rgb(255,255,255)"/>' +
       '<circle cx="58" cy="56" r="4" fill="white"/>' +
       '<rect x="70" y="70" width="8" height="8" fill="#1D1B2F" style="fill:#000"/>';
-    expect(checkSource(name, 'system', svg(body))).toEqual([
+    expect(checkSource(name, 'triangle', svg(body))).toEqual([
       `${name} gives a colour as fill="rgb(255,255,255)", which the check can't read: use a six-digit hex`,
       `${name} gives a colour as fill="white", which the check can't read: use a six-digit hex`,
       `${name} has a style attribute (style="fill:#000"), which the check can't read: use fill and stroke attributes`,
@@ -168,7 +212,7 @@ describe('the real guide, sources and render config', () => {
         .map((f) => f.slice(0, -4))
     : [];
 
-  it("the guide's §5 lists troupe-run's seven Apps, and not dco", () => {
+  it("the guide's §5 lists troupe-run's eight Apps, and not dco", () => {
     expect(rows.map((r) => r.app).sort()).toEqual([
       'troupe-run-board',
       'troupe-run-dependabot',
@@ -177,6 +221,7 @@ describe('the real guide, sources and render config', () => {
       'troupe-run-infrastructure',
       'troupe-run-release',
       'troupe-run-review',
+      'troupe-run-test-quality',
     ]);
   });
 
@@ -184,12 +229,21 @@ describe('the real guide, sources and render config', () => {
     expect(checkAppSet({ guide: rows.map((r) => r.app), sources, apps: APPS })).toEqual([]);
   });
 
-  it("each App's source uses only its kind's colours", () => {
+  it("the guide gives troupe-run-test-quality the bug head as a system App, and every other App its kind's head", () => {
+    expect(rows.find((r) => r.app === 'troupe-run-test-quality')).toMatchObject({ kind: 'system', head: 'bug' });
+    expect(
+      rows
+        .filter((r) => r.app !== 'troupe-run-test-quality')
+        .map((r) => [r.app, r.head === (r.kind === 'agent' ? 'square' : 'triangle')]),
+    ).toEqual(rows.filter((r) => r.app !== 'troupe-run-test-quality').map((r) => [r.app, true]));
+  });
+
+  it("each App's source uses only its head's colours", () => {
     expect(
       rows
         .filter((r) => sources.includes(r.app))
         .flatMap((r) =>
-          checkSource(`brand/apps/${r.app}.svg`, r.kind, readFileSync(`brand/apps/${r.app}.svg`, 'utf8')),
+          checkSource(`brand/apps/${r.app}.svg`, r.head, readFileSync(`brand/apps/${r.app}.svg`, 'utf8')),
         ),
     ).toEqual([]);
   });

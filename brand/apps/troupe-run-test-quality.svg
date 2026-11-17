@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- troupe-run-test-quality: a teal bug, the one exception to the shape rule, holding a magnifying glass on a badge (brand guide §5, "GitHub Apps") -->
+  <path d="M31 20 C28 13 24 10 19 9 M45 20 C48 13 52 10 57 9" fill="none" stroke="#14857D" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="18" cy="9" r="3.6" fill="#14857D"/>
+  <circle cx="58" cy="9" r="3.6" fill="#14857D"/>
+  <path d="M18 36 L10 32 L6 25 M16 47 L6 47 L2 52 M19 58 L11 62 L8 69 M58 36 L66 32 L70 25" fill="none" stroke="#14857D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="38" cy="44" rx="22" ry="24" fill="#14857D"/>
+  <circle cx="29" cy="38" r="4.4" fill="#FFFFFF"/>
+  <circle cx="47" cy="38" r="4.4" fill="#FFFFFF"/>
+  <circle cx="69" cy="69" r="27" fill="#FFF8EE"/>
+  <circle cx="69" cy="69" r="23" fill="#FFC93C"/>
+  <g transform="translate(54 54) scale(1.25)" stroke="#1D1B2F" stroke-width="2.88" stroke-linecap="round" stroke-linejoin="round">
+    <circle fill="none" cx="10" cy="10" r="5.5"/>
+    <path fill="none" d="M14 14 L19.5 19.5"/>
+  </g>
+</svg>

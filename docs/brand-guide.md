@@ -171,6 +171,11 @@ recognisably ours and shows which job it does (decided with the owner on 2026-11
 - **The shape follows what the App is.**
   - An App that runs a fixed workflow is troupe acting by itself, the `system` actor kind: the tomato triangle.
   - An App that is an AI acting as an agent is an agent: the teal square.
+  - **One exception: `troupe-run-test-quality` is a teal bug** (owner, 2026-11-18, troupe-run/website#128). It runs a
+    fixed workflow, so it's `system`, but the bug says what it hunts for: the modules its mutation testing finds
+    under-tested. It's the only teal head that isn't an agent, and its shape isn't the agent's square, so teal on a
+    square still means an agent everywhere else. The table's Head column records it, and the check holds every other
+    App to its kind's head.
 - **An avatar is a head and a prop on a badge**, on cream, with two round white eyes and no reflection. The head
   sits top left. The prop is a simple `--ink` line drawing on a `--sunflower` disc, set off from the head by a ring of
   the cream background, over the head's lower right. Sunflower alone disappears on cream and on tomato, and ink on
@@ -184,15 +189,16 @@ recognisably ours and shows which job it does (decided with the owner on 2026-11
 - The list follows troupe-run/infrastructure's `oob/app-installations.json`. `dco` is a third-party App and keeps its
   own icon.
 
-| App | Kind | Prop |
-|---|---|---|
-| `troupe-run-release` | system | a rosette |
-| `troupe-run-review` | agent | a checklist |
-| `troupe-run-dependabot` | system | a pull request to an issue |
-| `troupe-run-infrastructure` | system | layers |
-| `troupe-run-docs` | system | an open book |
-| `troupe-run-dispatch` | system | forward chevrons |
-| `troupe-run-board` | system | a board with three columns |
+| App | Kind | Head | Prop |
+|---|---|---|---|
+| `troupe-run-release` | system | triangle | a rosette |
+| `troupe-run-review` | agent | square | a checklist |
+| `troupe-run-dependabot` | system | triangle | a pull request to an issue |
+| `troupe-run-infrastructure` | system | triangle | layers |
+| `troupe-run-docs` | system | triangle | an open book |
+| `troupe-run-dispatch` | system | triangle | forward chevrons |
+| `troupe-run-board` | system | triangle | a board with three columns |
+| `troupe-run-test-quality` | system | bug | a magnifying glass |
 
 ## 6. The theatre metaphor
 
