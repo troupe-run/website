@@ -20,10 +20,11 @@ describe('summarise', () => {
   });
 
   it('returns the 404 and the unreachable host as broken, and not the working link', () => {
-    expect(summarise(broken).broken.map((l: { url: string }) => l.url).sort()).toEqual([
-      'https://no-such-host.invalid/',
-      'https://troupe.run/definitely-not-here-404',
-    ]);
+    expect(
+      summarise(broken)
+        .broken.map((l: { url: string }) => l.url)
+        .sort(),
+    ).toEqual(['https://no-such-host.invalid/', 'https://troupe.run/definitely-not-here-404']);
   });
 
   // Hand-written: linkinator 8 omits skipped links from its JSON, so no real run has produced this entry. It guards

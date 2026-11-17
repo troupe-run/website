@@ -7,7 +7,13 @@ import { parse } from 'yaml';
 // (troupe-run/infrastructure#110), which can only dispatch it.
 const TEXT = readFileSync('.github/workflows/deploy.yml', 'utf8');
 type Step = { uses?: string; run?: string; with?: Record<string, unknown> };
-type Job = { if?: string; needs?: string; concurrency?: { group: string; 'cancel-in-progress': boolean }; environment?: { name: string }; steps?: Step[] };
+type Job = {
+  if?: string;
+  needs?: string;
+  concurrency?: { group: string; 'cancel-in-progress': boolean };
+  environment?: { name: string };
+  steps?: Step[];
+};
 const workflow = parse(TEXT) as { on: Record<string, unknown>; jobs: Record<string, Job> };
 const { build, deploy } = workflow.jobs;
 

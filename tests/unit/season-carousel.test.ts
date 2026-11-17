@@ -7,7 +7,14 @@ afterEach(() => vi.useRealTimers());
 const make = (extra: { startPaused?: boolean } = {}) => {
   const shown: number[] = [];
   const causes: string[] = [];
-  const c = createSeasonCarousel({ count: 4, onChange: (i, cause) => { shown.push(i); causes.push(cause); }, ...extra });
+  const c = createSeasonCarousel({
+    count: 4,
+    onChange: (i, cause) => {
+      shown.push(i);
+      causes.push(cause);
+    },
+    ...extra,
+  });
   return { c, shown, causes };
 };
 

@@ -11,7 +11,7 @@ const COPY = {
   latest: '{version} (latest), at {path}',
   release: '{version}, at {path}',
 };
-const MARKER = '<!-- protocol:releases (from troupe\'s protocol-v* tags) -->';
+const MARKER = "<!-- protocol:releases (from troupe's protocol-v* tags) -->";
 const PAGE_TEXT = `## Releases\n\n${MARKER}\n\n## What each schema defines\n\nText.\n`;
 
 async function render(releases: string[], markdown = PAGE_TEXT, file = PAGE) {
@@ -24,7 +24,7 @@ describe('protocol plugin', () => {
   it('says there is no release yet, with the paths and main as code, leaving no marker', async () => {
     const html = await render([]);
     expect(html).toContain(
-      "<p>No protocol release yet. Until there is one, <code>/protocol/</code> and <code>/protocol/0/</code> serve troupe’s unreleased <code>main</code>.</p>",
+      '<p>No protocol release yet. Until there is one, <code>/protocol/</code> and <code>/protocol/0/</code> serve troupe’s unreleased <code>main</code>.</p>',
     );
     expect(html).not.toContain('protocol:releases');
     expect(html).not.toContain('<ul');
@@ -47,7 +47,9 @@ describe('protocol plugin', () => {
     await expect(render([], '## Releases\n')).rejects.toThrow(
       'src/content/docs/protocol.md has no protocol:releases marker: put `<!-- protocol:releases -->` on its own line where it goes',
     );
-    await expect(render([], `${MARKER}\n\n${MARKER}\n`)).rejects.toThrow('src/content/docs/protocol.md has 2 protocol:releases markers: keep one');
+    await expect(render([], `${MARKER}\n\n${MARKER}\n`)).rejects.toThrow(
+      'src/content/docs/protocol.md has 2 protocol:releases markers: keep one',
+    );
     await expect(render([], `${MARKER}\n\n<!-- protocol:status -->\n`)).rejects.toThrow(
       'src/content/docs/protocol.md has an unknown marker protocol:status: use protocol:releases',
     );

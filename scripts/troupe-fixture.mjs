@@ -37,7 +37,9 @@ export function makeFixtureRepo(fixtureDir = FIXTURE) {
   const git = (args, env = ENV) => execFileSync('git', args, { cwd: path, env, stdio: ['ignore', 'pipe', 'pipe'] });
   try {
     git(['init', '--quiet', '--initial-branch=main']);
-    const steps = readdirSync(fixtureDir).filter((n) => /^\d+-/.test(n)).sort((a, b) => parseInt(a) - parseInt(b));
+    const steps = readdirSync(fixtureDir)
+      .filter((n) => /^\d+-/.test(n))
+      .sort((a, b) => parseInt(a) - parseInt(b));
     steps.forEach((step, i) => {
       for (const folder of ['docs', 'protocol']) {
         if (!existsSync(join(fixtureDir, step, folder))) continue;
@@ -83,13 +85,18 @@ export function withFixtureMilestones(fn, file = MILESTONES_FIXTURE) {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const status = withFixtureRepo((path) => withFixtureMilestones((milestones) => {
-    const build = spawnSync('npx', ['astro', 'build', '--outDir', OUT_DIR], {
-      cwd: ROOT, env: { ...process.env, TROUPE_DOCS: path, TROUPE_MILESTONES: milestones }, stdio: 'inherit',
-    });
-    // The version tests read what this build was made from, not whatever the last sync left in src/generated/.
-    if (build.status === 0) copyFileSync(join(ROOT, 'src', 'generated', 'troupe-docs.json'), join(ROOT, OUT_DIR, 'troupe-docs.json'));
-    return build.status ?? 1;
-  }));
+  const status = withFixtureRepo((path) =>
+    withFixtureMilestones((milestones) => {
+      const build = spawnSync('npx', ['astro', 'build', '--outDir', OUT_DIR], {
+        cwd: ROOT,
+        env: { ...process.env, TROUPE_DOCS: path, TROUPE_MILESTONES: milestones },
+        stdio: 'inherit',
+      });
+      // The version tests read what this build was made from, not whatever the last sync left in src/generated/.
+      if (build.status === 0)
+        copyFileSync(join(ROOT, 'src', 'generated', 'troupe-docs.json'), join(ROOT, OUT_DIR, 'troupe-docs.json'));
+      return build.status ?? 1;
+    }),
+  );
   process.exit(status);
 }

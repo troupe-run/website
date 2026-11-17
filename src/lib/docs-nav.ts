@@ -13,21 +13,55 @@ export interface Section {
 }
 
 export const NAV: Section[] = [
-  { dir: 'programme', label: 'Programme', pages: ['what-is-troupe', 'principles'], kept: { label: 'Status and roadmap', href: '/status/' } },
+  {
+    dir: 'programme',
+    label: 'Programme',
+    pages: ['what-is-troupe', 'principles'],
+    kept: { label: 'Status and roadmap', href: '/status/' },
+  },
   { dir: 'opening-night', label: 'Opening night', pages: ['install', 'first-theatre', 'first-performance'] },
   {
-    dir: 'the-company', label: 'The company',
-    pages: ['theatres', 'roles-and-actors', 'performances-and-runs', 'flows', 'gates-and-decisions', 'escalation', 'notes', 'lineage', 'guests', 'the-house'],
+    dir: 'the-company',
+    label: 'The company',
+    pages: [
+      'theatres',
+      'roles-and-actors',
+      'performances-and-runs',
+      'flows',
+      'gates-and-decisions',
+      'escalation',
+      'notes',
+      'lineage',
+      'guests',
+      'the-house',
+    ],
   },
   {
-    dir: 'stagecraft', label: 'Stagecraft',
-    pages: ['configure-roles', 'route-decisions', 'build-a-flow', 'bring-your-own-agent', 'hand-edit-config', 'write-a-guest', 'read-the-lineage'],
+    dir: 'stagecraft',
+    label: 'Stagecraft',
+    pages: [
+      'configure-roles',
+      'route-decisions',
+      'build-a-flow',
+      'bring-your-own-agent',
+      'hand-edit-config',
+      'write-a-guest',
+      'read-the-lineage',
+    ],
   },
   { dir: 'prompt-book', label: 'Prompt book', pages: ['cli', 'config-schema', 'events', 'guest-manifest', 'glossary'] },
-  { dir: 'backstage', label: 'Backstage', pages: ['licensing', 'changelog'], kept: { label: 'Contributing', href: CONTRIBUTING } },
+  {
+    dir: 'backstage',
+    label: 'Backstage',
+    pages: ['licensing', 'changelog'],
+    kept: { label: 'Contributing', href: CONTRIBUTING },
+  },
 ];
 
-export interface Page { path: string; title: string }
+export interface Page {
+  path: string;
+  title: string;
+}
 
 /** A version's pages in sidebar order, section by section: listed pages first, then the rest by title. */
 export function ordered(pages: Page[]): { section: Section; pages: Page[] }[] {

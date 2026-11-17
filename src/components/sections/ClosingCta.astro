@@ -3,17 +3,55 @@ import { getCopy } from '../../lib/copy';
 const copy = await getCopy('closing');
 const star = copy.cta.label.startsWith('★ ');
 ---
+
 <section id="follow" class="closing" aria-labelledby="follow-title">
   <div class="wrap">
     <h2 id="follow-title">{copy.title}</h2>
     <p>{copy.body}</p>
-    <a class="btn" href={copy.cta.href}>{star && <span class="star" aria-hidden="true">★</span>}<span class="label">{star ? copy.cta.label.slice(2) : copy.cta.label}</span></a>
+    <a class="btn" href={copy.cta.href}>
+      {star && (
+        <span class="star" aria-hidden="true">
+          ★
+        </span>
+      )}
+      <span class="label">{star ? copy.cta.label.slice(2) : copy.cta.label}</span>
+    </a>
   </div>
 </section>
 <style>
-  .closing { text-align: center; padding: 48px 0; }
-  h2 { font-size: clamp(24px, 4vw, 34px); margin: 0 0 8px; }
-  p { color: var(--muted); margin: 0 auto 20px; max-width: 46ch; }
-  .star { margin-right: .4em; position: relative; top: 1px; line-height: 1; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 46px; font-size: 15px; line-height: 1.2; font-weight: 600; padding: 0 18px; border-radius: 12px; text-decoration: none; background: var(--tomato); color: var(--on-accent); box-shadow: 0 3px 0 var(--tomato-shadow); }
+  .closing {
+    text-align: center;
+    padding: 48px 0;
+  }
+  h2 {
+    font-size: clamp(24px, 4vw, 34px);
+    margin: 0 0 8px;
+  }
+  p {
+    color: var(--muted);
+    margin: 0 auto 20px;
+    max-width: 46ch;
+  }
+  .star {
+    margin-right: 0.4em;
+    position: relative;
+    top: 1px;
+    line-height: 1;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 46px;
+    font-size: 15px;
+    line-height: 1.2;
+    font-weight: 600;
+    padding: 0 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    background: var(--tomato);
+    color: var(--on-accent);
+    box-shadow: 0 3px 0 var(--tomato-shadow);
+  }
 </style>

@@ -14,7 +14,9 @@ export function rewriteLink(url, page, base) {
   const hash = url.indexOf('#');
   const [path, anchor] = hash < 0 ? [url, ''] : [url.slice(0, hash), url.slice(hash)];
   if (!path.endsWith('.md')) {
-    throw new Error(`the link ${url} isn't a .md page: link another page by its .md path, or anything else by a full URL`);
+    throw new Error(
+      `the link ${url} isn't a .md page: link another page by its .md path, or anything else by a full URL`,
+    );
   }
   const target = posix.normalize(posix.join(posix.dirname(page), path));
   if (target.startsWith('../') || target === '..') {
@@ -29,7 +31,9 @@ function locate(docsDir, fileURL) {
   const rel = relative(docsDir, fileURLToPath(fileURL)).split(sep).join('/');
   if (rel.startsWith('..') || rel === '') return null;
   const [first, ...rest] = rel.split('/');
-  return VERSION_DIR.test(first) ? { base: `/docs/${first}/`, page: rest.join('/'), rel } : { base: '/docs/', page: rel, rel };
+  return VERSION_DIR.test(first)
+    ? { base: `/docs/${first}/`, page: rest.join('/'), rel }
+    : { base: '/docs/', page: rel, rel };
 }
 
 /** The plugin, for pages under `docsDir` (the generated docs) only. */

@@ -7,11 +7,13 @@ describe('external link skips', () => {
   });
 
   it('skipProblems reports an entry with no reason, one with no pattern, and one whose pattern will not compile', () => {
-    expect(skipProblems([
-      { pattern: 'example\\.com', reason: ' ' },
-      { reason: 'blocks bots' },
-      { pattern: '(', reason: 'broken regex' },
-    ])).toEqual(['entry 0: no reason', 'entry 1: no pattern', 'entry 2: pattern is not a valid regex']);
+    expect(
+      skipProblems([
+        { pattern: 'example\\.com', reason: ' ' },
+        { reason: 'blocks bots' },
+        { pattern: '(', reason: 'broken regex' },
+      ]),
+    ).toEqual(['entry 0: no reason', 'entry 1: no pattern', 'entry 2: pattern is not a valid regex']);
   });
 
   it('no skip matches the product repository, https://github.com/troupe-run/troupe', () => {

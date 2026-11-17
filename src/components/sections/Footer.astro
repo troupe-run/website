@@ -3,17 +3,56 @@ import Mark from '../Mark.astro';
 import { getCopy } from '../../lib/copy';
 const copy = await getCopy('footer');
 ---
+
 <footer class="site-footer">
   <div class="wrap cols">
-    <div><Mark height={16} /> <a href="https://hps.gd" target="_blank" rel="noopener">{copy.attribution}</a></div>
-    <ul>{copy.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
-    <div class="small"><p><a href="https://hps.gd" target="_blank" rel="noopener">{copy.copyright}</a></p></div>
+    <div>
+      <Mark height={16} />{' '}
+      <a href="https://hps.gd" target="_blank" rel="noopener">
+        {copy.attribution}
+      </a>
+    </div>
+    <ul>
+      {copy.links.map((l) => (
+        <li>
+          <a href={l.href}>{l.label}</a>
+        </li>
+      ))}
+    </ul>
+    <div class="small">
+      <p>
+        <a href="https://hps.gd" target="_blank" rel="noopener">
+          {copy.copyright}
+        </a>
+      </p>
+    </div>
   </div>
 </footer>
 <style>
-  .site-footer { border-top: 2px solid var(--line); padding: 24px 0 32px; font-size: 14px; color: var(--muted); }
-  .cols { display: flex; flex-wrap: wrap; gap: 12px 32px; justify-content: space-between; align-items: flex-start; }
-  a { color: inherit; }
-  ul { display: flex; gap: 16px; list-style: none; margin: 0; padding: 0; }
-  .small p { margin: 0 0 4px; }
+  .site-footer {
+    border-top: 2px solid var(--line);
+    padding: 24px 0 32px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .cols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  a {
+    color: inherit;
+  }
+  ul {
+    display: flex;
+    gap: 16px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .small p {
+    margin: 0 0 4px;
+  }
 </style>

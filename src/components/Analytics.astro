@@ -1,4 +1,7 @@
 ---
 const GOATCOUNTER = 'https://troupe-run.goatcounter.com/count';
 ---
-{import.meta.env.PROD && <script is:inline async data-goatcounter={GOATCOUNTER} src="https://gc.zgo.at/count.js"></script>}
+
+{import.meta.env.PROD && (
+  <script is:inline async data-goatcounter={GOATCOUNTER} src="https://gc.zgo.at/count.js"></script>
+)}

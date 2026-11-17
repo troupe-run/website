@@ -4,8 +4,11 @@ import { headerSection, keptPage, ownPagination, siteSection } from '../../src/l
 // Which part of the site a route is in decides its header label and whether it has the docs sidebar.
 describe('siteSection', () => {
   it.each([
-    ['blog', 'blog'], ['blog/2026-10-10-methodology-bake-off', 'blog'],
-    ['docs/programme/what-is-troupe', 'docs'], ['docs/v0.1/the-company/flows', 'docs'], ['404', 'docs'],
+    ['blog', 'blog'],
+    ['blog/2026-10-10-methodology-bake-off', 'blog'],
+    ['docs/programme/what-is-troupe', 'docs'],
+    ['docs/v0.1/the-company/flows', 'docs'],
+    ['404', 'docs'],
     ['status', 'site'],
   ])('puts %s in %s', (id, section) => {
     expect(siteSection(id)).toBe(section);
@@ -16,7 +19,10 @@ describe('siteSection', () => {
 // /docs links into it through "Previous" or "Next".
 describe('keptPage', () => {
   it.each([
-    ['/status/', '/status/'], ['/blog/', undefined], ['/blog/2026-10-10-methodology-bake-off/', undefined], ['/about/', undefined],
+    ['/status/', '/status/'],
+    ['/blog/', undefined],
+    ['/blog/2026-10-10-methodology-bake-off/', undefined],
+    ['/about/', undefined],
   ])('the docs sidebar link that %s answers to is %s', (pathname, href) => {
     expect(keptPage(pathname)).toBe(href);
   });

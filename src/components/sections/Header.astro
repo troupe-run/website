@@ -12,45 +12,122 @@ const { section, embedded = false } = Astro.props;
 const copy = await getCopy('header');
 const Tag = embedded ? 'div' : 'header';
 ---
+
 <Tag class:list={['site-header', { embedded }]}>
   <div class:list={['bar', { wrap: !embedded }]}>
     <span class="brand">
-      <a class="home" href="/" aria-label="troupe home"><Mark wordmark height={20} /></a>
-      {section && <a class="section" href={`/${section}/`}>{section}</a>}
+      <a class="home" href="/" aria-label="troupe home">
+        <Mark wordmark height={20} />
+      </a>
+      {section && (
+        <a class="section" href={`/${section}/`}>
+          {section}
+        </a>
+      )}
       {Astro.slots.has('version') && <slot name="version" />}
     </span>
-    {Astro.slots.has('default') && <div class="extra"><slot /></div>}
+    {Astro.slots.has('default') && (
+      <div class="extra">
+        <slot />
+      </div>
+    )}
     <nav aria-label="Site">
-      <ul>{copy.nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+      <ul>
+        {copy.nav.map((l) => (
+          <li>
+            <a href={l.href}>{l.label}</a>
+          </li>
+        ))}
+      </ul>
     </nav>
   </div>
 </Tag>
 <style>
-  .bar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; padding-block: 14px; }
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 14px;
+  }
   /* Centre, not baseline: the wordmark's flex box takes its baseline from the logo SVG, which put "docs" 2px
      low. Both words share a font size and line height, so centring lines their baselines up exactly. */
-  .brand { display: inline-flex; align-items: center; gap: .35em; white-space: nowrap; }
-  .home, .section { text-decoration: none; }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    white-space: nowrap;
+  }
+  .home,
+  .section {
+    text-decoration: none;
+  }
   /* Same size as the wordmark (Mark.astro: 1.5em), lighter, so it reads "troupe docs" as one name. */
-  .section { font-family: var(--font-display); font-weight: 500; font-size: 1.5em; letter-spacing: -.02em; color: var(--muted); }
-  .section:hover { color: var(--tomato-text); }
-  ul { display: flex; flex-wrap: wrap; gap: 4px 16px; list-style: none; margin: 0; padding: 0; }
-  nav a { color: var(--ink); text-decoration: none; font-size: 15px; }
-  nav a:hover { color: var(--tomato-text); text-decoration: underline; }
+  .section {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.5em;
+    letter-spacing: -0.02em;
+    color: var(--muted);
+  }
+  .section:hover {
+    color: var(--tomato-text);
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 15px;
+  }
+  nav a:hover {
+    color: var(--tomato-text);
+    text-decoration: underline;
+  }
 
   /* Inside Starlight's fixed-height header: one row, the search box takes the free space. */
-  .embedded { height: 100%; }
-  .embedded .bar { flex-wrap: nowrap; height: 100%; padding-block: 0; gap: 16px; }
-  .embedded .extra { flex: 1; display: flex; justify-content: center; min-width: 0; }
-  .embedded ul { flex-wrap: nowrap; gap: 12px; }
+  .embedded {
+    height: 100%;
+  }
+  .embedded .bar {
+    flex-wrap: nowrap;
+    height: 100%;
+    padding-block: 0;
+    gap: 16px;
+  }
+  .embedded .extra {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+  }
+  .embedded ul {
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
   /* Docs at phone width: the menu button sits at the right, so the site links move into the menu
      (docs/MobileMenuFooter.astro). 50rem is Starlight's own breakpoint for that button. */
   @media (max-width: 50rem) {
-    :global([data-has-sidebar]) .embedded nav { display: none; }
+    :global([data-has-sidebar]) .embedded nav {
+      display: none;
+    }
   }
   @media (max-width: 30rem) {
-    .embedded .bar { gap: 10px; }
-    .embedded ul { gap: 10px; }
-    .embedded nav a { font-size: 14px; }
+    .embedded .bar {
+      gap: 10px;
+    }
+    .embedded ul {
+      gap: 10px;
+    }
+    .embedded nav a {
+      font-size: 14px;
+    }
   }
 </style>

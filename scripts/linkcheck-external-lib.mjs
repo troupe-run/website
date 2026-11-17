@@ -55,18 +55,25 @@ export function boardIssueUrl({ decision, openedUrl = '' }) {
  */
 export function extraUrlProblem(value, skips) {
   if (!value) return null;
-  const fix = 'Start the run again with an absolute http(s) URL, such as https://troupe.run/definitely-not-here-404, or leave it empty.';
+  const fix =
+    'Start the run again with an absolute http(s) URL, such as https://troupe.run/definitely-not-here-404, or leave it empty.';
   let url;
-  try { url = new URL(value); } catch { url = null; }
+  try {
+    url = new URL(value);
+  } catch {
+    url = null;
+  }
   if (!url || !['http:', 'https:'].includes(url.protocol)) {
     return `extra-url must be an absolute http(s) URL; got ${JSON.stringify(value)}. ${fix}`;
   }
   const skip = skips.find((s) => new RegExp(s.pattern).test(value));
-  if (skip) return `extra-url ${JSON.stringify(value)} matches the skip pattern ${skip.pattern}, so checking it would prove nothing. ${fix}`;
+  if (skip)
+    return `extra-url ${JSON.stringify(value)} matches the skip pattern ${skip.pattern}, so checking it would prove nothing. ${fix}`;
   return null;
 }
 
-const escapeHtml = (s) => s.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+const escapeHtml = (s) =>
+  s.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 /**
  * The page that holds a run's `extra-url`, so linkinator checks it like any link on the site.
@@ -110,10 +117,14 @@ export function formatReport({ broken, external, runUrl, dir = 'dist', forIssue 
   }
   lines.push(`${broken.length} broken external link(s) out of ${external} checked.`, '');
   lines.push('| URL | Status | Found on |', '| --- | --- | --- |');
-  for (const l of broken.slice(0, MAX_ROWS)) lines.push(`| ${cell(l.url)} | ${cell(status(l))} | ${cell(sitePath(l.parent, dir))} |`);
+  for (const l of broken.slice(0, MAX_ROWS))
+    lines.push(`| ${cell(l.url)} | ${cell(status(l))} | ${cell(sitePath(l.parent, dir))} |`);
   if (broken.length > MAX_ROWS) lines.push('', `+${broken.length - MAX_ROWS} more, see the run.`);
   lines.push('', `Run: ${runUrl}`);
   if (!forIssue) return lines.join('\n');
-  lines.push('', 'This issue is kept by the weekly external link check (`.github/workflows/links-weekly.yml`). It closes itself after a clean run; to close it sooner, fix the links and run the workflow by hand.');
+  lines.push(
+    '',
+    'This issue is kept by the weekly external link check (`.github/workflows/links-weekly.yml`). It closes itself after a clean run; to close it sooner, fix the links and run the workflow by hand.',
+  );
   return lines.join('\n');
 }

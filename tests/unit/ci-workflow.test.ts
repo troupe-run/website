@@ -67,13 +67,13 @@ describe("ci.yml's changes job", () => {
     expect(draft.if).toBe("github.event_name == 'pull_request' && github.event.pull_request.draft");
     expect(draft.run).toContain('::notice::');
     expect(draft.run).toContain('marked ready');
-    expect(draft.run).toContain("echo 'test=false' >> \"$GITHUB_OUTPUT\"");
+    expect(draft.run).toContain('echo \'test=false\' >> "$GITHUB_OUTPUT"');
   });
 
   it('answers test=true on a pull request that is ready for review', () => {
     const ready = step('ready');
     expect(ready.if).toBe("github.event_name == 'pull_request' && !github.event.pull_request.draft");
-    expect(ready.run).toContain("echo 'test=true' >> \"$GITHUB_OUTPUT\"");
+    expect(ready.run).toContain('echo \'test=true\' >> "$GITHUB_OUTPUT"');
   });
 
   it('on a push, checks out (only then) and asks queue_passed.py about the pushed commit', () => {

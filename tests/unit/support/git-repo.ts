@@ -41,7 +41,8 @@ export function makeRepo(): Repo {
       }
       git('add', '--all');
       execFileSync('git', ['commit', '--quiet', '-m', `at ${date}`], {
-        cwd: path, env: { ...ENV, GIT_AUTHOR_DATE: date, GIT_COMMITTER_DATE: date },
+        cwd: path,
+        env: { ...ENV, GIT_AUTHOR_DATE: date, GIT_COMMITTER_DATE: date },
       });
       for (const tag of tags) git('tag', tag);
     },

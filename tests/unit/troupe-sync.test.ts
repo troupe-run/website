@@ -14,8 +14,14 @@ afterEach(() => cleanup.splice(0).forEach((f) => f()));
 function troupe(): Repo {
   const r = makeRepo();
   cleanup.push(r.remove);
-  r.commit({ ...SCHEMAS, 'docs/programme/a.md': page('A'), 'docs/programme/gone.md': page('Gone') }, '2026-01-01T00:00:00Z', ['troupe-run-v0.1.0']);
-  r.commit({ 'docs/programme/gone.md': null, 'docs/backstage/removed.md': page('Removed') }, '2026-02-01T00:00:00Z', ['troupe-run-v0.2.0']);
+  r.commit(
+    { ...SCHEMAS, 'docs/programme/a.md': page('A'), 'docs/programme/gone.md': page('Gone') },
+    '2026-01-01T00:00:00Z',
+    ['troupe-run-v0.1.0'],
+  );
+  r.commit({ 'docs/programme/gone.md': null, 'docs/backstage/removed.md': page('Removed') }, '2026-02-01T00:00:00Z', [
+    'troupe-run-v0.2.0',
+  ]);
   r.commit({ 'docs/backstage/removed.md': null, 'docs/stagecraft/added.md': page('Added') }, '2026-03-01T00:00:00Z');
   return r;
 }
@@ -26,7 +32,9 @@ function site(): string {
 }
 // Read back as YAML, as Astro reads it (the yaml package's 1.2 schema leaves the date a string).
 function docs(root: string, path: string) {
-  const [, head, body] = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/.exec(readFileSync(join(root, 'src/content/docs/docs', path), 'utf8'))!;
+  const [, head, body] = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/.exec(
+    readFileSync(join(root, 'src/content/docs/docs', path), 'utf8'),
+  )!;
   return { front: parse(head), body };
 }
 const EDIT = 'https://github.com/troupe-run/troupe/edit/main/docs/';
@@ -45,7 +53,16 @@ describe('sync', () => {
     const root = site();
     await sync({ env: {}, root, remote: troupe().path });
     const { front, body } = docs(root, 'next/programme/a.md');
-    expect(Object.keys(front)).toEqual(['title', 'description', 'status', 'prerelease', 'slug', 'editUrl', 'lastUpdated', 'pagefind']);
+    expect(Object.keys(front)).toEqual([
+      'title',
+      'description',
+      'status',
+      'prerelease',
+      'slug',
+      'editUrl',
+      'lastUpdated',
+      'pagefind',
+    ]);
     expect(front).toMatchObject({ title: 'A', description: 'About A.', status: 'written', prerelease: false });
     expect(body).toContain("A's text.");
   });
@@ -112,7 +129,13 @@ describe('sync', () => {
     const root = site();
     await sync({ env: {}, root, remote: troupe().path });
     const manifest = JSON.parse(readFileSync(join(root, 'src/generated/troupe-docs.json'), 'utf8'));
-    expect(manifest.versions.map((v: { role: string; ref: string; pages: { path: string }[] }) => [v.role, v.ref, v.pages.map((p) => p.path)])).toEqual([
+    expect(
+      manifest.versions.map((v: { role: string; ref: string; pages: { path: string }[] }) => [
+        v.role,
+        v.ref,
+        v.pages.map((p) => p.path),
+      ]),
+    ).toEqual([
       ['next', 'main', ['programme/a.md', 'stagecraft/added.md']],
       ['current', 'troupe-run-v0.2.0', ['backstage/removed.md', 'programme/a.md']],
       ['archived', 'troupe-run-v0.1.0', ['programme/a.md', 'programme/gone.md']],
@@ -120,7 +143,7 @@ describe('sync', () => {
     expect(manifest.glossary).toBe(join(root, 'src/content/docs/docs/next/prompt-book/glossary.md'));
   });
 
-  it("records in the manifest the release tags the versions were chosen from, each with its date, and no other tag (spec: roadmap)", async () => {
+  it('records in the manifest the release tags the versions were chosen from, each with its date, and no other tag (spec: roadmap)', async () => {
     const root = site();
     const r = troupe();
     r.git('tag', 'not-a-release');
@@ -130,7 +153,9 @@ describe('sync', () => {
       { tag: 'troupe-run-v0.1.0', date: '2026-01-01T00:00:00Z' },
       { tag: 'troupe-run-v0.2.0', date: '2026-02-01T00:00:00Z' },
     ]);
-    expect(JSON.parse(readFileSync(join(root, 'src/generated/troupe-docs.json'), 'utf8')).releases).toEqual(manifest.releases);
+    expect(JSON.parse(readFileSync(join(root, 'src/generated/troupe-docs.json'), 'utf8')).releases).toEqual(
+      manifest.releases,
+    );
   });
 
   it('removes pages that troupe no longer has on the next run', async () => {
@@ -142,9 +167,13 @@ describe('sync', () => {
     expect(existsSync(join(root, 'src/content/docs/docs/next/stagecraft/added.md'))).toBe(false);
   });
 
-  it("refuses a version with a bad page, naming the version, the page and the problem, and writes nothing", async () => {
+  it('refuses a version with a bad page, naming the version, the page and the problem, and writes nothing', async () => {
     const r = troupe();
-    r.commit({ 'docs/programme/a.md': page('A').replace('status: written', 'staus: written') }, '2026-05-01T00:00:00Z', ['troupe-run-v0.3.0']);
+    r.commit(
+      { 'docs/programme/a.md': page('A').replace('status: written', 'staus: written') },
+      '2026-05-01T00:00:00Z',
+      ['troupe-run-v0.3.0'],
+    );
     r.commit({ 'docs/programme/a.md': page('A') }, '2026-05-02T00:00:00Z');
     const root = site();
     await expect(sync({ env: {}, root, remote: r.path })).rejects.toThrow(
@@ -157,7 +186,9 @@ describe('sync', () => {
     const root = site();
     mkdirSync(join(root, 'src/content/docs/docs'), { recursive: true });
     writeFileSync(join(root, 'src/content/docs/docs/mine.md'), 'hand-written');
-    await expect(sync({ env: {}, root, remote: troupe().path })).rejects.toThrow(/holds files the docs sync didn't write/);
+    await expect(sync({ env: {}, root, remote: troupe().path })).rejects.toThrow(
+      /holds files the docs sync didn't write/,
+    );
     expect(readFileSync(join(root, 'src/content/docs/docs/mine.md'), 'utf8')).toBe('hand-written');
   });
 });
@@ -176,14 +207,19 @@ describe("links from troupe's main into troupe's repository", () => {
       '2026-01-01T00:00:00Z',
       ['troupe-run-v0.1.0'],
     );
-    r.commit({ 'protocol/CHANGELOG.md': 'p\n', 'plugins/runner/README.md': 'r\n', ...mainPages }, '2026-02-01T00:00:00Z');
+    r.commit(
+      { 'protocol/CHANGELOG.md': 'p\n', 'plugins/runner/README.md': 'r\n', ...mainPages },
+      '2026-02-01T00:00:00Z',
+    );
     return r;
   }
   const changelog = (body: string) => ({ 'docs/backstage/changelog.md': page('Changelog', body) });
 
   it('refuses a link to a changelog main lacks, naming the version, the page, the link and the fix', async () => {
     const url = `${REPO}/blob/main/plugins/runner-ollama/CHANGELOG.md`;
-    await expect(sync({ env: {}, root: site(), remote: linking(changelog(`- [ollama](${url})`)).path })).rejects.toThrow(
+    await expect(
+      sync({ env: {}, root: site(), remote: linking(changelog(`- [ollama](${url})`)).path }),
+    ).rejects.toThrow(
       "troupe's main can't be built into /docs:\n" +
         `  - docs/backstage/changelog.md: the link ${url} names plugins/runner-ollama/CHANGELOG.md, which isn't at main: ` +
         'link it once it exists, or link a path that does',
@@ -240,16 +276,26 @@ describe("links from troupe's main into troupe's repository", () => {
   it('names every broken link on every page in one failure', async () => {
     const r = linking({
       'docs/backstage/changelog.md': page('Changelog', `[a](${REPO}/blob/main/plugins/runner-openai/CHANGELOG.md)`),
-      'docs/stagecraft/notes.md': page('Notes', `See ${REPO}/blob/main/packages/troupe-plugin-sdk/CHANGELOG.md for it.`),
+      'docs/stagecraft/notes.md': page(
+        'Notes',
+        `See ${REPO}/blob/main/packages/troupe-plugin-sdk/CHANGELOG.md for it.`,
+      ),
     });
     const failure = sync({ env: {}, root: site(), remote: r.path });
-    await expect(failure).rejects.toThrow(/docs\/backstage\/changelog\.md: .*runner-openai\/CHANGELOG\.md, which isn't at main/);
-    await expect(failure).rejects.toThrow(/docs\/stagecraft\/notes\.md: .*troupe-plugin-sdk\/CHANGELOG\.md, which isn't at main/);
+    await expect(failure).rejects.toThrow(
+      /docs\/backstage\/changelog\.md: .*runner-openai\/CHANGELOG\.md, which isn't at main/,
+    );
+    await expect(failure).rejects.toThrow(
+      /docs\/stagecraft\/notes\.md: .*troupe-plugin-sdk\/CHANGELOG\.md, which isn't at main/,
+    );
   });
 
   it("doesn't check a link in a code block, and leaves it as written", async () => {
     const root = site();
-    const body = '```md\n[x](https://github.com/troupe-run/troupe/blob/main/missing.md)\n```\n\nAnd `' + REPO + '/blob/main/gone.md`.';
+    const body =
+      '```md\n[x](https://github.com/troupe-run/troupe/blob/main/missing.md)\n```\n\nAnd `' +
+      REPO +
+      '/blob/main/gone.md`.';
     await sync({ env: {}, root, remote: linking(changelog(body)).path });
     expect(readFileSync(join(root, 'src/content/docs/docs/next/backstage/changelog.md'), 'utf8')).toContain(
       '[x](https://github.com/troupe-run/troupe/blob/main/missing.md)',
@@ -261,13 +307,20 @@ describe("links from troupe's main into troupe's repository", () => {
     // main drops the page, so only the tag has the broken link.
     const r = linking({ 'docs/backstage/old.md': null } as unknown as Record<string, string>, tagged);
     const manifest = await sync({ env: {}, root: site(), remote: r.path });
-    expect(manifest.versions.find((v: { ref: string }) => v.ref === 'troupe-run-v0.1.0').pages.map((p: { path: string }) => p.path)).toContain('backstage/old.md');
+    expect(
+      manifest.versions
+        .find((v: { ref: string }) => v.ref === 'troupe-run-v0.1.0')
+        .pages.map((p: { path: string }) => p.path),
+    ).toContain('backstage/old.md');
   });
 
   it('checks main when no release exists yet, as /docs/ is read from main then', async () => {
     const r = makeRepo();
     cleanup.push(r.remove);
-    r.commit({ ...SCHEMAS, 'docs/programme/a.md': page('A', `[x](${REPO}/blob/main/missing.md)`) }, '2026-01-01T00:00:00Z');
+    r.commit(
+      { ...SCHEMAS, 'docs/programme/a.md': page('A', `[x](${REPO}/blob/main/missing.md)`) },
+      '2026-01-01T00:00:00Z',
+    );
     await expect(sync({ env: {}, root: site(), remote: r.path })).rejects.toThrow(/missing\.md, which isn't at main/);
   });
 
@@ -279,8 +332,14 @@ describe("links from troupe's main into troupe's repository", () => {
   });
 
   it("doesn't check other links to GitHub, such as an issue, a release or the front page", async () => {
-    const body = [`${REPO}/issues/366`, `${REPO}/releases`, REPO, 'https://github.com/troupe-run/website/blob/main/gone.md']
-      .map((l) => `- [x](${l})`).join('\n');
+    const body = [
+      `${REPO}/issues/366`,
+      `${REPO}/releases`,
+      REPO,
+      'https://github.com/troupe-run/website/blob/main/gone.md',
+    ]
+      .map((l) => `- [x](${l})`)
+      .join('\n');
     await sync({ env: {}, root: site(), remote: linking(changelog(body)).path });
   });
 });

@@ -23,32 +23,51 @@ const LINEAGE = { $defs: { hash: { type: 'string' }, 'a/b': { type: 'string' }, 
 
 describe('checkReferences', () => {
   it('passes references that resolve: a pointer into another file, #, a dynamic anchor, an anchor, ~1 and %20', () => {
-    const result = checkReferences(site({
-      '0/lineage.schema.json': LINEAGE,
-      '0/runner/run-start.schema.json': {
-        properties: {
-          a: { $ref: '../lineage.schema.json#/$defs/hash' },
-          b: { $ref: '#' },
-          c: { $dynamicRef: '#runnerOptions' },
-          d: { $ref: '#named' },
-          e: { $ref: '../lineage.schema.json#/$defs/a~1b' },
-          f: { $ref: `${BASE}0/lineage.schema.json#/$defs/with%20space` },
+    const result = checkReferences(
+      site({
+        '0/lineage.schema.json': LINEAGE,
+        '0/runner/run-start.schema.json': {
+          properties: {
+            a: { $ref: '../lineage.schema.json#/$defs/hash' },
+            b: { $ref: '#' },
+            c: { $dynamicRef: '#runnerOptions' },
+            d: { $ref: '#named' },
+            e: { $ref: '../lineage.schema.json#/$defs/a~1b' },
+            f: { $ref: `${BASE}0/lineage.schema.json#/$defs/with%20space` },
+          },
+          $defs: { options: { $dynamicAnchor: 'runnerOptions' }, n: { $anchor: 'named' } },
         },
-        $defs: { options: { $dynamicAnchor: 'runnerOptions' }, n: { $anchor: 'named' } },
-      },
-    }));
+      }),
+    );
     expect(result.broken).toEqual([]);
     expect(result.checked).toBe(6);
   });
 
   const broken: [string, Record<string, object>, string, string][] = [
-    ['a missing file', { 'a.schema.json': { $ref: 'gone.schema.json' } }, 'gone.schema.json', 'protocol/gone.schema.json isn\'t published'],
-    ['a pointer that leads nowhere', { 'lineage.schema.json': LINEAGE, 'a.schema.json': { $ref: 'lineage.schema.json#/$defs/summary' } },
-      'lineage.schema.json#/$defs/summary', '/$defs/summary isn\'t in protocol/lineage.schema.json'],
-    ['an undeclared anchor', { 'a.schema.json': { $dynamicRef: '#runnerErrors' } }, '#runnerErrors',
-      'no $anchor or $dynamicAnchor in protocol/a.schema.json is named runnerErrors'],
-    ['a reference into another copy', { 'lineage.schema.json': LINEAGE, '0/a.schema.json': { $ref: `${BASE}lineage.schema.json` } },
-      `${BASE}lineage.schema.json`, 'it leaves the copy at /protocol/0/ for the one at /protocol/'],
+    [
+      'a missing file',
+      { 'a.schema.json': { $ref: 'gone.schema.json' } },
+      'gone.schema.json',
+      "protocol/gone.schema.json isn't published",
+    ],
+    [
+      'a pointer that leads nowhere',
+      { 'lineage.schema.json': LINEAGE, 'a.schema.json': { $ref: 'lineage.schema.json#/$defs/summary' } },
+      'lineage.schema.json#/$defs/summary',
+      "/$defs/summary isn't in protocol/lineage.schema.json",
+    ],
+    [
+      'an undeclared anchor',
+      { 'a.schema.json': { $dynamicRef: '#runnerErrors' } },
+      '#runnerErrors',
+      'no $anchor or $dynamicAnchor in protocol/a.schema.json is named runnerErrors',
+    ],
+    [
+      'a reference into another copy',
+      { 'lineage.schema.json': LINEAGE, '0/a.schema.json': { $ref: `${BASE}lineage.schema.json` } },
+      `${BASE}lineage.schema.json`,
+      'it leaves the copy at /protocol/0/ for the one at /protocol/',
+    ],
   ];
   it.each(broken)('fails %s, naming the file, where in it, the reference and why', (_, files, ref, reason) => {
     const result = checkReferences(site(files));
@@ -64,7 +83,9 @@ describe('checkReferences', () => {
   });
 
   it("doesn't read $ref inside data, such as const and examples", () => {
-    const result = checkReferences(site({ 'a.schema.json': { const: { $ref: 'gone.schema.json' }, examples: [{ $ref: '#/nope' }] } }));
+    const result = checkReferences(
+      site({ 'a.schema.json': { const: { $ref: 'gone.schema.json' }, examples: [{ $ref: '#/nope' }] } }),
+    );
     expect(result).toMatchObject({ checked: 0, broken: [] });
   });
 

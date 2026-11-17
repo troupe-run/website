@@ -8,13 +8,16 @@ import { section, table } from './support/markdown';
 // `npm run docs:sync` fetched it (troupe-run/website#23). troupe's own docs check holds the docs pages to the rules
 // for "TBC" and "project"; this one holds the brand guide, the landing copy and the site's own pages.
 const MANIFEST = 'src/generated/troupe-docs.json';
-if (!existsSync(MANIFEST)) throw new Error(`${MANIFEST} is missing: run npm run docs:sync first, which fetches troupe's docs`);
+if (!existsSync(MANIFEST))
+  throw new Error(`${MANIFEST} is missing: run npm run docs:sync first, which fetches troupe's docs`);
 const GLOSSARY: string = JSON.parse(readFileSync(MANIFEST, 'utf8')).glossary;
 const BRAND_GUIDE = 'docs/brand-guide.md';
 const GLOSSARY_SOURCE = 'https://github.com/troupe-run/troupe/blob/main/docs/prompt-book/glossary.md';
 
 /** The site's own pages: every Starlight page outside the blog and the docs fetched from troupe. */
-const SITE_PAGES = readdirSync('src/content/docs').filter((n) => n.endsWith('.md')).map((n) => `src/content/docs/${n}`);
+const SITE_PAGES = readdirSync('src/content/docs')
+  .filter((n) => n.endsWith('.md'))
+  .map((n) => `src/content/docs/${n}`);
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((n) => {
@@ -29,7 +32,9 @@ const isRejected = (status: string) => /^rejected\b/i.test(status);
 
 describe('the glossary and the brand guide list the same terms', () => {
   it("every term the brand guide's §6 keeps has a glossary row, and every glossary row has a status there", () => {
-    const kept = vocabulary().rows.filter((r) => !isRejected(r[1])).map((r) => r[0]);
+    const kept = vocabulary()
+      .rows.filter((r) => !isRejected(r[1]))
+      .map((r) => r[0]);
     const glossary = glossaryTerms();
     expect({
       'kept in the guide, missing from the glossary': kept.filter((t) => !glossary.includes(t)),
@@ -41,7 +46,9 @@ describe('the glossary and the brand guide list the same terms', () => {
   });
 
   it("no word the brand guide's §6 rejects has a glossary row", () => {
-    const rejected = vocabulary().rows.filter((r) => isRejected(r[1])).map((r) => r[0]);
+    const rejected = vocabulary()
+      .rows.filter((r) => isRejected(r[1]))
+      .map((r) => r[0]);
     expect(glossaryTerms().filter((t) => rejected.includes(t))).toEqual([]);
   });
 
@@ -56,7 +63,9 @@ describe('the glossary and the brand guide list the same terms', () => {
   });
 
   it("the brand guide's §6 writes each term plainly, with no code font, as troupe's glossary does", () => {
-    const raw = section(readFileSync(BRAND_GUIDE, 'utf8'), '6.').split('\n').filter((l) => l.startsWith('| ') && !/^\| (Term|---)/.test(l));
+    const raw = section(readFileSync(BRAND_GUIDE, 'utf8'), '6.')
+      .split('\n')
+      .filter((l) => l.startsWith('| ') && !/^\| (Term|---)/.test(l));
     expect(raw.filter((l) => l.split('|')[1].includes('`'))).toEqual([]);
   });
 
@@ -140,7 +149,9 @@ describe('site copy says "theatre" for a theatre', () => {
   it("the scan reads the landing copy and the site's own pages, and no blog post or page fetched from troupe", () => {
     expect(scanned).toContain('src/content/copy/principles.md');
     expect(scanned).toContain('src/content/docs/status.md');
-    expect(scanned.filter((f) => f.startsWith('src/content/docs/blog/') || f.startsWith('src/content/docs/docs/'))).toEqual([]);
+    expect(
+      scanned.filter((f) => f.startsWith('src/content/docs/blog/') || f.startsWith('src/content/docs/docs/')),
+    ).toEqual([]);
   });
 
   it('every "project" in the landing copy and the site\'s own pages is recorded with a reason', () => {

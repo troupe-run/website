@@ -21,7 +21,12 @@ export function readAppTable(guide) {
   const block = [];
   for (const l of lines.slice(first)) {
     if (!l.startsWith('|')) break;
-    block.push(l.replace(/^\||\|$/g, '').split('|').map((c) => c.trim().replace(/`/g, '')));
+    block.push(
+      l
+        .replace(/^\||\|$/g, '')
+        .split('|')
+        .map((c) => c.trim().replace(/`/g, '')),
+    );
   }
   const where = `${GUIDE} §5 "GitHub Apps"`;
   if (block[0]?.join(' | ') !== 'App | Kind | Prop') {
@@ -38,8 +43,10 @@ export function checkSource(name, kind, svg) {
   const problems = [];
   const palette = [HEAD[kind], ...SHARED];
   const reported = new Set();
-  for (const m of svg.matchAll(/<(linearGradient|radialGradient|filter|mask|style)\b/g)) problems.push(`${name} has a <${m[1]}>: ${NOT_FLAT}`);
-  for (const m of svg.matchAll(/\s((?:fill-|stroke-)?opacity)="([^"]*)"/g)) problems.push(`${name} has ${m[1]}="${m[2]}": ${NOT_FLAT}`);
+  for (const m of svg.matchAll(/<(linearGradient|radialGradient|filter|mask|style)\b/g))
+    problems.push(`${name} has a <${m[1]}>: ${NOT_FLAT}`);
+  for (const m of svg.matchAll(/\s((?:fill-|stroke-)?opacity)="([^"]*)"/g))
+    problems.push(`${name} has ${m[1]}="${m[2]}": ${NOT_FLAT}`);
   for (const m of svg.matchAll(/\s(fill|stroke|stop-color|color)="([^"]*)"/g)) {
     const value = m[2];
     if (value === 'none') continue;
@@ -50,11 +57,15 @@ export function checkSource(name, kind, svg) {
     const hex = value.toUpperCase();
     if (!palette.includes(hex) && !reported.has(hex)) {
       reported.add(hex);
-      problems.push(`${name} uses ${hex}, which isn't in ${kind === 'agent' ? 'an agent' : 'a system'} App's colours (${palette.join(', ')})`);
+      problems.push(
+        `${name} uses ${hex}, which isn't in ${kind === 'agent' ? 'an agent' : 'a system'} App's colours (${palette.join(', ')})`,
+      );
     }
   }
   for (const m of svg.matchAll(/\sstyle="([^"]*)"/g)) {
-    problems.push(`${name} has a style attribute (style="${m[1]}"), which the check can't read: use fill and stroke attributes`);
+    problems.push(
+      `${name} has a style attribute (style="${m[1]}"), which the check can't read: use fill and stroke attributes`,
+    );
   }
   // Each shape carries its own fill, so nothing relies on inheritance or on SVG's default black.
   for (const m of svg.matchAll(new RegExp(`<(${SHAPES.join('|')})\\b([^>]*)>`, 'g'))) {
@@ -63,8 +74,15 @@ export function checkSource(name, kind, svg) {
     const stroke = attr('stroke');
     if (fill === undefined) {
       problems.push(`${name} has a <${m[1]}> with no fill, which draws black: give every shape its own fill`);
-    } else if (stroke !== undefined && stroke !== 'none' && fill !== 'none' && stroke.toUpperCase() !== fill.toUpperCase()) {
-      problems.push(`${name} has a <${m[1]}> with stroke ${stroke} on fill ${fill}, an outline: give the stroke its fill's colour, or fill="none" for a line`);
+    } else if (
+      stroke !== undefined &&
+      stroke !== 'none' &&
+      fill !== 'none' &&
+      stroke.toUpperCase() !== fill.toUpperCase()
+    ) {
+      problems.push(
+        `${name} has a <${m[1]}> with stroke ${stroke} on fill ${fill}, an outline: give the stroke its fill's colour, or fill="none" for a line`,
+      );
     }
   }
   return problems;
@@ -74,8 +92,10 @@ export function checkSource(name, kind, svg) {
 export function checkAppSet({ guide, sources, apps }) {
   const problems = [];
   for (const app of guide) {
-    if (!sources.includes(app)) problems.push(`${app} is in the brand guide but has no source: draw brand/apps/${app}.svg`);
-    if (!apps.includes(app)) problems.push(`${app} is in the brand guide but not in APPS in scripts/assets.config.mjs, so it has no avatar`);
+    if (!sources.includes(app))
+      problems.push(`${app} is in the brand guide but has no source: draw brand/apps/${app}.svg`);
+    if (!apps.includes(app))
+      problems.push(`${app} is in the brand guide but not in APPS in scripts/assets.config.mjs, so it has no avatar`);
   }
   for (const app of sources.filter((a) => !guide.includes(a))) {
     problems.push(`brand/apps/${app}.svg is for an App the brand guide's §5 doesn't list`);

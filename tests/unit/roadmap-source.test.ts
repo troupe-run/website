@@ -22,12 +22,14 @@ function tempDir(): string {
 }
 
 describe('readMilestones with TROUPE_MILESTONES unset', () => {
-  it("clones the remote and reads tofu/milestones.json from its main", () => {
+  it('clones the remote and reads tofu/milestones.json from its main', () => {
     const r = infrastructure('{"milestones": [1]}');
-    expect(readMilestones({}, { cacheDir: join(tempDir(), 'infrastructure.git'), remote: r.path })).toBe('{"milestones": [1]}');
+    expect(readMilestones({}, { cacheDir: join(tempDir(), 'infrastructure.git'), remote: r.path })).toBe(
+      '{"milestones": [1]}',
+    );
   });
 
-  it("fetches main again on the next run, so a changed file is read", () => {
+  it('fetches main again on the next run, so a changed file is read', () => {
     const r = infrastructure('{"milestones": [1]}');
     const cacheDir = join(tempDir(), 'infrastructure.git');
     readMilestones({}, { cacheDir, remote: r.path });
@@ -41,7 +43,10 @@ describe('readMilestones with TROUPE_MILESTONES unset', () => {
     readMilestones({}, { cacheDir, remote: r.path });
     const gone = join(tempDir(), 'gone');
     expect(() => readMilestones({}, { cacheDir, remote: gone })).toThrow(
-      new RegExp(`^couldn't fetch troupe-run/infrastructure \\(${gone}\\): .+\\nFix: .*set TROUPE_MILESTONES to a local infrastructure checkout`, 's'),
+      new RegExp(
+        `^couldn't fetch troupe-run/infrastructure \\(${gone}\\): .+\\nFix: .*set TROUPE_MILESTONES to a local infrastructure checkout`,
+        's',
+      ),
     );
   });
 
@@ -51,7 +56,7 @@ describe('readMilestones with TROUPE_MILESTONES unset', () => {
     expect(readMilestones({}, { cacheDir, remote: infrastructure().path })).toBe('{"milestones": []}');
   });
 
-  it("refuses a main with no tofu/milestones.json, naming the file", () => {
+  it('refuses a main with no tofu/milestones.json, naming the file', () => {
     const r = makeRepo();
     cleanup.push(r.remove);
     r.commit({ 'notes.txt': 'x' }, '2026-01-02T03:04:05Z');
@@ -80,18 +85,35 @@ describe('readMilestones with TROUPE_MILESTONES set', () => {
     ['missing', () => join(tempDir(), 'nope'), /which isn't a folder\. Fix:/],
     ['without tofu/milestones.json', () => tempDir(), /which has no tofu\/milestones\.json\. Fix:/],
   ];
-  it.each(refusals)('refuses a TROUPE_MILESTONES that is %s, naming the variable and its value', (_, value, message) => {
-    const v = value();
-    expect(() => readMilestones({ TROUPE_MILESTONES: v }, { cacheDir: 'unused' })).toThrow(message);
-    expect(() => readMilestones({ TROUPE_MILESTONES: v }, { cacheDir: 'unused' })).toThrow(`TROUPE_MILESTONES is set to ${JSON.stringify(v)}`);
-  });
+  it.each(refusals)(
+    'refuses a TROUPE_MILESTONES that is %s, naming the variable and its value',
+    (_, value, message) => {
+      const v = value();
+      expect(() => readMilestones({ TROUPE_MILESTONES: v }, { cacheDir: 'unused' })).toThrow(message);
+      expect(() => readMilestones({ TROUPE_MILESTONES: v }, { cacheDir: 'unused' })).toThrow(
+        `TROUPE_MILESTONES is set to ${JSON.stringify(v)}`,
+      );
+    },
+  );
 });
 
 describe('syncRoadmap', () => {
   it('writes src/generated/roadmap.json from the milestones and the release tags, and returns it', () => {
     const root = tempDir();
-    const r = infrastructure(JSON.stringify({ milestones: [{ title: '0.2.0', description: 'b' }, { title: '0.1.0', description: 'a' }] }));
-    const roadmap = syncRoadmap({ env: {}, root, remote: r.path, tags: [{ tag: 'troupe-run-v0.1.0', date: '2026-11-05T10:00:00+10:00' }] });
+    const r = infrastructure(
+      JSON.stringify({
+        milestones: [
+          { title: '0.2.0', description: 'b' },
+          { title: '0.1.0', description: 'a' },
+        ],
+      }),
+    );
+    const roadmap = syncRoadmap({
+      env: {},
+      root,
+      remote: r.path,
+      tags: [{ tag: 'troupe-run-v0.1.0', date: '2026-11-05T10:00:00+10:00' }],
+    });
     expect(roadmap).toEqual({
       releases: [
         { version: '0.1.0', description: 'a', released: '2026-11-05' },
@@ -102,7 +124,7 @@ describe('syncRoadmap', () => {
     expect(JSON.parse(readFileSync(join(root, 'src/generated/roadmap.json'), 'utf8'))).toEqual(roadmap);
   });
 
-  it('keeps its clone in .cache/infrastructure.git, beside troupe\'s', () => {
+  it("keeps its clone in .cache/infrastructure.git, beside troupe's", () => {
     const root = tempDir();
     syncRoadmap({ env: {}, root, remote: infrastructure().path, tags: [] });
     expect(readFileSync(join(root, '.cache/infrastructure.git/HEAD'), 'utf8')).toMatch(/main/);

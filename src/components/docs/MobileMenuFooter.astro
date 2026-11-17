@@ -5,12 +5,36 @@
 import { getCopy } from '../../lib/copy';
 const copy = await getCopy('header');
 ---
+
 <nav class="mobile-site-nav" aria-label="Site">
-  <ul>{copy.nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+  <ul>
+    {copy.nav.map((l) => (
+      <li>
+        <a href={l.href}>{l.label}</a>
+      </li>
+    ))}
+  </ul>
 </nav>
 <style>
-  .mobile-site-nav { border-top: 1px solid var(--sl-color-gray-6); padding-block: 1rem; }
-  ul { display: flex; flex-wrap: wrap; gap: 8px 20px; list-style: none; margin: 0; padding: 0; }
-  a { color: var(--ink); text-decoration: none; font-size: 16px; }
-  a:hover { color: var(--tomato-text); text-decoration: underline; }
+  .mobile-site-nav {
+    border-top: 1px solid var(--sl-color-gray-6);
+    padding-block: 1rem;
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 16px;
+  }
+  a:hover {
+    color: var(--tomato-text);
+    text-decoration: underline;
+  }
 </style>

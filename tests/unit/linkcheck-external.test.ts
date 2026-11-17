@@ -1,8 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import {
-  boardIssueUrl, decide, exitCode, extraUrlPage, extraUrlProblem, formatReport, matchTrackingIssues, sitePath,
-  TRACKING_TITLE, MAX_ROWS,
+  boardIssueUrl,
+  decide,
+  exitCode,
+  extraUrlPage,
+  extraUrlProblem,
+  formatReport,
+  matchTrackingIssues,
+  sitePath,
+  TRACKING_TITLE,
+  MAX_ROWS,
 } from '../../scripts/linkcheck-external-lib.mjs';
 import { summarise } from '../../scripts/linkinator-lib.mjs';
 
@@ -11,8 +19,14 @@ const real = JSON.parse(readFileSync(new URL('fixtures/linkinator-broken.json', 
 const { broken } = summarise(real);
 // The author shape is copied from `gh issue view --json author` on a real issue opened by GitHub Actions.
 const bot = { login: 'app/github-actions', is_bot: true };
-const issue = (number: number, createdAt: string, over = {}) =>
-  ({ number, title: TRACKING_TITLE, author: bot, createdAt, state: 'OPEN', ...over });
+const issue = (number: number, createdAt: string, over = {}) => ({
+  number,
+  title: TRACKING_TITLE,
+  author: bot,
+  createdAt,
+  state: 'OPEN',
+  ...over,
+});
 const RUN = 'https://github.com/troupe-run/website/actions/runs/1';
 
 describe('decide', () => {
@@ -41,7 +55,9 @@ describe('decide', () => {
   });
 
   it('leaves the issue alone when no external links were checked, even with an issue open', () => {
-    expect(decide({ broken: [], external: 0, openIssues: [issue(7, '2026-10-01T00:00:00Z')] })).toEqual({ action: 'none' });
+    expect(decide({ broken: [], external: 0, openIssues: [issue(7, '2026-10-01T00:00:00Z')] })).toEqual({
+      action: 'none',
+    });
   });
 
   it('leaves the issue alone when linkinator crashed', () => {
@@ -98,19 +114,29 @@ describe('formatReport', () => {
   });
 
   it('escapes a | in a URL so it does not split the table row', () => {
-    const md = formatReport({ broken: [{ url: 'https://example.com/a|b', status: 404, parent: 'dist' }], external: 1, runUrl: RUN });
+    const md = formatReport({
+      broken: [{ url: 'https://example.com/a|b', status: 404, parent: 'dist' }],
+      external: 1,
+      runUrl: RUN,
+    });
     expect(md).toContain('| https://example.com/a\\|b | 404 | / |');
   });
 
   it(`shows at most ${MAX_ROWS} rows and says how many more there are`, () => {
-    const many = Array.from({ length: MAX_ROWS + 1 }, (_, i) => ({ url: `https://example.com/${i}`, status: 404, parent: 'dist' }));
+    const many = Array.from({ length: MAX_ROWS + 1 }, (_, i) => ({
+      url: `https://example.com/${i}`,
+      status: 404,
+      parent: 'dist',
+    }));
     const md = formatReport({ broken: many, external: 200, runUrl: RUN });
     expect(md.split('\n').filter((l) => l.startsWith('| https://'))).toHaveLength(MAX_ROWS);
     expect(md).toContain('+1 more, see the run.');
   });
 
   it('says how many links were checked when none is broken', () => {
-    expect(formatReport({ broken: [], external: 75, runUrl: RUN })).toBe(`No broken external links: 75 checked.\n\nRun: ${RUN}`);
+    expect(formatReport({ broken: [], external: 75, runUrl: RUN })).toBe(
+      `No broken external links: 75 checked.\n\nRun: ${RUN}`,
+    );
   });
 });
 
@@ -118,10 +144,14 @@ describe('boardIssueUrl', () => {
   const URL18 = 'https://github.com/troupe-run/website/issues/18';
   it('is the URL gh printed when the run opened the issue', () =>
     expect(boardIssueUrl({ decision: { action: 'open' }, openedUrl: URL18 })).toBe(URL18));
-  it('is the matched issue\'s url when the run commented on it', () =>
-    expect(boardIssueUrl({ decision: { action: 'comment', issue: issue(18, '2026-10-19T00:00:00Z', { url: URL18 }) } })).toBe(URL18));
+  it("is the matched issue's url when the run commented on it", () =>
+    expect(
+      boardIssueUrl({ decision: { action: 'comment', issue: issue(18, '2026-10-19T00:00:00Z', { url: URL18 }) } }),
+    ).toBe(URL18));
   it('is empty when the run closed the issue or had nothing to do', () => {
-    expect(boardIssueUrl({ decision: { action: 'close', issue: issue(18, '2026-10-19T00:00:00Z', { url: URL18 }) } })).toBe('');
+    expect(
+      boardIssueUrl({ decision: { action: 'close', issue: issue(18, '2026-10-19T00:00:00Z', { url: URL18 }) } }),
+    ).toBe('');
     expect(boardIssueUrl({ decision: { action: 'none' } })).toBe('');
   });
   it('is empty when the run opened the issue but gh printed no URL', () =>
@@ -136,12 +166,14 @@ describe('extraUrlProblem', () => {
   it('accepts an absolute https URL that no skip matches', () =>
     expect(extraUrlProblem('https://troupe.run/definitely-not-here-404', [])).toBeNull());
   it.each(['troupe.run/x', 'ftp://troupe.run/x', '/docs/', 'not a url'])(
-    'refuses %s, naming extra-url and the value', (value) => {
+    'refuses %s, naming extra-url and the value',
+    (value) => {
       const problem = extraUrlProblem(value, []);
       expect(problem).toContain('extra-url');
       expect(problem).toContain(JSON.stringify(value));
       expect(problem).toContain('absolute http(s) URL');
-    });
+    },
+  );
   it('refuses a URL a skip pattern matches, naming the pattern', () => {
     const problem = extraUrlProblem('https://example.com/a', [{ pattern: 'example\\.com', reason: 'test' }]);
     expect(problem).toContain('extra-url');

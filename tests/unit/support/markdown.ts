@@ -19,6 +19,10 @@ export function table(text: string): { header: string[]; rows: string[][] } {
     block.push(l);
   }
   const cells = (l: string) =>
-    l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim().replace(/`/g, ''));
+    l
+      .trim()
+      .replace(/^\||\|$/g, '')
+      .split('|')
+      .map((c) => c.trim().replace(/`/g, ''));
   return { header: cells(block[0]), rows: block.slice(2).map(cells) };
 }

@@ -13,7 +13,9 @@ try {
   const { copies } = manifest.protocol;
   console.log(`docs:sync: /protocol/ has ${copies.length} copies, the latest from ${copies[0].ref}`);
   const roadmap = syncRoadmap({ root, tags: manifest.releases });
-  console.log(`docs:sync: /status/ lists ${roadmap.releases.length} releases, the latest released ${roadmap.latest ?? 'none yet'}`);
+  console.log(
+    `docs:sync: /status/ lists ${roadmap.releases.length} releases, the latest released ${roadmap.latest ?? 'none yet'}`,
+  );
 } catch (error) {
   if (!(error instanceof TroupeDocsError) && !(error instanceof RoadmapError)) throw error;
   console.error(`docs:sync: ${error.message}`);

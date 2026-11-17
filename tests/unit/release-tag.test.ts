@@ -23,7 +23,9 @@ describe('releaseVersion', () => {
   it.each(['troupe-run-v1.0.0-rc.1', 'troupe-run-v01.0.0', 'troupe-run-v1.2', 'troupe-run-vx'])(
     'refuses %s, naming it and the form that is accepted',
     (tag) => {
-      expect(() => releaseVersion(tag)).toThrow(`${tag} isn't a release tag troupe.run can build: use troupe-run-vMAJOR.MINOR.PATCH`);
+      expect(() => releaseVersion(tag)).toThrow(
+        `${tag} isn't a release tag troupe.run can build: use troupe-run-vMAJOR.MINOR.PATCH`,
+      );
     },
   );
 });

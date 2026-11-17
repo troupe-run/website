@@ -4,7 +4,11 @@ import { execFileSync } from 'node:child_process';
 // at once is ordinary: each run takes a port that's free when it starts. Playwright loads its config again in each
 // worker; writing the port back to E2E_PORT, which the workers inherit, gives them all the same one.
 // The fixture build's server has its own, E2E_FIXTURE_PORT, chosen the same way (versioned-docs design D9).
-export function e2ePort(env: Record<string, string | undefined> = process.env, name = 'E2E_PORT', avoid?: number): number {
+export function e2ePort(
+  env: Record<string, string | undefined> = process.env,
+  name = 'E2E_PORT',
+  avoid?: number,
+): number {
   const set = env[name];
   if (set === undefined) {
     let port = freePort();

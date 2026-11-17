@@ -33,7 +33,10 @@ const INSTALL = '/docs/opening-night/install/';
 
 test('the hero links "Install (pre-alpha)" to the install page, and has no disabled button', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#top').getByRole('link', { name: 'Install (pre-alpha)' })).toHaveAttribute('href', INSTALL);
+  await expect(page.locator('#top').getByRole('link', { name: 'Install (pre-alpha)' })).toHaveAttribute(
+    'href',
+    INSTALL,
+  );
   await expect(page.locator('#top button:disabled')).toHaveCount(0);
 });
 
@@ -55,14 +58,18 @@ test('Tab from "Watch on GitHub" focuses "Install (pre-alpha)", which draws an o
 
 test('hero cast is human, agent, troupe, agent, human', async ({ page }) => {
   await page.goto('/');
-  const kinds = await page.locator('[data-cast] .character').evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')));
+  const kinds = await page
+    .locator('[data-cast] .character')
+    .evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')));
   expect(kinds).toEqual(['human', 'agent', 'troupe', 'agent', 'human']);
 });
 
 test('principles section shows six cards, each with exactly one topic icon', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#principles .principle')).toHaveCount(6);
-  const perCard = await page.locator('#principles .principle').evaluateAll((els) => els.map((e) => e.querySelectorAll('.topic-icon').length));
+  const perCard = await page
+    .locator('#principles .principle')
+    .evaluateAll((els) => els.map((e) => e.querySelectorAll('.topic-icon').length));
   expect(perCard).toEqual([1, 1, 1, 1, 1, 1]);
 });
 
@@ -76,7 +83,9 @@ for (const width of [320, 390]) {
   test(`no page-level horizontal scroll at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/');
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
     expect(overflow).toBeLessThanOrEqual(0);
   });
 }
@@ -84,7 +93,9 @@ for (const width of [320, 390]) {
 test('below 480px the cast shows three characters, troupe in the middle', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto('/');
-  const visible = await page.locator('[data-cast] .character:visible').evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')));
+  const visible = await page
+    .locator('[data-cast] .character:visible')
+    .evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')));
   expect(visible).toEqual(['agent', 'troupe', 'agent']);
 });
 
@@ -114,7 +125,8 @@ test("the hero's line under the title is the brand guide's paragraph", async ({ 
   await page.goto('/');
   await expect(page.locator('#top .sub')).toHaveText(
     'troupe runs your development process with a team of agents, asking only when it needs you. ' +
-    'Work branches and loops, decisions go to whoever owns them, and every decision records who made it.');
+      'Work branches and loops, decisions go to whoever owns them, and every decision records who made it.',
+  );
 });
 
 test('the how-it-works section has the --surface background', async ({ page }) => {
@@ -130,11 +142,14 @@ test('the how-it-works section has the --surface background', async ({ page }) =
   expect(bgs.section).toBe(bgs.surface);
 });
 
-test('each how-it-works step names the problem it fixes inside its own sentence, with no separate label', async ({ page }) => {
+test('each how-it-works step names the problem it fixes inside its own sentence, with no separate label', async ({
+  page,
+}) => {
   await page.goto('/');
   await expect(page.locator('#how-it-works .instead')).toHaveCount(0);
   await expect(page.locator('#how-it-works #step-panel-1 .body')).toHaveText(
-    "Tasks fork, join, swarm and loop, so the work isn't stuck behind one agent at a time.");
+    "Tasks fork, join, swarm and loop, so the work isn't stuck behind one agent at a time.",
+  );
 });
 
 test('the home page has no standalone problem section', async ({ page }) => {
@@ -144,23 +159,32 @@ test('the home page has no standalone problem section', async ({ page }) => {
 
 test('the cast band lists four roles in order with their holders', async ({ page }) => {
   await page.goto('/');
-  const rows = await page.locator('#the-cast .row').evaluateAll((els) => els.map((e) => [
-    e.querySelector('.role')?.textContent, e.querySelector('.holder')?.textContent,
-  ]));
-  expect(rows).toEqual([['Product owner', 'Alex'], ['Engineer', 'Build agent'], ['Reviewer', 'Review agent'], ['QA', 'Sam']]);
+  const rows = await page
+    .locator('#the-cast .row')
+    .evaluateAll((els) =>
+      els.map((e) => [e.querySelector('.role')?.textContent, e.querySelector('.holder')?.textContent]),
+    );
+  expect(rows).toEqual([
+    ['Product owner', 'Alex'],
+    ['Engineer', 'Build agent'],
+    ['Reviewer', 'Review agent'],
+    ['QA', 'Sam'],
+  ]);
 });
 
 test('each cast row shows a lilac circle for a person and a teal rounded square for an agent', async ({ page }) => {
   await page.goto('/');
-  const shapes = await page.locator('#the-cast .row .shape').evaluateAll((els) => els.map((e) => {
-    const s = getComputedStyle(e);
-    const probe = document.createElement('i');
-    document.body.append(probe);
-    probe.style.color = `var(--${e.dataset.kind === 'human' ? 'lilac' : 'teal'})`;
-    const token = getComputedStyle(probe).color;
-    probe.remove();
-    return { kind: e.getAttribute('data-kind'), bg: s.backgroundColor, token, round: s.borderTopLeftRadius };
-  }));
+  const shapes = await page.locator('#the-cast .row .shape').evaluateAll((els) =>
+    els.map((e) => {
+      const s = getComputedStyle(e);
+      const probe = document.createElement('i');
+      document.body.append(probe);
+      probe.style.color = `var(--${e.dataset.kind === 'human' ? 'lilac' : 'teal'})`;
+      const token = getComputedStyle(probe).color;
+      probe.remove();
+      return { kind: e.getAttribute('data-kind'), bg: s.backgroundColor, token, round: s.borderTopLeftRadius };
+    }),
+  );
   expect(shapes.map((s) => s.kind)).toEqual(['human', 'agent', 'agent', 'human']);
   for (const s of shapes) {
     expect(s.bg).toBe(s.token);
@@ -180,7 +204,9 @@ test('the cast band does not animate: its shapes are not hero characters and not
   await expect(page.locator('#the-cast [data-cast]')).toHaveCount(0);
 });
 
-test('the landing page says neither repo, YAML nor config, except in the local-first principle’s "its config, history and decisions" line', async ({ page }) => {
+test('the landing page says neither repo, YAML nor config, except in the local-first principle’s "its config, history and decisions" line', async ({
+  page,
+}) => {
   await page.goto('/');
   const text = (await page.locator('main').innerText()).replace('its config, history and decisions live in git', '');
   expect(text).not.toMatch(/\b(repo|YAML|config)\b/i);
@@ -206,24 +232,32 @@ test('the hero has no eyebrow line, no status badge and the header has no status
 test('at 1280px the hero headline sits on one line', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
-  const lines = await page.locator('#top h1').evaluate((e) => Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight)));
+  const lines = await page
+    .locator('#top h1')
+    .evaluate((e) => Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight)));
   expect(lines).toBe(1);
 });
 
-test('the hero buttons and the closing button centre their text, and the hero pair share a baseline', async ({ page }) => {
+test('the hero buttons and the closing button centre their text, and the hero pair share a baseline', async ({
+  page,
+}) => {
   await page.goto('/');
   const btns = page.locator('#top .btn, #follow .btn');
   await expect(btns).toHaveCount(3);
-  const info = await btns.evaluateAll((els) => els.map((e) => {
-    const s = getComputedStyle(e);
-    return { display: s.display, align: s.alignItems, height: e.getBoundingClientRect().height };
-  }));
+  const info = await btns.evaluateAll((els) =>
+    els.map((e) => {
+      const s = getComputedStyle(e);
+      return { display: s.display, align: s.alignItems, height: e.getBoundingClientRect().height };
+    }),
+  );
   for (const i of info) {
     expect(i.display).toMatch(/flex/); // blockified to flex inside the hero's flex row
     expect(i.align).toBe('center');
   }
   expect(new Set(info.map((i) => Math.round(i.height))).size).toBe(1);
-  const tops = await page.locator('#top .btn').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+  const tops = await page
+    .locator('#top .btn')
+    .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
   expect(new Set(tops).size).toBe(1);
 });
 
@@ -242,7 +276,9 @@ test('the footer drops the privacy and licence lines and links hps.gd twice, in 
 test('six principles lay out as two rows of three at 1280px', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
-  const tops = await page.locator('#principles .principle').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+  const tops = await page
+    .locator('#principles .principle')
+    .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
   const rows = [...new Set(tops)].map((t) => tops.filter((x) => x === t).length);
   expect(rows).toEqual([3, 3]);
 });

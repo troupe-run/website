@@ -4,7 +4,12 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  openSource, parseFrontMatter, frontMatterProblems, renderPage, FRONT_MATTER_KEYS, SITE_KEYS,
+  openSource,
+  parseFrontMatter,
+  frontMatterProblems,
+  renderPage,
+  FRONT_MATTER_KEYS,
+  SITE_KEYS,
 } from '../../scripts/troupe-docs-lib.mjs';
 
 // The site's reading of a page is troupe's (spec: versioned-docs; design D4). These tests read troupe's main
@@ -16,7 +21,10 @@ let userdocs: string;
 let work: string;
 beforeAll(() => {
   source = openSource(process.env, { cacheDir: '.cache/troupe.git' });
-  userdocs = source.kind === 'local' ? readFileSync(join(process.env.TROUPE_DOCS!, USERDOCS), 'utf8') : source.readRepo('main', USERDOCS);
+  userdocs =
+    source.kind === 'local'
+      ? readFileSync(join(process.env.TROUPE_DOCS!, USERDOCS), 'utf8')
+      : source.readRepo('main', USERDOCS);
   work = mkdtempSync(join(tmpdir(), 'troupe-userdocs-'));
   // userdocs.py finds the repository three folders up from itself, so give it three.
   mkdirSync(join(work, 'a/b/c'), { recursive: true });
@@ -65,7 +73,10 @@ describe("troupe's page contract", () => {
 
   it("adds only the site's keys to a page: slug, editUrl, lastUpdated and pagefind", () => {
     const front = { title: 'T', description: 'D.', status: 'written', prerelease: false };
-    const text = renderPage({ ref: 'troupe-run-v0.1.0', dir: 'v0.1' }, { path: 'programme/t.md', front, body: 'B', editUrl: false, date: '2026-01-01T00:00:00Z', pagefind: false });
+    const text = renderPage(
+      { ref: 'troupe-run-v0.1.0', dir: 'v0.1' },
+      { path: 'programme/t.md', front, body: 'B', editUrl: false, date: '2026-01-01T00:00:00Z', pagefind: false },
+    );
     const keys = [...text.split('\n---\n')[0].matchAll(/^(\w+):/gm)].map(([, k]) => k);
     expect(keys.filter((k) => !(k in FRONT_MATTER_KEYS))).toEqual(SITE_KEYS);
     expect(SITE_KEYS).toEqual(['slug', 'editUrl', 'lastUpdated', 'pagefind']);
@@ -82,10 +93,50 @@ describe("troupe's page contract", () => {
 // Every input both readers see, and must agree on: troupe's real pages, and generated front matter around the
 // edges of the YAML subset (quoting, reserved words, numbers, indicators, comments, keys).
 const VALUES = [
-  'Theatres', '"Flows: fork, join"', 'Flows: fork, join', "'it''s'", "'it's'", 'yes', 'No', 'null', '~', '12', '-1.5',
-  '+3', 'a # comment', 'a#b', '[a, b]', '{a: 1}', '- item', '?q', '&anchor', '*alias', '!tag', '|', '>', '%x', '@at',
-  '`tick`', '"bad \\q escape"', '"ok \\"quoted\\""', 'true', 'false', 'True', 'ends:', 'a: b', ' lead', 'trail ', '٣',
-  'é accents', '"\\u00e9"', "''", '""', 'C:\\path', 'tab\there', ' \t', "it's \"both\"",
+  'Theatres',
+  '"Flows: fork, join"',
+  'Flows: fork, join',
+  "'it''s'",
+  "'it's'",
+  'yes',
+  'No',
+  'null',
+  '~',
+  '12',
+  '-1.5',
+  '+3',
+  'a # comment',
+  'a#b',
+  '[a, b]',
+  '{a: 1}',
+  '- item',
+  '?q',
+  '&anchor',
+  '*alias',
+  '!tag',
+  '|',
+  '>',
+  '%x',
+  '@at',
+  '`tick`',
+  '"bad \\q escape"',
+  '"ok \\"quoted\\""',
+  'true',
+  'false',
+  'True',
+  'ends:',
+  'a: b',
+  ' lead',
+  'trail ',
+  '٣',
+  'é accents',
+  '"\\u00e9"',
+  "''",
+  '""',
+  'C:\\path',
+  'tab\there',
+  ' \t',
+  'it\'s "both"',
 ];
 const KEYS = ['title', 'description', 'status', 'prerelease', 'purpose', 'staus', 'Title', 'with_underscore', '9lives'];
 function generated(): string[] {
@@ -98,7 +149,13 @@ function generated(): string[] {
       }
     }
   }
-  out.push('# no front matter\n', '---\ntitle: T\n', '---\ntitle: A\ntitle: B\n---\n', '---\nno separator\n---\n', '---\r\ntitle: T\r\n---\r\n');
+  out.push(
+    '# no front matter\n',
+    '---\ntitle: T\n',
+    '---\ntitle: A\ntitle: B\n---\n',
+    '---\nno separator\n---\n',
+    '---\r\ntitle: T\r\n---\r\n',
+  );
   return out;
 }
 
@@ -113,7 +170,9 @@ describe('the site reads front matter as troupe does', () => {
     const texts = generated();
     const site = siteReads(texts);
     const theirs = troupeReads(texts);
-    const differ = texts.flatMap((t, i) => (JSON.stringify(site[i]) === JSON.stringify(theirs[i]) ? [] : [{ text: t, site: site[i], troupe: theirs[i] }]));
+    const differ = texts.flatMap((t, i) =>
+      JSON.stringify(site[i]) === JSON.stringify(theirs[i]) ? [] : [{ text: t, site: site[i], troupe: theirs[i] }],
+    );
     expect(differ).toEqual([]);
   });
 });

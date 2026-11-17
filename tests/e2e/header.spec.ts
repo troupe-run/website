@@ -24,7 +24,9 @@ for (const p of PAGES) {
     await page.goto(p.path);
     const brand = page.locator('.site-header .brand');
     // The wordmark and section name, not the docs version picker that follows them (versioned-docs design D6).
-    await expect(brand.locator(':scope > a')).toHaveText(p.label ? ['troupe', p.label] : ['troupe'], { useInnerText: false });
+    await expect(brand.locator(':scope > a')).toHaveText(p.label ? ['troupe', p.label] : ['troupe'], {
+      useInnerText: false,
+    });
     await expect(brand.locator('.section')).toHaveCount(p.label ? 1 : 0);
     if (p.label) await expect(brand.locator('.section')).toHaveAttribute('href', `/${p.label}/`);
   });
@@ -33,14 +35,15 @@ for (const p of PAGES) {
 for (const path of ['/docs/programme/what-is-troupe/', '/status/', '/blog/']) {
   test(`on ${path} "troupe" and the section name share a baseline`, async ({ page }) => {
     await page.goto(path);
-    const baseline = (sel: string) => page.locator(sel).evaluate((el) => {
-      const probe = document.createElement('span');
-      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
-      el.appendChild(probe);
-      const y = probe.getBoundingClientRect().top;
-      probe.remove();
-      return y;
-    });
+    const baseline = (sel: string) =>
+      page.locator(sel).evaluate((el) => {
+        const probe = document.createElement('span');
+        probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+        el.appendChild(probe);
+        const y = probe.getBoundingClientRect().top;
+        probe.remove();
+        return y;
+      });
     const word = await baseline('.site-header .wordmark');
     const section = await baseline('.site-header .section');
     expect(Math.abs(word - section)).toBeLessThanOrEqual(0.5);
@@ -84,7 +87,12 @@ async function linksFitOnScreen(page: import('@playwright/test').Page) {
   }
 }
 
-for (const [name, path] of [['landing page', '/'], ['docs page', '/docs/programme/what-is-troupe/'], ['blog index', '/blog/'], ['blog post', BLOG_POST]] as const) {
+for (const [name, path] of [
+  ['landing page', '/'],
+  ['docs page', '/docs/programme/what-is-troupe/'],
+  ['blog index', '/blog/'],
+  ['blog post', BLOG_POST],
+] as const) {
   test(`at 1280px every site link on the ${name} is fully on screen`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(path);
@@ -92,7 +100,11 @@ for (const [name, path] of [['landing page', '/'], ['docs page', '/docs/programm
   });
 }
 
-for (const [name, path] of [['landing page', '/'], ['blog index', '/blog/'], ['blog post', BLOG_POST]] as const) {
+for (const [name, path] of [
+  ['landing page', '/'],
+  ['blog index', '/blog/'],
+  ['blog post', BLOG_POST],
+] as const) {
   test(`at 375px every site link on the ${name} is fully on screen`, async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 800 });
     await page.goto(path);
@@ -133,9 +145,12 @@ test('a blog post keeps its "On this page" contents', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-has-toc');
 });
 
-test('the blog post column is the docs width, not Starlight\'s wide splash width', async ({ page }) => {
+test("the blog post column is the docs width, not Starlight's wide splash width", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto(BLOG_POST);
-  const width = await page.locator('.main-pane .sl-container').first().evaluate((el) => el.getBoundingClientRect().width);
+  const width = await page
+    .locator('.main-pane .sl-container')
+    .first()
+    .evaluate((el) => el.getBoundingClientRect().width);
   expect(width).toBeLessThanOrEqual(720);
 });

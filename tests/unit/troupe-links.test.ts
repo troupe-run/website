@@ -10,12 +10,36 @@ const DOCS = resolve('src/content/docs/docs');
 
 describe('rewriteLink', () => {
   it.each([
-    ['a sibling page', 'gates-and-decisions.md', 'the-company/flows.md', '/docs/', '/docs/the-company/gates-and-decisions/'],
-    ['a page in another section', '../stagecraft/build-a-flow.md', 'the-company/flows.md', '/docs/', '/docs/stagecraft/build-a-flow/'],
+    [
+      'a sibling page',
+      'gates-and-decisions.md',
+      'the-company/flows.md',
+      '/docs/',
+      '/docs/the-company/gates-and-decisions/',
+    ],
+    [
+      'a page in another section',
+      '../stagecraft/build-a-flow.md',
+      'the-company/flows.md',
+      '/docs/',
+      '/docs/stagecraft/build-a-flow/',
+    ],
     ['a link with an anchor', 'cli.md#errors', 'prompt-book/events.md', '/docs/', '/docs/prompt-book/cli/#errors'],
-    ['a link in an archived version', '../stagecraft/build-a-flow.md', 'the-company/flows.md', '/docs/v0.1/', '/docs/v0.1/stagecraft/build-a-flow/'],
+    [
+      'a link in an archived version',
+      '../stagecraft/build-a-flow.md',
+      'the-company/flows.md',
+      '/docs/v0.1/',
+      '/docs/v0.1/stagecraft/build-a-flow/',
+    ],
     ['a link in next', 'flows.md', 'the-company/notes.md', '/docs/next/', '/docs/next/the-company/flows/'],
-    ['a section path that resolves back into its section', '../the-company/lineage.md', 'the-company/notes.md', '/docs/', '/docs/the-company/lineage/'],
+    [
+      'a section path that resolves back into its section',
+      '../the-company/lineage.md',
+      'the-company/notes.md',
+      '/docs/',
+      '/docs/the-company/lineage/',
+    ],
   ])('rewrites %s', (_, url, page, base, expected) => {
     expect(rewriteLink(url, page, base)).toBe(expected);
   });
@@ -50,7 +74,10 @@ async function render(markdown: string, file: string) {
 
 describe('troupeLinks, in the Markdown pipeline', () => {
   it("rewrites a page's links to its version's URLs", async () => {
-    const html = await render('See [flows](flows.md) and [the CLI](../prompt-book/cli.md#errors).', 'v0.1/the-company/notes.md');
+    const html = await render(
+      'See [flows](flows.md) and [the CLI](../prompt-book/cli.md#errors).',
+      'v0.1/the-company/notes.md',
+    );
     expect(html).toContain('href="/docs/v0.1/the-company/flows/"');
     expect(html).toContain('href="/docs/v0.1/prompt-book/cli/#errors"');
   });
@@ -68,8 +95,13 @@ describe('troupeLinks, in the Markdown pipeline', () => {
   });
 
   it("doesn't touch pages outside the generated docs, such as the blog", async () => {
-    const processor = await createSatteriMarkdownProcessor({ mdastPlugins: [troupeLinks(DOCS)], syntaxHighlight: false });
-    const { code } = await processor.render('[x](other.md)', { fileURL: pathToFileURL(resolve('src/content/docs/blog/post.md')) });
+    const processor = await createSatteriMarkdownProcessor({
+      mdastPlugins: [troupeLinks(DOCS)],
+      syntaxHighlight: false,
+    });
+    const { code } = await processor.render('[x](other.md)', {
+      fileURL: pathToFileURL(resolve('src/content/docs/blog/post.md')),
+    });
     expect(code).toContain('href="other.md"');
   });
 

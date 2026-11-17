@@ -33,17 +33,24 @@ function troupeDocs() {
           if (first) redirects[v.base.slice(0, -1)] = pageUrl(v.base, first.path);
           logger.info(`${v.base} from ${v.ref}, ${v.pages.length} pages`);
         }
-        logger.info(`/protocol/ has ${manifest.protocol.copies.length} copies, the latest from ${manifest.protocol.copies[0].ref}`);
+        logger.info(
+          `/protocol/ has ${manifest.protocol.copies.length} copies, the latest from ${manifest.protocol.copies[0].ref}`,
+        );
         const roadmap = syncRoadmap({ root, tags: manifest.releases });
-        logger.info(`/status/ lists ${roadmap.releases.length} releases, the latest released ${roadmap.latest ?? 'none yet'}`);
+        logger.info(
+          `/status/ lists ${roadmap.releases.length} releases, the latest released ${roadmap.latest ?? 'none yet'}`,
+        );
         // The pages the website keeps moved out of /docs (design D10). troupe's "What is troupe?" links the first.
         redirects['/docs/programme/status-and-roadmap'] = '/status/';
         redirects['/docs/backstage/contributing'] = CONTRIBUTING;
         updateConfig({ redirects });
         // Added to the processor's own list, as Starlight adds its plugins, so neither replaces the other.
         const { processor } = config.markdown;
-        if (!isSatteriProcessor(processor)) throw new Error(`troupe-docs needs the Sätteri Markdown processor, not ${processor.name}`);
-        processor.options.mdastPlugins.push(troupeLinks(fileURLToPath(new URL('src/content/docs/docs/', import.meta.url))));
+        if (!isSatteriProcessor(processor))
+          throw new Error(`troupe-docs needs the Sätteri Markdown processor, not ${processor.name}`);
+        processor.options.mdastPlugins.push(
+          troupeLinks(fileURLToPath(new URL('src/content/docs/docs/', import.meta.url))),
+        );
         // /status/'s status line and release lists, and /protocol/'s release list, where their pages mark them (spec:
         // roadmap, protocol-schemas). Registered from scripts/generated-pages.mjs, the table src/content.config.ts's
         // docs loader reads to render a page again when its inputs change (troupe-run/website#35).

@@ -3,6 +3,7 @@ import TopicIcon from '../TopicIcon.astro';
 import { getCopy } from '../../lib/copy';
 const copy = await getCopy('principles');
 ---
+
 <section id="principles" class="principles" aria-labelledby="principles-title">
   <div class="wrap">
     <p class="eyebrow">{copy.eyebrow}</p>
@@ -10,20 +11,63 @@ const copy = await getCopy('principles');
     <p class="intro">{copy.intro}</p>
     <ul class="grid">
       {copy.items.map((p) => (
-        <li class="principle"><TopicIcon name={p.icon} /><h3>{p.title}</h3><p>{p.body}</p></li>
+        <li class="principle">
+          <TopicIcon name={p.icon} />
+          <h3>{p.title}</h3>
+          <p>{p.body}</p>
+        </li>
       ))}
     </ul>
   </div>
 </section>
 <style>
-  .principles { padding: 40px 0; }
-  h2 { font-size: clamp(24px, 4vw, 34px); margin: 6px 0; }
-  .intro { color: var(--muted); }
-  .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; list-style: none; padding: 0; margin: 18px 0 0; }
-  .principle { flex: 0 1 calc((100% - 24px) / 3); box-sizing: border-box; }
-  @media (max-width: 900px) { .principle { flex-basis: calc((100% - 12px) / 2); } }
-  @media (max-width: 479px) { .principle { flex-basis: 100%; } }
-  .principle { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 16px; }
-  .principle h3 { font-size: 17px; font-weight: 700; margin: 10px 0 4px; }
-  .principle p { margin: 0; color: var(--muted); font-size: 15px; }
+  .principles {
+    padding: 40px 0;
+  }
+  h2 {
+    font-size: clamp(24px, 4vw, 34px);
+    margin: 6px 0;
+  }
+  .intro {
+    color: var(--muted);
+  }
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 18px 0 0;
+  }
+  .principle {
+    flex: 0 1 calc((100% - 24px) / 3);
+    box-sizing: border-box;
+  }
+  @media (max-width: 900px) {
+    .principle {
+      flex-basis: calc((100% - 12px) / 2);
+    }
+  }
+  @media (max-width: 479px) {
+    .principle {
+      flex-basis: 100%;
+    }
+  }
+  .principle {
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .principle h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 10px 0 4px;
+  }
+  .principle p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
 </style>

@@ -7,11 +7,17 @@ import CastDefs from '../../src/components/CastDefs.astro';
 import { TOPIC_ICONS } from '../../src/lib/topic-icons';
 
 let c: AstroContainer;
-beforeAll(async () => { c = await AstroContainer.create(); });
+beforeAll(async () => {
+  c = await AstroContainer.create();
+});
 const count = (html: string, re: RegExp) => (html.match(re) ?? []).length;
 
 describe('Character', () => {
-  for (const [kind, headTag] of [['human', '<circle'], ['agent', '<rect'], ['troupe', '<path']] as const) {
+  for (const [kind, headTag] of [
+    ['human', '<circle'],
+    ['agent', '<rect'],
+    ['troupe', '<path'],
+  ] as const) {
     it(`${kind}: head and reflection use the ${headTag.slice(1)} shape, and both eyes are circles`, async () => {
       const html = await c.renderToString(Character, { props: { kind } });
       expect(html).toContain(`data-kind="${kind}"`);
