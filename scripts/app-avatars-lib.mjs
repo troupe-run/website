@@ -1,13 +1,23 @@
 // The GitHub Apps' avatars (spec: app-avatars). The brand guide's §5 "GitHub Apps" table is the list of Apps and
-// each one's kind; these check the sources in brand/apps/ and APPS in assets.config.mjs against it.
+// each one's kind and head; these check the sources in brand/apps/ and APPS in assets.config.mjs against it.
 
 const GUIDE = 'docs/brand-guide.md';
-const HEAD = { system: '#FF5A3C', agent: '#14857D' };
+const KINDS = ['system', 'agent'];
+// Each head's colour, and the kinds it may be drawn for. The square means an agent and the triangle means troupe
+// acting by itself; the bug is the one recorded exception, a teal head on a system App (troupe-run/website#128).
+const HEADS = {
+  triangle: { colour: '#FF5A3C', kinds: ['system'] },
+  square: { colour: '#14857D', kinds: ['agent'] },
+  bug: { colour: '#14857D', kinds: ['system'] },
+};
 const SHARED = ['#FFFFFF', '#1D1B2F', '#FFC93C', '#FFF8EE']; // eyes, ink, sunflower, and cream for the badge's ring
 const SHAPES = ['path', 'circle', 'rect', 'ellipse', 'polygon', 'polyline', 'line'];
 const NOT_FLAT = 'an App avatar is flat, with no gradient, filter, mask or opacity';
 
-/** The rows of §5's "GitHub Apps" table, as { app, kind, prop }. Throws on a missing table or an unknown kind. */
+/**
+ * The rows of §5's "GitHub Apps" table, as { app, kind, head, prop }. Throws on a missing table, an unknown kind or
+ * head, or a head on a kind it isn't for.
+ */
 export function readAppTable(guide) {
   const text = `\n${guide}`;
   const start = text.indexOf('\n## 5.');
@@ -29,19 +39,25 @@ export function readAppTable(guide) {
     );
   }
   const where = `${GUIDE} §5 "GitHub Apps"`;
-  if (block[0]?.join(' | ') !== 'App | Kind | Prop') {
-    throw new Error(`${where}: the table's columns are ${block[0]?.join(' | ')}, expected App | Kind | Prop`);
+  if (block[0]?.join(' | ') !== 'App | Kind | Head | Prop') {
+    throw new Error(`${where}: the table's columns are ${block[0]?.join(' | ')}, expected App | Kind | Head | Prop`);
   }
-  return block.slice(2).map(([app, kind, prop]) => {
-    if (!(kind in HEAD)) throw new Error(`${where}: ${app} has kind "${kind}"; the kind is system or agent`);
-    return { app, kind, prop };
+  return block.slice(2).map(([app, kind, head, prop]) => {
+    if (!KINDS.includes(kind)) throw new Error(`${where}: ${app} has kind "${kind}"; the kind is system or agent`);
+    if (!(head in HEADS)) throw new Error(`${where}: ${app} has head "${head}"; the head is triangle, square or bug`);
+    if (!HEADS[head].kinds.includes(kind)) {
+      throw new Error(
+        `${where}: ${app} is kind ${kind} with head "${head}", which is only for ${HEADS[head].kinds.join(' or ')}`,
+      );
+    }
+    return { app, kind, head, prop };
   });
 }
 
-/** Problems with one App's source SVG: any colour outside its kind's palette, or anything that isn't flat. */
-export function checkSource(name, kind, svg) {
+/** Problems with one App's source SVG: any colour outside its head's palette, or anything that isn't flat. */
+export function checkSource(name, head, svg) {
   const problems = [];
-  const palette = [HEAD[kind], ...SHARED];
+  const palette = [HEADS[head].colour, ...SHARED];
   const reported = new Set();
   for (const m of svg.matchAll(/<(linearGradient|radialGradient|filter|mask|style)\b/g))
     problems.push(`${name} has a <${m[1]}>: ${NOT_FLAT}`);
@@ -57,9 +73,7 @@ export function checkSource(name, kind, svg) {
     const hex = value.toUpperCase();
     if (!palette.includes(hex) && !reported.has(hex)) {
       reported.add(hex);
-      problems.push(
-        `${name} uses ${hex}, which isn't in ${kind === 'agent' ? 'an agent' : 'a system'} App's colours (${palette.join(', ')})`,
-      );
+      problems.push(`${name} uses ${hex}, which isn't in a ${head} App's colours (${palette.join(', ')})`);
     }
   }
   for (const m of svg.matchAll(/\sstyle="([^"]*)"/g)) {
