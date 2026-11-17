@@ -9,13 +9,22 @@ export function pngSize(buf) {
 
 export function hashFiles(paths, root) {
   return Object.fromEntries(
-    paths.map((p) => [p, createHash('sha256').update(readFileSync(join(root, p))).digest('hex')]),
+    paths.map((p) => [
+      p,
+      createHash('sha256')
+        .update(readFileSync(join(root, p)))
+        .digest('hex'),
+    ]),
   );
 }
 
 // Every file the render step writes, so verify() can tell a hand-edited or stale output from a rendered one.
 export function outputPaths(config) {
-  return [...config.ASSETS.map((a) => a.out), ...config.COPIES.map((c) => c.to), ...(config.ICO ? [config.ICO.to] : [])];
+  return [
+    ...config.ASSETS.map((a) => a.out),
+    ...config.COPIES.map((c) => c.to),
+    ...(config.ICO ? [config.ICO.to] : []),
+  ];
 }
 
 export function verify(root, config) {
@@ -30,12 +39,19 @@ export function verify(root, config) {
   }
   for (const a of config.ASSETS) {
     const out = join(root, a.out);
-    if (!existsSync(out)) { problems.push(`${a.out} is missing`); continue; }
+    if (!existsSync(out)) {
+      problems.push(`${a.out} is missing`);
+      continue;
+    }
     const { width, height } = pngSize(readFileSync(out));
-    if (width !== a.width || height !== a.height) problems.push(`${a.out} is ${width}×${height}, expected ${a.width}×${a.height}`);
+    if (width !== a.width || height !== a.height)
+      problems.push(`${a.out} is ${width}×${height}, expected ${a.width}×${a.height}`);
   }
   for (const c of config.COPIES) {
-    if (!existsSync(join(root, c.to))) { problems.push(`${c.to} is missing`); continue; }
+    if (!existsSync(join(root, c.to))) {
+      problems.push(`${c.to} is missing`);
+      continue;
+    }
     if (!readFileSync(join(root, c.from)).equals(readFileSync(join(root, c.to)))) {
       problems.push(`${c.to} differs from ${c.from}: run npm run assets:render`);
     }
@@ -44,7 +60,8 @@ export function verify(root, config) {
   for (const p of outputPaths(config)) {
     if (!existsSync(join(root, p))) continue; // already reported as missing
     const h = hashFiles([p], root)[p];
-    if (recordedOutputs[p] !== h) problems.push(`${p} differs from the rendered version recorded in the manifest: run npm run assets:render`);
+    if (recordedOutputs[p] !== h)
+      problems.push(`${p} differs from the rendered version recorded in the manifest: run npm run assets:render`);
   }
   return problems;
 }

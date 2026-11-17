@@ -1,24 +1,50 @@
 ---
-interface Props { wordmark?: boolean; height?: number }
+interface Props {
+  wordmark?: boolean;
+  height?: number;
+}
 const { wordmark = false, height = 20 } = Astro.props;
 const width = Math.round((height * 49) / 20);
 ---
+
 <span class="mark">
   <svg width={width} height={height} viewBox="0 0 49 20" aria-hidden="true" focusable="false">
     <circle class="mark-human" cx="7" cy="12" r="7" />
-    <circle class="eye" cx="4.9" cy="11.2" r="1.05" /><circle class="eye" cx="9.1" cy="11.2" r="1.05" />
+    <circle class="eye" cx="4.9" cy="11.2" r="1.05" />
+    <circle class="eye" cx="9.1" cy="11.2" r="1.05" />
     <path class="mark-troupe" d="M24.5 5.6 L31.78 18.2 L17.22 18.2 Z" stroke-width="2" stroke-linejoin="round" />
-    <circle class="eye" cx="22.7" cy="14.6" r="1.1" /><circle class="eye" cx="26.3" cy="14.6" r="1.1" />
+    <circle class="eye" cx="22.7" cy="14.6" r="1.1" />
+    <circle class="eye" cx="26.3" cy="14.6" r="1.1" />
     <rect class="mark-agent" x="34.8" y="5" width="14" height="14" rx="4" />
-    <circle class="eye" cx="38.8" cy="11.3" r="1.1" /><circle class="eye" cx="44.8" cy="11.3" r="1.1" />
+    <circle class="eye" cx="38.8" cy="11.3" r="1.1" />
+    <circle class="eye" cx="44.8" cy="11.3" r="1.1" />
   </svg>
   {wordmark && <span class="wordmark">troupe</span>}
 </span>
 <style is:global>
-  .mark { display: inline-flex; align-items: center; gap: .4em; }
-  .mark-human { fill: var(--lilac); }
-  .mark-troupe { fill: var(--tomato); stroke: var(--tomato); }
-  .mark-agent { fill: var(--teal); }
-  .mark .eye { fill: var(--eye); }
-  .mark .wordmark { font-family: var(--font-display); font-weight: 800; font-size: 1.5em; letter-spacing: -.02em; color: var(--ink); }
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+  .mark-human {
+    fill: var(--lilac);
+  }
+  .mark-troupe {
+    fill: var(--tomato);
+    stroke: var(--tomato);
+  }
+  .mark-agent {
+    fill: var(--teal);
+  }
+  .mark .eye {
+    fill: var(--eye);
+  }
+  .mark .wordmark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.5em;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
 </style>

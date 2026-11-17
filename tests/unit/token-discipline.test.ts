@@ -15,8 +15,8 @@ describe('token discipline', () => {
     const offenders: string[] = [];
     for (const f of [...files('src/components'), ...files('src/pages'), ...files('src/layouts')]) {
       const text = readFileSync(f, 'utf8')
-        .replace(/href="#[^"]*"/g, '')     // in-page anchors
-        .replace(/url\(#[^)]*\)/g, '');    // SVG paint-server references
+        .replace(/href="#[^"]*"/g, '') // in-page anchors
+        .replace(/url\(#[^)]*\)/g, ''); // SVG paint-server references
       for (const m of text.matchAll(HEX)) offenders.push(`${f}: ${m[0]}`);
     }
     expect(offenders).toEqual([]);

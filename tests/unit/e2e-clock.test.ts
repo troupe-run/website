@@ -15,7 +15,12 @@ describe('e2e tests fake the clock only through freezeClock()', () => {
   });
 
   it(`no file under ${E2E}/ other than ${HELPER} calls clock.install(`, () => {
-    const offenders = files.filter((f) => f !== HELPER && readFileSync(join(E2E, f), 'utf8').includes('clock.install('));
-    expect(offenders, `call freezeClock(page) from ./clock instead of page.clock.install() in: ${offenders.join(', ')}`).toEqual([]);
+    const offenders = files.filter(
+      (f) => f !== HELPER && readFileSync(join(E2E, f), 'utf8').includes('clock.install('),
+    );
+    expect(
+      offenders,
+      `call freezeClock(page) from ./clock instead of page.clock.install() in: ${offenders.join(', ')}`,
+    ).toEqual([]);
   });
 });

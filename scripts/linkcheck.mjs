@@ -16,13 +16,24 @@ if (run.error) {
 const { links, scanned, broken } = summarise(run.result);
 console.log(`Scanned ${scanned.length} links in ${dir} (${links.length - scanned.length} skipped)`);
 for (const l of broken) console.error(`✗ ${l.status} ${l.url} (from ${l.parent})`);
-if (scanned.length < 2) { console.error('✗ scanned fewer than 2 links (root only or nothing): the link check is not checking anything'); process.exit(1); }
-if (broken.length) { console.error(`✗ ${broken.length} broken link(s)`); process.exit(1); }
+if (scanned.length < 2) {
+  console.error('✗ scanned fewer than 2 links (root only or nothing): the link check is not checking anything');
+  process.exit(1);
+}
+if (broken.length) {
+  console.error(`✗ ${broken.length} broken link(s)`);
+  process.exit(1);
+}
 console.log('✓ no broken internal links');
 
 const references = checkReferences(dir);
-console.log(`Checked ${references.checked} schema references in ${dir}/protocol (${references.skipped} outside troupe.run skipped)`);
+console.log(
+  `Checked ${references.checked} schema references in ${dir}/protocol (${references.skipped} outside troupe.run skipped)`,
+);
 const problems = referenceProblems(references);
 for (const p of problems) console.error(`✗ ${p}`);
-if (problems.length) { console.error(`✗ ${references.broken.length} broken schema reference(s)`); process.exit(1); }
+if (problems.length) {
+  console.error(`✗ ${references.broken.length} broken schema reference(s)`);
+  process.exit(1);
+}
 console.log('✓ no broken schema references');

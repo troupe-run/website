@@ -1,22 +1,53 @@
 import { describe, it, expect } from 'vitest';
-import { locate, sidebar, pagination, samePageIn, label, shortLabel, versionNotice, sourceUrl, type Manifest, type Version } from '../../src/lib/docs-versions';
+import {
+  locate,
+  sidebar,
+  pagination,
+  samePageIn,
+  label,
+  shortLabel,
+  versionNotice,
+  sourceUrl,
+  type Manifest,
+  type Version,
+} from '../../src/lib/docs-versions';
 import { ordered, firstPage } from '../../src/lib/docs-nav';
 
 // Each version's sidebar, pagination and menu links come from that version's own pages (spec: versioned-docs;
 // design D6).
 const v = (role: Version['role'], dir: string, paths: string[]): Version => ({
-  role, version: dir.startsWith('v') ? dir.slice(1) : null, dir, ref: dir || 'troupe-run-v0.2.0',
+  role,
+  version: dir.startsWith('v') ? dir.slice(1) : null,
+  dir,
+  ref: dir || 'troupe-run-v0.2.0',
   base: dir ? `/docs/${dir}/` : '/docs/',
   pages: paths.map((path) => ({ path, title: path.split('/')[1].replace('.md', '') })),
 });
-const current = { ...v('current', '', ['programme/what-is-troupe.md', 'programme/principles.md', 'stagecraft/build-a-flow.md', 'stagecraft/new-guide.md', 'stagecraft/another.md']), version: '0.2' };
+const current = {
+  ...v('current', '', [
+    'programme/what-is-troupe.md',
+    'programme/principles.md',
+    'stagecraft/build-a-flow.md',
+    'stagecraft/new-guide.md',
+    'stagecraft/another.md',
+  ]),
+  version: '0.2',
+};
 const archived = v('archived', 'v0.1', ['programme/what-is-troupe.md', 'stagecraft/build-a-flow.md']);
-const manifest: Manifest = { versions: [v('next', 'next', ['programme/what-is-troupe.md']), current, archived], glossary: '', releases: [] };
+const manifest: Manifest = {
+  versions: [v('next', 'next', ['programme/what-is-troupe.md']), current, archived],
+  glossary: '',
+  releases: [],
+};
 
 describe('ordered', () => {
   it("lists a section's named pages in the website's order, then pages it doesn't name, by title", () => {
     const stagecraft = ordered(current.pages).find((s) => s.section.dir === 'stagecraft')!;
-    expect(stagecraft.pages.map((p) => p.path)).toEqual(['stagecraft/build-a-flow.md', 'stagecraft/another.md', 'stagecraft/new-guide.md']);
+    expect(stagecraft.pages.map((p) => p.path)).toEqual([
+      'stagecraft/build-a-flow.md',
+      'stagecraft/another.md',
+      'stagecraft/new-guide.md',
+    ]);
   });
 
   it('leaves out a named page the version lacks', () => {
@@ -24,7 +55,7 @@ describe('ordered', () => {
     expect(programme.pages.map((p) => p.path)).toEqual(['programme/what-is-troupe.md']);
   });
 
-  it("starts each version at its first page in sidebar order", () => {
+  it('starts each version at its first page in sidebar order', () => {
     expect(firstPage(archived.pages)?.path).toBe('programme/what-is-troupe.md');
   });
 });
@@ -33,11 +64,18 @@ describe('sidebar', () => {
   it('keeps every page link in the version, marks the current page, and ends Programme and Backstage with the kept pages', () => {
     const groups = sidebar(archived, 'stagecraft/build-a-flow.md');
     const pageLinks = groups.flatMap((g) => g.entries).filter((e) => e.href.startsWith('/docs'));
-    expect(pageLinks.map((e) => e.href)).toEqual(['/docs/v0.1/programme/what-is-troupe/', '/docs/v0.1/stagecraft/build-a-flow/']);
+    expect(pageLinks.map((e) => e.href)).toEqual([
+      '/docs/v0.1/programme/what-is-troupe/',
+      '/docs/v0.1/stagecraft/build-a-flow/',
+    ]);
     expect(pageLinks.filter((e) => e.isCurrent).map((e) => e.href)).toEqual(['/docs/v0.1/stagecraft/build-a-flow/']);
-    expect(groups.find((g) => g.label === 'Programme')!.entries.at(-1)).toMatchObject({ label: 'Status and roadmap', href: '/status/' });
+    expect(groups.find((g) => g.label === 'Programme')!.entries.at(-1)).toMatchObject({
+      label: 'Status and roadmap',
+      href: '/status/',
+    });
     expect(groups.find((g) => g.label === 'Backstage')!.entries.at(-1)).toMatchObject({
-      label: 'Contributing', href: 'https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md',
+      label: 'Contributing',
+      href: 'https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md',
     });
   });
 
@@ -45,7 +83,11 @@ describe('sidebar', () => {
     expect(sidebar(archived, '').map((g) => g.label)).toEqual(['Programme', 'Stagecraft', 'Backstage']);
   });
 
-  const currentLabels = (groups: ReturnType<typeof sidebar>) => groups.flatMap((g) => g.entries).filter((e) => e.isCurrent).map((e) => e.label);
+  const currentLabels = (groups: ReturnType<typeof sidebar>) =>
+    groups
+      .flatMap((g) => g.entries)
+      .filter((e) => e.isCurrent)
+      .map((e) => e.label);
 
   it('on /status/, marks Status and roadmap current and nothing else (troupe-run/website#28)', () => {
     expect(currentLabels(sidebar(current, '/status/'))).toEqual(['Status and roadmap']);
@@ -114,14 +156,18 @@ describe('versionNotice', () => {
 
   it('gives an archived page a banner linking the same page in the latest release', () => {
     expect(versionNotice(manifest, archived, 'stagecraft/build-a-flow.md').banner).toEqual({
-      kind: 'archived', latest: 'v0.2', href: '/docs/stagecraft/build-a-flow/', samePage: true,
+      kind: 'archived',
+      latest: 'v0.2',
+      href: '/docs/stagecraft/build-a-flow/',
+      samePage: true,
     });
   });
 
   it("links the latest release's first page when it doesn't have the page", () => {
     const only = v('archived', 'v0.1', ['programme/what-is-troupe.md', 'stagecraft/old-guide.md']);
-    expect(versionNotice({ ...manifest, versions: [...manifest.versions, only] }, only, 'stagecraft/old-guide.md').banner)
-      .toMatchObject({ href: '/docs/programme/what-is-troupe/', samePage: false });
+    expect(
+      versionNotice({ ...manifest, versions: [...manifest.versions, only] }, only, 'stagecraft/old-guide.md').banner,
+    ).toMatchObject({ href: '/docs/programme/what-is-troupe/', samePage: false });
   });
 
   it('gives the current version no banner', () => {
@@ -131,15 +177,19 @@ describe('versionNotice', () => {
 
 describe('sourceUrl', () => {
   it("links the page's source at its version's tag", () => {
-    expect(sourceUrl({ ...archived, ref: 'troupe-run-v0.1.1' }, 'stagecraft/build-a-flow.md'))
-      .toBe('https://github.com/troupe-run/troupe/blob/troupe-run-v0.1.1/docs/stagecraft/build-a-flow.md');
+    expect(sourceUrl({ ...archived, ref: 'troupe-run-v0.1.1' }, 'stagecraft/build-a-flow.md')).toBe(
+      'https://github.com/troupe-run/troupe/blob/troupe-run-v0.1.1/docs/stagecraft/build-a-flow.md',
+    );
   });
 });
 
 describe('shortLabel', () => {
   const copy = { latest: 'latest', unreleased: 'unreleased', next: 'next' };
   it.each([
-    [current, 'v0.2'], [archived, 'v0.1'], [manifest.versions[0], 'next'], [{ ...current, version: null, ref: 'main' }, 'unreleased'],
+    [current, 'v0.2'],
+    [archived, 'v0.1'],
+    [manifest.versions[0], 'next'],
+    [{ ...current, version: null, ref: 'main' }, 'unreleased'],
   ] as [Version, string][])('names a %s version briefly, for the closed picker', (version, expected) => {
     expect(shortLabel(version, copy)).toBe(expected);
   });

@@ -22,12 +22,16 @@ test.describe('which troupe each URL serves', () => {
     });
   }
 
-  test('no version is published from an older patch of a minor, or from the latest minor under /docs/vX.Y/', async ({ page }) => {
+  test('no version is published from an older patch of a minor, or from the latest minor under /docs/vX.Y/', async ({
+    page,
+  }) => {
     expect((await page.goto('/docs/v0.2/the-company/theatres/'))?.status()).toBe(404);
     expect((await page.goto('/docs/v0.1.0/the-company/theatres/'))?.status()).toBe(404);
   });
 
-  test("publishes no version from core's tag troupe-v0.3.0, though it's higher than every release", async ({ page }) => {
+  test("publishes no version from core's tag troupe-v0.3.0, though it's higher than every release", async ({
+    page,
+  }) => {
     expect((await page.goto('/docs/v0.3/the-company/theatres/'))?.status()).toBe(404);
     await page.goto('/docs/the-company/theatres/');
     await menu(page).locator('summary').click();
@@ -47,7 +51,9 @@ test.describe('which troupe each URL serves', () => {
 });
 
 test.describe('the version menu', () => {
-  test("sits in the header, beside \"troupe docs\", and shows only the version being read until it's opened", async ({ page }) => {
+  test('sits in the header, beside "troupe docs", and shows only the version being read until it\'s opened', async ({
+    page,
+  }) => {
     await page.goto('/docs/v0.1/the-company/theatres/');
     await expect(page.locator('header [data-version-menu]')).toHaveCount(1);
     await expect(page.locator('.sl-markdown-content [data-version-menu]')).toHaveCount(0);
@@ -108,31 +114,42 @@ test.describe('the version menu', () => {
       const box = (await menu(page).locator('ul').boundingBox())!;
       expect(box.x).toBeGreaterThanOrEqual(0);
       expect(box.x + box.width).toBeLessThanOrEqual(width);
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
       expect(overflow).toBeLessThanOrEqual(0);
     });
   }
 });
 
 test.describe('banners', () => {
-  test('an archived page says which version it is and that v0.2 is the latest, linking the same page there', async ({ page }) => {
+  test('an archived page says which version it is and that v0.2 is the latest, linking the same page there', async ({
+    page,
+  }) => {
     await page.goto('/docs/v0.1/the-company/theatres/');
     const banner = page.locator('aside[data-doc-note="archived"]');
     await expect(banner).toContainText("You're reading the docs for v0.1. The latest release is v0.2.");
-    await expect(banner.getByRole('link', { name: 'Read this page in v0.2' })).toHaveAttribute('href', '/docs/the-company/theatres/');
+    await expect(banner.getByRole('link', { name: 'Read this page in v0.2' })).toHaveAttribute(
+      'href',
+      '/docs/the-company/theatres/',
+    );
   });
 
   test("an archived page the latest release lacks links the latest release's first page", async ({ page }) => {
     await page.goto('/docs/v0.1/stagecraft/old-guide/');
-    await expect(page.locator('aside[data-doc-note="archived"]').getByRole('link', { name: 'Go to the v0.2 docs' }))
-      .toHaveAttribute('href', '/docs/programme/what-is-troupe/');
+    await expect(
+      page.locator('aside[data-doc-note="archived"]').getByRole('link', { name: 'Go to the v0.2 docs' }),
+    ).toHaveAttribute('href', '/docs/programme/what-is-troupe/');
   });
 
   test('a next page says it is unreleased, ahead of v0.2, linking the same page in v0.2', async ({ page }) => {
     await page.goto('/docs/next/the-company/theatres/');
     const banner = page.locator('aside[data-doc-note="next"]');
     await expect(banner).toContainText("Unreleased: these docs describe troupe's main, ahead of v0.2.");
-    await expect(banner.getByRole('link', { name: 'Read this page in v0.2' })).toHaveAttribute('href', '/docs/the-company/theatres/');
+    await expect(banner.getByRole('link', { name: 'Read this page in v0.2' })).toHaveAttribute(
+      'href',
+      '/docs/the-company/theatres/',
+    );
   });
 
   test('a page of the latest release has no version banner', async ({ page }) => {
@@ -145,7 +162,10 @@ test.describe("each version's sidebar", () => {
   test("lists v0.1's own pages, every link inside /docs/v0.1/ but the website's two", async ({ page }) => {
     await page.goto('/docs/v0.1/the-company/theatres/');
     const hrefs = await sidebarHrefs(page);
-    expect(hrefs.filter((h) => !h.startsWith('/docs/v0.1/'))).toEqual(['/status/', 'https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md']);
+    expect(hrefs.filter((h) => !h.startsWith('/docs/v0.1/'))).toEqual([
+      '/status/',
+      'https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md',
+    ]);
     expect(hrefs).toContain('/docs/v0.1/stagecraft/old-guide/');
     expect(hrefs).not.toContain('/docs/v0.1/stagecraft/design-a-flow/');
   });
@@ -164,10 +184,15 @@ test.describe("each version's sidebar", () => {
     await expect(stagecraft(page)).toHaveText(['A new guide', 'Design a flow']);
   });
 
-  test("/status/ shows the latest release's sidebar: no link under /docs/next/ or /docs/v0.1/ (troupe-run/website#28)", async ({ page }) => {
+  test("/status/ shows the latest release's sidebar: no link under /docs/next/ or /docs/v0.1/ (troupe-run/website#28)", async ({
+    page,
+  }) => {
     await page.goto('/status/');
     const hrefs = await sidebarHrefs(page);
-    expect(hrefs.filter((h) => !h.startsWith('/docs/'))).toEqual(['/status/', 'https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md']);
+    expect(hrefs.filter((h) => !h.startsWith('/docs/'))).toEqual([
+      '/status/',
+      'https://github.com/troupe-run/.github/blob/main/CONTRIBUTING.md',
+    ]);
     expect(hrefs.filter((h) => h.startsWith('/docs/next/') || h.startsWith('/docs/v0.1/'))).toEqual([]);
     // v0.2 has one Stagecraft page; main adds "A new guide".
     await expect(stagecraft(page)).toHaveText(['Design a flow']);
@@ -180,34 +205,49 @@ test.describe("each version's sidebar", () => {
 
   test("a page's links lead to pages in its own version", async ({ page }) => {
     await page.goto('/docs/v0.1/the-company/flows/');
-    await expect(page.locator('.sl-markdown-content').getByRole('link', { name: 'Build a flow' })).toHaveAttribute('href', '/docs/v0.1/stagecraft/build-a-flow/');
+    await expect(page.locator('.sl-markdown-content').getByRole('link', { name: 'Build a flow' })).toHaveAttribute(
+      'href',
+      '/docs/v0.1/stagecraft/build-a-flow/',
+    );
   });
 });
 
 test.describe('edit links and sources', () => {
   for (const url of ['/docs/the-company/theatres/', '/docs/next/the-company/theatres/']) {
-    test(`${url} links "Improve this page" to the page on troupe's main, and has no "View source"`, async ({ page }) => {
+    test(`${url} links "Improve this page" to the page on troupe's main, and has no "View source"`, async ({
+      page,
+    }) => {
       await page.goto(url);
-      await expect(page.getByRole('link', { name: 'Improve this page' })).toHaveAttribute('href', `${EDIT}the-company/theatres.md`);
+      await expect(page.getByRole('link', { name: 'Improve this page' })).toHaveAttribute(
+        'href',
+        `${EDIT}the-company/theatres.md`,
+      );
       await expect(page.getByRole('link', { name: 'View source' })).toHaveCount(0);
     });
   }
 
-  test('an archived page has no "Improve this page", and links "View source" to the page at its tag', async ({ page }) => {
+  test('an archived page has no "Improve this page", and links "View source" to the page at its tag', async ({
+    page,
+  }) => {
     await page.goto('/docs/v0.1/the-company/theatres/');
     await expect(page.getByRole('link', { name: 'Improve this page' })).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'View source' }))
-      .toHaveAttribute('href', 'https://github.com/troupe-run/troupe/blob/troupe-run-v0.1.1/docs/the-company/theatres.md');
+    await expect(page.getByRole('link', { name: 'View source' })).toHaveAttribute(
+      'href',
+      'https://github.com/troupe-run/troupe/blob/troupe-run-v0.1.1/docs/the-company/theatres.md',
+    );
   });
 
   test('a planned page in next shows its note with a "Help write this page" link to troupe', async ({ page }) => {
     await page.goto('/docs/next/the-company/roles-and-actors/');
     const note = page.locator('aside[data-doc-note="planned"]');
     await expect(note).toContainText('Planned: not written yet.');
-    await expect(note.getByRole('link', { name: 'Help write this page' })).toHaveAttribute('href', `${EDIT}the-company/roles-and-actors.md`);
+    await expect(note.getByRole('link', { name: 'Help write this page' })).toHaveAttribute(
+      'href',
+      `${EDIT}the-company/roles-and-actors.md`,
+    );
   });
 
-  test("\"Last updated\" is the date of troupe's last commit to the page at the version's ref", async ({ page }) => {
+  test('"Last updated" is the date of troupe\'s last commit to the page at the version\'s ref', async ({ page }) => {
     await page.goto('/docs/v0.1/the-company/theatres/');
     await expect(page.locator('time')).toHaveAttribute('datetime', '2026-02-01T00:00:00.000Z');
   });
@@ -216,7 +256,9 @@ test.describe('edit links and sources', () => {
 test.describe('search', () => {
   test('indexes the latest release only, never next or an archived version', async ({ page }) => {
     for (const [url, indexed] of [
-      ['/docs/the-company/theatres/', 1], ['/docs/next/the-company/theatres/', 0], ['/docs/v0.1/the-company/theatres/', 0],
+      ['/docs/the-company/theatres/', 1],
+      ['/docs/next/the-company/theatres/', 0],
+      ['/docs/v0.1/the-company/theatres/', 0],
     ] as const) {
       await page.goto(url);
       await expect(page.locator('[data-pagefind-body]'), url).toHaveCount(indexed);
@@ -239,8 +281,13 @@ test.describe('search', () => {
 });
 
 for (const theme of ['light', 'dark'] as const) {
-  for (const [name, url] of [['an archived page', '/docs/v0.1/the-company/theatres/'], ['a next page', '/docs/next/the-company/roles-and-actors/']]) {
-    test(`axe reports no serious or critical violations on ${name}, with the version menu open (${theme})`, async ({ page }) => {
+  for (const [name, url] of [
+    ['an archived page', '/docs/v0.1/the-company/theatres/'],
+    ['a next page', '/docs/next/the-company/roles-and-actors/'],
+  ]) {
+    test(`axe reports no serious or critical violations on ${name}, with the version menu open (${theme})`, async ({
+      page,
+    }) => {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
       await page.goto(url);
       await menu(page).locator('summary').click();
@@ -256,15 +303,20 @@ test.describe('the roadmap on /status/', () => {
   // A section's entries: the first list after its heading (Milestones has an introduction before its own).
   const entries = (page: import('@playwright/test').Page, id: string) =>
     page.locator(`.sl-heading-wrapper:has(h2#${id}) ~ ol`).first().locator('> li');
-  const versionsIn = (page: import('@playwright/test').Page, id: string) => entries(page, id).locator('> strong').allInnerTexts();
+  const versionsIn = (page: import('@playwright/test').Page, id: string) =>
+    entries(page, id).locator('> strong').allInnerTexts();
 
-  test('lists 0.1.0 and 0.2.0 under Releases and the rest under Milestones, each in version order, with no entry for the 0.1.1 patch', async ({ page }) => {
+  test('lists 0.1.0 and 0.2.0 under Releases and the rest under Milestones, each in version order, with no entry for the 0.1.1 patch', async ({
+    page,
+  }) => {
     await page.goto('/status/');
     expect(await versionsIn(page, 'releases')).toEqual(['0.1.0', '0.2.0']);
     expect(await versionsIn(page, 'milestones')).toEqual(['0.3.0', '0.10.0', '1.0.0']);
   });
 
-  test('dates 0.1.0 and 0.2.0 by their tags, as text and in a <time>, and nothing under Milestones', async ({ page }) => {
+  test('dates 0.1.0 and 0.2.0 by their tags, as text and in a <time>, and nothing under Milestones', async ({
+    page,
+  }) => {
     await page.goto('/status/');
     const released = entries(page, 'releases');
     await expect(released.nth(0)).toHaveText('0.1.0 One: the first fixture release Released 2026-01-01');
@@ -285,7 +337,7 @@ test.describe('the roadmap on /status/', () => {
     expect(toc).toEqual(headings);
   });
 
-  test("leaves 0.3.0 under Milestones with no date, though core has the tag troupe-v0.3.0", async ({ page }) => {
+  test('leaves 0.3.0 under Milestones with no date, though core has the tag troupe-v0.3.0', async ({ page }) => {
     await page.goto('/status/');
     expect(await versionsIn(page, 'releases')).not.toContain('0.3.0');
     const three = entries(page, 'milestones').filter({ has: page.locator('> strong', { hasText: /^0\.3\.0$/ }) });
@@ -295,7 +347,9 @@ test.describe('the roadmap on /status/', () => {
 
   test('names 0.2.0 as the latest release in the status', async ({ page }) => {
     await page.goto('/status/');
-    await expect(page.locator('.sl-heading-wrapper:has(h2#status) + p')).toHaveText('Pre-alpha. The latest release is 0.2.0, installed with uv from its tag on GitHub.');
+    await expect(page.locator('.sl-heading-wrapper:has(h2#status) + p')).toHaveText(
+      'Pre-alpha. The latest release is 0.2.0, installed with uv from its tag on GitHub.',
+    );
   });
 });
 
@@ -310,11 +364,18 @@ test.describe('the protocol copies', () => {
     return response.json();
   };
   const copies: [string, string][] = [
-    ['', 'protocol-v1.0.0'], ['1/', 'protocol-v1.0.0'], ['0/', 'protocol-v0.2.0'], ['next/', 'main'],
-    ['1.0.0/', 'protocol-v1.0.0'], ['0.2.0/', 'protocol-v0.2.0'], ['0.1.0/', 'protocol-v0.1.0'],
+    ['', 'protocol-v1.0.0'],
+    ['1/', 'protocol-v1.0.0'],
+    ['0/', 'protocol-v0.2.0'],
+    ['next/', 'main'],
+    ['1.0.0/', 'protocol-v1.0.0'],
+    ['0.2.0/', 'protocol-v0.2.0'],
+    ['0.1.0/', 'protocol-v0.1.0'],
   ];
   for (const [prefix, ref] of copies) {
-    test(`/protocol/${prefix} serves ${ref}, with its own ids and its absolute reference moved with them`, async ({ request }) => {
+    test(`/protocol/${prefix} serves ${ref}, with its own ids and its absolute reference moved with them`, async ({
+      request,
+    }) => {
       const schema = await pinned(request, prefix);
       expect(schema.description).toBe(`The fixture troupe at ${ref}: an absolute reference to another of its schemas.`);
       expect(schema.$id).toBe(`${BASE}${prefix}pinned.schema.json`);
@@ -332,9 +393,10 @@ test.describe('the protocol copies', () => {
   test('/protocol/ lists the releases newest first, naming the latest', async ({ page }) => {
     await page.goto('/protocol/');
     await expect(page.locator('.protocol-releases li')).toHaveText([
-      '1.0.0 (latest), at /protocol/1.0.0/', '0.2.0, at /protocol/0.2.0/', '0.1.0, at /protocol/0.1.0/',
+      '1.0.0 (latest), at /protocol/1.0.0/',
+      '0.2.0, at /protocol/0.2.0/',
+      '0.1.0, at /protocol/0.1.0/',
     ]);
     await expect(page.getByText('No protocol release yet.')).toHaveCount(0);
   });
 });
-

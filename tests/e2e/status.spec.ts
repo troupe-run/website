@@ -2,7 +2,9 @@ import { test, expect } from './fixtures';
 
 // The pages the website keeps, outside /docs (spec: versioned-docs; design D10). Status and roadmap keeps the docs
 // sidebar, so a reader who follows it from the docs keeps the navigation (troupe-run/website#28).
-test('/status/ shows Status and roadmap with "troupe docs" in the header, the docs sidebar and no version menu', async ({ page }) => {
+test('/status/ shows Status and roadmap with "troupe docs" in the header, the docs sidebar and no version menu', async ({
+  page,
+}) => {
   await page.goto('/status/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Status and roadmap');
   await expect(page.locator('.site-header .section')).toHaveText('docs');
@@ -47,13 +49,17 @@ test("at 320px, /status/'s Menu button opens the docs sidebar, with Status and r
   await expect(link).toBeVisible();
 });
 
-test("/status/'s \"Improve this page\" opens its source in troupe-run/website", async ({ page }) => {
+test('/status/\'s "Improve this page" opens its source in troupe-run/website', async ({ page }) => {
   await page.goto('/status/');
-  await expect(page.getByRole('link', { name: 'Improve this page' }))
-    .toHaveAttribute('href', 'https://github.com/troupe-run/website/edit/main/src/content/docs/status.md');
+  await expect(page.getByRole('link', { name: 'Improve this page' })).toHaveAttribute(
+    'href',
+    'https://github.com/troupe-run/website/edit/main/src/content/docs/status.md',
+  );
 });
 
-test('the old Status and roadmap URL, which troupe links, redirects to /status/, with the docs sidebar', async ({ page }) => {
+test('the old Status and roadmap URL, which troupe links, redirects to /status/, with the docs sidebar', async ({
+  page,
+}) => {
   await page.goto('/docs/programme/status-and-roadmap/');
   await expect(page).toHaveURL(/\/status\/$/);
   await expect(page.locator('html')).toHaveAttribute('data-has-sidebar', '');
@@ -78,7 +84,9 @@ const byVersion = (a: string, b: string) => {
   return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
 };
 
-test('/status/ lists the milestones not yet out under Milestones, each starting with its version in bold, in version order', async ({ page }) => {
+test('/status/ lists the milestones not yet out under Milestones, each starting with its version in bold, in version order', async ({
+  page,
+}) => {
   await page.goto('/status/');
   await expect(page.locator('.sl-markdown-content ol')).not.toHaveCount(0);
   const versions = await versionsIn(page, 'milestones');
@@ -88,14 +96,17 @@ test('/status/ lists the milestones not yet out under Milestones, each starting 
   await expect(page.locator('.sl-markdown-content')).not.toContainText('roadmap:');
 });
 
-test('/status/ has a Releases section exactly when the status names a latest release, each entry dated and in version order', async ({ page }) => {
+test('/status/ has a Releases section exactly when the status names a latest release, each entry dated and in version order', async ({
+  page,
+}) => {
   await page.goto('/status/');
   const status = await page.locator('.sl-heading-wrapper:has(h2#status) + p').innerText();
   const latest = /The latest release is (\d+\.\d+\.\d+)/.exec(status)?.[1];
   await expect(page.locator('h2#releases')).toHaveCount(latest ? 1 : 0);
   const versions = await versionsIn(page, 'releases');
   expect(versions).toEqual([...versions].sort(byVersion));
-  for (const text of await entries(page, 'releases').allInnerTexts()) expect(text).toMatch(/Released \d{4}-\d{2}-\d{2}$/);
+  for (const text of await entries(page, 'releases').allInnerTexts())
+    expect(text).toMatch(/Released \d{4}-\d{2}-\d{2}$/);
 });
 
 test('/status/ lists no version under both Releases and Milestones', async ({ page }) => {
@@ -104,7 +115,9 @@ test('/status/ lists no version under both Releases and Milestones', async ({ pa
   expect((await versionsIn(page, 'releases')).filter((v) => planned.has(v))).toEqual([]);
 });
 
-test('/status/ has no count, percentage, progress mark or date beside a milestone under Milestones', async ({ page }) => {
+test('/status/ has no count, percentage, progress mark or date beside a milestone under Milestones', async ({
+  page,
+}) => {
   await page.goto('/status/');
   const planned = await entries(page, 'milestones').allInnerTexts();
   expect(planned.length).toBeGreaterThan(0);
@@ -114,7 +127,9 @@ test('/status/ has no count, percentage, progress mark or date beside a mileston
   }
 });
 
-test('/status/ lists exactly Status and Milestones in "On this page" while nothing is released, and Releases between them after', async ({ page }) => {
+test('/status/ lists exactly Status and Milestones in "On this page" while nothing is released, and Releases between them after', async ({
+  page,
+}) => {
   await page.goto('/status/');
   const sections = ['Status', 'Releases', 'Milestones', 'How to read it'];
   const toc = (await page.locator('starlight-toc a').allInnerTexts()).filter((t) => sections.includes(t));

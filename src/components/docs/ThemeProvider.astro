@@ -2,10 +2,13 @@
 // The theme always follows the system colour scheme (owner 2026-10-08): any stored `starlight-theme` is ignored.
 // Inlined to avoid a flash of the wrong theme.
 ---
+
 <script is:inline>
   (() => {
     const mq = matchMedia('(prefers-color-scheme: light)');
-    const apply = () => { document.documentElement.dataset.theme = mq.matches ? 'light' : 'dark'; };
+    const apply = () => {
+      document.documentElement.dataset.theme = mq.matches ? 'light' : 'dark';
+    };
     apply();
     mq.addEventListener('change', apply);
     window.StarlightThemeProvider = { updatePickers() {} };

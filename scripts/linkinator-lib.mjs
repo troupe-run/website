@@ -4,7 +4,15 @@ import { spawnSync } from 'node:child_process';
 
 /** Runs linkinator over `dir`. Returns `{ result }`, or `{ error, stdout, stderr }` when it printed no JSON. */
 export function runLinkinator(dir, skips = [], extraArgs = []) {
-  const args = ['linkinator', dir, '--recurse', ...skips.flatMap((s) => ['--skip', s]), ...extraArgs, '--format', 'json'];
+  const args = [
+    'linkinator',
+    dir,
+    '--recurse',
+    ...skips.flatMap((s) => ['--skip', s]),
+    ...extraArgs,
+    '--format',
+    'json',
+  ];
   const r = spawnSync('npx', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   try {
     return { result: JSON.parse(r.stdout) };

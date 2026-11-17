@@ -20,7 +20,9 @@ export function loadProtocolInputs(root) {
 
 /** Phrasing nodes for `words`, where text in backticks is code. */
 function phrasing(words) {
-  return words.split(/`([^`]*)`/).map((part, i) => (i % 2 ? { type: 'inlineCode', value: part } : { type: 'text', value: part }))
+  return words
+    .split(/`([^`]*)`/)
+    .map((part, i) => (i % 2 ? { type: 'inlineCode', value: part } : { type: 'text', value: part }))
     .filter((n) => n.value !== '');
 }
 
@@ -61,13 +63,18 @@ export function protocolPlugin({ page, load }) {
         const marker = MARKER.exec(node.value.trim())?.[1];
         if (marker === undefined) return;
         if (!MARKERS.includes(marker)) {
-          throw new Error(`${name} has an unknown marker protocol:${marker}: use ${MARKERS.map((m) => `protocol:${m}`).join(' or ')}`);
+          throw new Error(
+            `${name} has an unknown marker protocol:${marker}: use ${MARKERS.map((m) => `protocol:${m}`).join(' or ')}`,
+          );
         }
         found += 1;
         ctx.replaceNode(node, releaseList(releases, copy));
       },
       after: () => {
-        if (found === 0) throw new Error(`${name} has no protocol:releases marker: put \`<!-- protocol:releases -->\` on its own line where it goes`);
+        if (found === 0)
+          throw new Error(
+            `${name} has no protocol:releases marker: put \`<!-- protocol:releases -->\` on its own line where it goes`,
+          );
         if (found > 1) throw new Error(`${name} has ${found} protocol:releases markers: keep one`);
       },
     };

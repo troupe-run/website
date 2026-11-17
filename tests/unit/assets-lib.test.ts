@@ -5,7 +5,10 @@ import { join } from 'node:path';
 import { pngSize, hashFiles, verify, outputPaths } from '../../scripts/assets-lib.mjs';
 
 // 1×1 transparent PNG
-const PNG_1x1 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+const PNG_1x1 = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64',
+);
 
 function fixture() {
   const root = mkdtempSync(join(tmpdir(), 'assets-'));
@@ -21,10 +24,13 @@ function fixture() {
     COPIES: [{ from: 'brand/a.svg', to: 'public/a.svg' }],
     ICO: { from: 'brand/out/x.png', to: 'public/x.ico' },
   };
-  writeFileSync(join(root, 'brand/out/manifest.json'), JSON.stringify({
-    sources: hashFiles(config.SOURCES, root),
-    outputs: hashFiles(outputPaths(config), root),
-  }));
+  writeFileSync(
+    join(root, 'brand/out/manifest.json'),
+    JSON.stringify({
+      sources: hashFiles(config.SOURCES, root),
+      outputs: hashFiles(outputPaths(config), root),
+    }),
+  );
   return { root, config };
 }
 
@@ -70,7 +76,9 @@ describe('assets-lib', () => {
     const other = Buffer.from(PNG_1x1);
     other[other.length - 20] ^= 0xff; // flip a byte in the IDAT/CRC area; IHDR size stays 1×1
     writeFileSync(join(root, 'brand/out/x.png'), other);
-    expect(verify(root, config)).toEqual(['brand/out/x.png differs from the rendered version recorded in the manifest: run npm run assets:render']);
+    expect(verify(root, config)).toEqual([
+      'brand/out/x.png differs from the rendered version recorded in the manifest: run npm run assets:render',
+    ]);
   });
   it('verify reports a copy whose content differs from its source', () => {
     const { root, config } = fixture();
@@ -93,7 +101,9 @@ describe('assets-lib', () => {
   it('verify reports an ICO whose bytes changed since the render', () => {
     const { root, config } = fixture();
     writeFileSync(join(root, 'public/x.ico'), 'other-bytes');
-    expect(verify(root, config)).toEqual(['public/x.ico differs from the rendered version recorded in the manifest: run npm run assets:render']);
+    expect(verify(root, config)).toEqual([
+      'public/x.ico differs from the rendered version recorded in the manifest: run npm run assets:render',
+    ]);
   });
   it('verify treats an old manifest with no recorded outputs as drift', () => {
     const { root, config } = fixture();

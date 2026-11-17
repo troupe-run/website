@@ -5,14 +5,28 @@ const copy = await getCopy('hero');
 const star = copy.primary.label.startsWith('★ ');
 const cast = ['human', 'agent', 'troupe', 'agent', 'human'] as const;
 ---
+
 <section id="top" class="hero">
   <div class="wrap">
-    <div class="cast" data-cast>{cast.map((k) => <Character kind={k} />)}</div>
+    <div class="cast" data-cast>
+      {cast.map((k) => (
+        <Character kind={k} />
+      ))}
+    </div>
     <h1>{copy.title}</h1>
     <p class="sub">{copy.subtitle}</p>
     <div class="ctas">
-      <a class="btn primary" href={copy.primary.href}>{star && <span class="star" aria-hidden="true">★</span>}<span class="label">{star ? copy.primary.label.slice(2) : copy.primary.label}</span></a>
-      <a class="btn secondary" href={copy.secondary.href}>{copy.secondary.label}</a>
+      <a class="btn primary" href={copy.primary.href}>
+        {star && (
+          <span class="star" aria-hidden="true">
+            ★
+          </span>
+        )}
+        <span class="label">{star ? copy.primary.label.slice(2) : copy.primary.label}</span>
+      </a>
+      <a class="btn secondary" href={copy.secondary.href}>
+        {copy.secondary.label}
+      </a>
     </div>
   </div>
 </section>
@@ -25,7 +39,8 @@ const cast = ['human', 'agent', 'troupe', 'agent', 'human'] as const;
     if (reduce.matches) {
       cast.dataset.idle = 'off';
     } else {
-      const shown = () => [...cast.querySelectorAll<SVGElement>('.character')].filter((el) => el.getClientRects().length > 0);
+      const shown = () =>
+        [...cast.querySelectorAll<SVGElement>('.character')].filter((el) => el.getClientRects().length > 0);
       let onScreen = true;
       const idle = createCastIdle({
         count: shown().length,
@@ -37,27 +52,98 @@ const cast = ['human', 'agent', 'troupe', 'agent', 'human'] as const;
           cast.dataset.idle = idle.state;
         },
       });
-      const sync = () => { idle.setVisible(onScreen && !document.hidden); cast.dataset.idle = idle.state; };
+      const sync = () => {
+        idle.setVisible(onScreen && !document.hidden);
+        cast.dataset.idle = idle.state;
+      };
       cast.dataset.idle = idle.state;
       cast.addEventListener('pointerover', (e) => {
         if ((e.target as Element).closest('.character')) idle.hover();
       });
-      new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; sync(); }).observe(cast);
+      new IntersectionObserver(([entry]) => {
+        onScreen = entry.isIntersecting;
+        sync();
+      }).observe(cast);
       document.addEventListener('visibilitychange', sync);
-      reduce.addEventListener('change', () => { if (reduce.matches) { idle.stop(); cast.dataset.idle = 'off'; } });
+      reduce.addEventListener('change', () => {
+        if (reduce.matches) {
+          idle.stop();
+          cast.dataset.idle = 'off';
+        }
+      });
     }
   }
 </script>
 <style>
-  .hero { text-align: center; padding: 32px 0 40px;
-    background: radial-gradient(ellipse 70% 60% at 50% 0%, color-mix(in srgb, var(--sunflower) 22%, transparent), transparent 70%); }
-  .cast { display: flex; justify-content: center; align-items: flex-end; gap: 18px; margin-bottom: 8px; }
-  @media (max-width: 479px) { .cast > :global(.character:first-child), .cast > :global(.character:last-child) { display: none; } }
-  h1 { font-size: clamp(32px, 7vw, 56px); line-height: 1.02; letter-spacing: -.03em; margin: 8px auto 12px; text-wrap: balance; }
-  .sub { max-width: 60ch; margin: 0 auto 24px; color: var(--muted); font-size: 17px; }
-  .ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 46px; font: inherit; font-weight: 600; font-size: 15px; line-height: 1.2; padding: 0 18px; border-radius: 12px; text-decoration: none; }
-  .star { margin-right: .4em; position: relative; top: 1px; line-height: 1; }
-  .primary { background: var(--tomato); color: var(--on-accent); box-shadow: 0 3px 0 var(--tomato-shadow); }
-  .secondary { background: var(--surface); color: var(--ink); border: 2px solid var(--ink); }
+  .hero {
+    text-align: center;
+    padding: 32px 0 40px;
+    background: radial-gradient(
+      ellipse 70% 60% at 50% 0%,
+      color-mix(in srgb, var(--sunflower) 22%, transparent),
+      transparent 70%
+    );
+  }
+  .cast {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 18px;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 479px) {
+    .cast > :global(.character:first-child),
+    .cast > :global(.character:last-child) {
+      display: none;
+    }
+  }
+  h1 {
+    font-size: clamp(32px, 7vw, 56px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin: 8px auto 12px;
+    text-wrap: balance;
+  }
+  .sub {
+    max-width: 60ch;
+    margin: 0 auto 24px;
+    color: var(--muted);
+    font-size: 17px;
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 46px;
+    font: inherit;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.2;
+    padding: 0 18px;
+    border-radius: 12px;
+    text-decoration: none;
+  }
+  .star {
+    margin-right: 0.4em;
+    position: relative;
+    top: 1px;
+    line-height: 1;
+  }
+  .primary {
+    background: var(--tomato);
+    color: var(--on-accent);
+    box-shadow: 0 3px 0 var(--tomato-shadow);
+  }
+  .secondary {
+    background: var(--surface);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+  }
 </style>

@@ -5,7 +5,8 @@ import { chooseVersions } from '../../scripts/troupe-docs-lib.mjs';
 // troupe-run-v* (bundle-tag-is-the-release design D1, D2). Menu order: next, latest, then archived minors newest first.
 const summary = (tags: string[]) =>
   chooseVersions(tags).map((v: { role: string; version: string | null; base: string; ref: string }) =>
-    [v.role, v.version ?? '', v.base, v.ref].join(' '));
+    [v.role, v.version ?? '', v.base, v.ref].join(' '),
+  );
 
 describe('chooseVersions', () => {
   it('with no tags, publishes main at /docs/ as the only version, with no next', () => {
@@ -23,7 +24,7 @@ describe('chooseVersions', () => {
     ]);
   });
 
-  it("publishes an earlier minor at /docs/vX.Y/ from its highest patch tag only", () => {
+  it('publishes an earlier minor at /docs/vX.Y/ from its highest patch tag only', () => {
     expect(summary(['troupe-run-v0.1.0', 'troupe-run-v0.1.1', 'troupe-run-v0.2.0'])).toEqual([
       'next  /docs/next/ main',
       'current 0.2 /docs/ troupe-run-v0.2.0',
@@ -42,8 +43,15 @@ describe('chooseVersions', () => {
   });
 
   it("ignores the other components' tags, core's and troupe-vcs-*'s among them", () => {
-    expect(summary(['protocol-v0.1.0', 'troupe-store-text-v0.1.0', 'troupe-v0.1.0', 'troupe-vcs-files-v0.1.0', 'troupe-vcs-git-v0.1.0']))
-      .toEqual(['current  /docs/ main']);
+    expect(
+      summary([
+        'protocol-v0.1.0',
+        'troupe-store-text-v0.1.0',
+        'troupe-v0.1.0',
+        'troupe-vcs-files-v0.1.0',
+        'troupe-vcs-git-v0.1.0',
+      ]),
+    ).toEqual(['current  /docs/ main']);
   });
 
   it("publishes the bundle's release, not core's, when core's tag is higher", () => {
@@ -54,13 +62,18 @@ describe('chooseVersions', () => {
   });
 
   it("ignores core's malformed tag, as another component's", () => {
-    expect(summary(['troupe-run-v0.1.0', 'troupe-v1.0.0-rc.1'])).toEqual(['next  /docs/next/ main', 'current 0.1 /docs/ troupe-run-v0.1.0']);
+    expect(summary(['troupe-run-v0.1.0', 'troupe-v1.0.0-rc.1'])).toEqual([
+      'next  /docs/next/ main',
+      'current 0.1 /docs/ troupe-run-v0.1.0',
+    ]);
   });
 
   it.each(['troupe-run-v1.0.0-rc.1', 'troupe-run-v1.2', 'troupe-run-v01.2.3', 'troupe-run-vx'])(
     'refuses %s, naming it and the form that is accepted',
     (tag) => {
-      expect(() => chooseVersions([tag])).toThrow(`${tag} isn't a release tag troupe.run can build: use troupe-run-vMAJOR.MINOR.PATCH`);
+      expect(() => chooseVersions([tag])).toThrow(
+        `${tag} isn't a release tag troupe.run can build: use troupe-run-vMAJOR.MINOR.PATCH`,
+      );
     },
   );
 });

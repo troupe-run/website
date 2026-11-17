@@ -24,7 +24,8 @@ export function keptPage(pathname: string): string | undefined {
  * which leads into /docs from nowhere in particular (troupe-run/website#28).
  */
 export function ownPagination<T extends { href: string }>(
-  section: ReturnType<typeof siteSection>, pagination: { prev: T | undefined; next: T | undefined },
+  section: ReturnType<typeof siteSection>,
+  pagination: { prev: T | undefined; next: T | undefined },
 ): { prev: T | undefined; next: T | undefined } {
   if (section === 'docs') return pagination;
   const keep = (l: T | undefined) => (section === 'blog' && l?.href.startsWith('/blog/') ? l : undefined);

@@ -1,10 +1,19 @@
 ---
 const kinds = ['human', 'agent', 'troupe'] as const;
 ---
+
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
   <defs>
     {kinds.map((kind) => (
-      <mask id={`cast-fade-${kind}`} maskUnits="objectBoundingBox" x="-0.5" y="-0.5" width="2" height="2" maskContentUnits="objectBoundingBox">
+      <mask
+        id={`cast-fade-${kind}`}
+        maskUnits="objectBoundingBox"
+        x="-0.5"
+        y="-0.5"
+        width="2"
+        height="2"
+        maskContentUnits="objectBoundingBox"
+      >
         <linearGradient id={`cast-fade-grad-${kind}`} gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="0" y2="0">
           <stop offset="0" stop-color="white" stop-opacity=".45" />
           <stop offset="0.75" stop-color="white" stop-opacity="0" />

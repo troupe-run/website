@@ -39,7 +39,9 @@ off carries its reason beside it; that's the baseline #323 allows.
 `.prettierrc.json`: `singleQuote`, `semi`, `printWidth: 120`, prettier-plugin-astro. `.prettierignore`: Markdown and
 MDX, generated and synced content (`src/content/docs/docs/`, `src/generated/`, `public/protocol/`), the lockfile,
 `dist*`, and the guard's delivered files (`.github/workflows/guard.yml`, `claude-review.yml`, `dependabot-dispatch.yml`,
-`.claude/settings.json`), which are written in infrastructure and would be reformatted on every delivery. The first
+`.claude/settings.json`), which are written in infrastructure and would be reformatted on every delivery. Also the brand images' render inputs
+(`brand/`, `scripts/assets.config.mjs`): the asset check records their hashes against the committed images, so a
+reformat would read as a change needing a re-render (found when the first reformat failed that check). The first
 `prettier --write` lands as its own commit, with nothing else in it, so the reformat is easy to review.
 
 *Alternative:* Prettier's defaults (80 columns, double quotes): rejected, it would rewrite nearly every line.

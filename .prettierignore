@@ -12,3 +12,7 @@ src/generated/
 src/content/docs/docs/
 .cache/
 package-lock.json
+# Render inputs: scripts/verify-assets.mjs records their hashes against the committed brand images, so reformatting
+# them would read as a change needing a re-render (lint-gates design D3).
+brand/
+scripts/assets.config.mjs

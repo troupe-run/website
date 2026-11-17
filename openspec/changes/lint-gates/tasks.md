@@ -11,7 +11,7 @@ Load rule: check `uptime` before `npm ci` or the full check; start only under a 
 
 ## 2. Bring the code into line
 
-- [ ] 2.1 `npx prettier --write .` as its own commit. Verify `prettier --check .` passes and no Markdown, MDX,
+- [x] 2.1 `npx prettier --write .` as its own commit. Verify `prettier --check .` passes and no Markdown, MDX,
       generated or delivered file changed
 - [x] 2.2 Fix each ESLint finding, or turn the rule off in `eslint.config.js` with the reason. Verify `eslint .` exits 0
 - [x] 2.3 Fix each `tsc --noEmit` error. Verify it exits 0

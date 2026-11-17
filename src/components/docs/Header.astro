@@ -12,6 +12,7 @@ const section = headerSection(Astro.locals.starlightRoute.id, Astro.url.pathname
 // Docs pages: the version picker beside "troupe docs" (versioned-docs design D6).
 const at = locate(manifestJson as Manifest, Astro.locals.starlightRoute.id);
 ---
+
 <SiteHeader section={section} embedded>
   {at && <VersionPicker slot="version" version={at.version} path={at.path} />}
   <Search />

@@ -23,7 +23,10 @@ export function parseNvmrc(text) {
   } catch (e) {
     if (!(e instanceof SyntaxError)) throw e;
   }
-  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const lines = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
   if (lines.length === 0) throw refuse('holds no version');
   const version = lines.length === 1 ? LINE.exec(lines[0])?.[1] : undefined;
   if (!version) throw refuse(`holds more than one value: ${JSON.stringify(text)}`);

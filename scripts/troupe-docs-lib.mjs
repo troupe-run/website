@@ -5,7 +5,16 @@
 // protocol-schemas).
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  realpathSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
 import { TroupeDocsError } from './troupe-error.mjs';
@@ -41,7 +50,11 @@ export function chooseVersions(tags) {
     { role: 'next', version: null, base: '/docs/next/', dir: 'next', ref: 'main' },
     { role: 'current', version: latest, base: '/docs/', dir: '', ref: top.tag },
     ...earlier.map(([version, r]) => ({
-      role: 'archived', version, base: `/docs/v${version}/`, dir: `v${version}`, ref: r.tag,
+      role: 'archived',
+      version,
+      base: `/docs/v${version}/`,
+      dir: `v${version}`,
+      ref: r.tag,
     })),
   ];
 }
@@ -51,7 +64,13 @@ export function chooseVersions(tags) {
 // Front matter is a strict subset of YAML, so a page that parses here means the same to Astro's YAML loader.
 
 /** Every key a troupe page may set, with its type. Must equal troupe's FRONT_MATTER_KEYS (checked by a test). */
-export const FRONT_MATTER_KEYS = { title: 'string', description: 'string', status: 'string', prerelease: 'boolean', purpose: 'string' };
+export const FRONT_MATTER_KEYS = {
+  title: 'string',
+  description: 'string',
+  status: 'string',
+  prerelease: 'boolean',
+  purpose: 'string',
+};
 const STATUSES = ['written', 'planned'];
 
 const KEY = /^[a-z][a-z0-9_]*$/;
@@ -104,7 +123,8 @@ function scalar(raw) {
  */
 export function parseFrontMatter(text) {
   const lines = text.replaceAll('\r\n', '\n').split('\n');
-  if (lines[0] !== '---') throw new TroupeDocsError("the page doesn't start with front matter: put `---` on its first line");
+  if (lines[0] !== '---')
+    throw new TroupeDocsError("the page doesn't start with front matter: put `---` on its first line");
   const end = lines.indexOf('---', 1);
   if (end < 0) throw new TroupeDocsError('the front matter has no closing `---` line');
   /** @type {Record<string, string | boolean>} */
@@ -133,7 +153,9 @@ export function frontMatterProblems(front, body) {
   const found = [];
   for (const [key, value] of Object.entries(front)) {
     if (!Object.hasOwn(FRONT_MATTER_KEYS, key)) {
-      found.push(`\`${key}\` isn't a front-matter key; the keys allowed are ${Object.keys(FRONT_MATTER_KEYS).join(', ')}`);
+      found.push(
+        `\`${key}\` isn't a front-matter key; the keys allowed are ${Object.keys(FRONT_MATTER_KEYS).join(', ')}`,
+      );
     } else if (typeof value !== FRONT_MATTER_KEYS[key]) {
       found.push(`\`${key}\` must be ${FRONT_MATTER_KEYS[key] === 'boolean' ? 'true or false' : 'a string'}`);
     }
@@ -206,7 +228,12 @@ function walk(dir) {
  * text, a page's last commit date, and the tags.
  */
 function fromGit(gitArgs) {
-  const tagSet = () => new Set(git([...gitArgs, 'tag', '--list']).split('\n').filter(Boolean));
+  const tagSet = () =>
+    new Set(
+      git([...gitArgs, 'tag', '--list'])
+        .split('\n')
+        .filter(Boolean),
+    );
   let tags;
   const commits = new Map();
   // A link's ref as git reads it, or null (design D3): main's branch, a tag by its full name, or a commit by its full
@@ -220,7 +247,9 @@ function fromGit(gitArgs) {
     if (!commits.has(ref)) {
       let ids = [];
       try {
-        ids = git([...gitArgs, 'rev-parse', `--disambiguate=${ref.toLowerCase()}`]).split('\n').filter(Boolean);
+        ids = git([...gitArgs, 'rev-parse', `--disambiguate=${ref.toLowerCase()}`])
+          .split('\n')
+          .filter(Boolean);
       } catch {
         // no object has that prefix
       }
@@ -231,7 +260,9 @@ function fromGit(gitArgs) {
   };
   const listTree = (ref, dir) =>
     git([...gitArgs, 'ls-tree', '-r', '--name-only', refName(ref), '--', `${dir}/`])
-      .split('\n').filter(Boolean).map((p) => p.slice(dir.length + 1));
+      .split('\n')
+      .filter(Boolean)
+      .map((p) => p.slice(dir.length + 1));
   const readFile = (ref, path) => git([...gitArgs, 'show', `${refName(ref)}:${path}`]);
   return {
     listTree,
@@ -240,8 +271,12 @@ function fromGit(gitArgs) {
     read: (ref, path) => readFile(ref, `docs/${path}`),
     /** Any file in the repository at `ref`, such as troupe's own page-contract module, for the drift tests. */
     readRepo: (ref, path) => git([...gitArgs, 'show', `${refName(ref)}:${path}`]),
-    date: (ref, path) => git([...gitArgs, 'log', '-1', '--format=%cI', refName(ref), '--', `docs/${path}`]).trim() || null,
-    tags: () => git([...gitArgs, 'tag', '--list']).split('\n').filter(Boolean),
+    date: (ref, path) =>
+      git([...gitArgs, 'log', '-1', '--format=%cI', refName(ref), '--', `docs/${path}`]).trim() || null,
+    tags: () =>
+      git([...gitArgs, 'tag', '--list'])
+        .split('\n')
+        .filter(Boolean),
     /** Whether `ref` is `main`, a tag, or a commit the repository has, and nothing else (design D3). */
     hasRef: (ref) => resolve(ref) !== null,
     /**
@@ -253,13 +288,18 @@ function fromGit(gitArgs) {
       for (const { path } of links) refuseOddPath(path);
       const input = links.map(({ ref, path }) => `${resolve(ref) ?? 'refs/missing/ref'}:${path}`).join('\n') + '\n';
       const out = execFileSync('git', [...gitArgs, 'cat-file', '--batch-check'], { encoding: 'utf8', input });
-      return out.split('\n').slice(0, links.length).map((line) => !line.endsWith(' missing') && !line.endsWith(' ambiguous'));
+      return out
+        .split('\n')
+        .slice(0, links.length)
+        .map((line) => !line.endsWith(' missing') && !line.endsWith(' ambiguous'));
     },
     /** Each tag's date: an annotated tag's tagger date, or a lightweight tag's commit date (spec: roadmap). */
     tagDates: () =>
       Object.fromEntries(
         git([...gitArgs, 'for-each-ref', '--format=%(refname:short) %(creatordate:iso-strict)', 'refs/tags'])
-          .split('\n').filter(Boolean).map((line) => line.split(' ')),
+          .split('\n')
+          .filter(Boolean)
+          .map((line) => line.split(' ')),
       ),
   };
 }
@@ -276,7 +316,15 @@ function cloned(cacheDir, remote) {
       }
     } else {
       git([...gitDir, 'remote', 'set-url', 'origin', remote]);
-      git([...gitDir, 'fetch', '--quiet', '--prune', 'origin', '+refs/heads/main:refs/heads/main', '+refs/tags/*:refs/tags/*']);
+      git([
+        ...gitDir,
+        'fetch',
+        '--quiet',
+        '--prune',
+        'origin',
+        '+refs/heads/main:refs/heads/main',
+        '+refs/tags/*:refs/tags/*',
+      ]);
     }
   } catch (error) {
     throw new TroupeDocsError(
@@ -296,23 +344,28 @@ function local(value) {
   if (value.trim() === '') throw refuse('which is empty');
   const root = resolve(value);
   if (!existsSync(root) || !statSync(root).isDirectory()) throw refuse("which isn't a folder");
-  if (!existsSync(join(root, 'docs')) || !statSync(join(root, 'docs')).isDirectory()) throw refuse('which has no docs/ folder');
+  if (!existsSync(join(root, 'docs')) || !statSync(join(root, 'docs')).isDirectory())
+    throw refuse('which has no docs/ folder');
   let top;
   try {
     top = git(['-C', root, 'rev-parse', '--show-toplevel']).trim();
   } catch {
     throw refuse("which isn't a git working tree");
   }
-  if (realpathSync(top) !== realpathSync(root)) throw refuse(`which is inside the git working tree ${top}, not its top`);
+  if (realpathSync(top) !== realpathSync(root))
+    throw refuse(`which is inside the git working tree ${top}, not its top`);
   const tagged = fromGit(['-C', root]);
   // main is the working tree, uncommitted edits included, so a writer can preview them.
   const listTree = (ref, dir) => {
     if (ref !== 'main') return tagged.listTree(ref, dir);
     const at = join(root, dir);
     if (!existsSync(at)) return [];
-    return walk(at).map((p) => relative(at, p).split(sep).join('/')).sort();
+    return walk(at)
+      .map((p) => relative(at, p).split(sep).join('/'))
+      .sort();
   };
-  const readFile = (ref, path) => (ref === 'main' ? readFileSync(join(root, path), 'utf8') : tagged.readFile(ref, path));
+  const readFile = (ref, path) =>
+    ref === 'main' ? readFileSync(join(root, path), 'utf8') : tagged.readFile(ref, path);
   // main's links are looked up in the working tree, uncommitted files included; other refs in git (design D4). .git
   // is on disk but never in the repository. (On a case-insensitive disk a wrongly-cased path passes here; the clone,
   // which CI builds from, is exact.)
@@ -425,11 +478,16 @@ export function renderPage(version, page) {
  */
 export function writeDocs(versions, outDir, manifestPath, releases = [], protocol = { copies: [], releases: [] }) {
   if (existsSync(outDir) && readdirSync(outDir).length && !existsSync(join(outDir, MARKER))) {
-    throw new TroupeDocsError(`${outDir} holds files the docs sync didn't write, so it won't replace them. Fix: move them, then run it again.`);
+    throw new TroupeDocsError(
+      `${outDir} holds files the docs sync didn't write, so it won't replace them. Fix: move them, then run it again.`,
+    );
   }
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, MARKER), 'Written by npm run docs:sync from troupe-run/troupe. Everything here is replaced on each run.\n');
+  writeFileSync(
+    join(outDir, MARKER),
+    'Written by npm run docs:sync from troupe-run/troupe. Everything here is replaced on each run.\n',
+  );
   for (const version of versions) {
     for (const page of version.pages) {
       const at = join(outDir, version.dir, page.path);
@@ -439,7 +497,10 @@ export function writeDocs(versions, outDir, manifestPath, releases = [], protoco
   }
   const main = versions.find((v) => v.ref === 'main');
   const manifest = {
-    versions: versions.map(({ pages, ...v }) => ({ ...v, pages: pages.map((p) => ({ path: p.path, title: p.front.title })) })),
+    versions: versions.map(({ pages, ...v }) => ({
+      ...v,
+      pages: pages.map((p) => ({ path: p.path, title: p.front.title })),
+    })),
     glossary: join(outDir, main.dir, 'prompt-book', 'glossary.md'),
     // The release tags the versions were chosen from, with their dates, which the roadmap on /status/ marks as
     // released (spec: roadmap).
@@ -460,10 +521,20 @@ export async function sync({ env = process.env, root, remote, open = openSource 
   const source = open(env, { cacheDir: join(root, '.cache', 'troupe.git'), remote });
   const versions = buildVersions(source);
   // Links into troupe's repository, on the versions read from main only: a tag can't be fixed (design D1).
-  for (const version of versions.filter((v) => v.ref === 'main')) refuse(version, await repoLinkProblems(source, version));
+  for (const version of versions.filter((v) => v.ref === 'main'))
+    refuse(version, await repoLinkProblems(source, version));
   const protocol = buildProtocol(source);
   const dates = source.tagDates();
-  const releases = source.tags().filter((t) => releaseVersion(t)).map((tag) => ({ tag, date: dates[tag] }));
+  const releases = source
+    .tags()
+    .filter((t) => releaseVersion(t))
+    .map((tag) => ({ tag, date: dates[tag] }));
   const summary = writeProtocol(protocol, join(root, 'public', 'protocol'));
-  return writeDocs(versions, join(root, 'src', 'content', 'docs', 'docs'), join(root, 'src', 'generated', 'troupe-docs.json'), releases, summary);
+  return writeDocs(
+    versions,
+    join(root, 'src', 'content', 'docs', 'docs'),
+    join(root, 'src', 'generated', 'troupe-docs.json'),
+    releases,
+    summary,
+  );
 }

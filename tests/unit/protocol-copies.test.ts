@@ -6,7 +6,7 @@ import { chooseCopies } from '../../scripts/protocol-lib.mjs';
 const copies = (tags: string[]) => chooseCopies(tags).copies.map((c) => [c.prefix, c.ref, c.rewrite]);
 
 describe('chooseCopies', () => {
-  it("serves main at the latest, 0/ and next/ before the first protocol release (owner, 2026-10-24)", () => {
+  it('serves main at the latest, 0/ and next/ before the first protocol release (owner, 2026-10-24)', () => {
     expect(copies([])).toEqual([
       ['', 'main', false],
       ['0/', 'main', true],
@@ -24,7 +24,7 @@ describe('chooseCopies', () => {
     ]);
   });
 
-  it("gives each major its own highest release", () => {
+  it('gives each major its own highest release', () => {
     expect(copies(['protocol-v0.3.0', 'protocol-v1.0.0', 'protocol-v0.4.2'])).toEqual([
       ['', 'protocol-v1.0.0', false],
       ['1/', 'protocol-v1.0.0', true],
@@ -41,8 +41,11 @@ describe('chooseCopies', () => {
   });
 
   it.each(['protocol-v1.0.0-rc.1', 'protocol-v01.0.0', 'protocol-v1.0', 'protocol-vnext'])(
-    'refuses %s, naming it and the accepted form', (tag) => {
-      expect(() => chooseCopies([tag])).toThrow(`${tag} isn't a protocol release tag troupe.run can build: use protocol-vMAJOR.MINOR.PATCH`);
+    'refuses %s, naming it and the accepted form',
+    (tag) => {
+      expect(() => chooseCopies([tag])).toThrow(
+        `${tag} isn't a protocol release tag troupe.run can build: use protocol-vMAJOR.MINOR.PATCH`,
+      );
     },
   );
 

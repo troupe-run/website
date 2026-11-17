@@ -1,5 +1,8 @@
 ---
-interface Props { kind: 'human' | 'agent' | 'troupe'; size?: number }
+interface Props {
+  kind: 'human' | 'agent' | 'troupe';
+  size?: number;
+}
 const { kind, size = 56 } = Astro.props;
 const height = Math.round((size * 70) / 56);
 const HEAD = {
@@ -8,30 +11,82 @@ const HEAD = {
   troupe: '<path d="M28 7.2 L44.86 36.4 L11.14 36.4 Z" stroke-width="7" stroke-linejoin="round" />',
 } as const;
 const EYES = {
-  human: [[22, 20], [34, 20]],
-  agent: [[22, 20.5], [34, 20.5]],
-  troupe: [[23, 26.5], [33, 26.5]],
+  human: [
+    [22, 20],
+    [34, 20],
+  ],
+  agent: [
+    [22, 20.5],
+    [34, 20.5],
+  ],
+  troupe: [
+    [23, 26.5],
+    [33, 26.5],
+  ],
 } as const;
 ---
-<svg class={`character character--${kind}`} data-kind={kind} width={size} height={height}
-     viewBox="0 0 56 70" aria-hidden="true" focusable="false">
-  <g class="reflection" transform="translate(0,82) scale(1,-1)" mask={`url(#cast-fade-${kind})`} set:html={HEAD[kind]} />
+
+<svg
+  class={`character character--${kind}`}
+  data-kind={kind}
+  width={size}
+  height={height}
+  viewBox="0 0 56 70"
+  aria-hidden="true"
+  focusable="false"
+>
+  <g
+    class="reflection"
+    transform="translate(0,82) scale(1,-1)"
+    mask={`url(#cast-fade-${kind})`}
+    set:html={HEAD[kind]}
+  />
   <g class="head" set:html={HEAD[kind]} />
-  {EYES[kind].map(([cx, cy]) => <circle class="eye" cx={cx} cy={cy} r="2.6" />)}
+  {EYES[kind].map(([cx, cy]) => (
+    <circle class="eye" cx={cx} cy={cy} r="2.6" />
+  ))}
 </svg>
 <style is:global>
-  .character { overflow: visible; transition: transform .2s ease; transform-origin: 50% 60%; }
-  .character:hover, .character.is-bowing { transform: translateY(-6px) rotate(-6deg); }
-  .character--human { --c: var(--lilac); }
-  .character--agent { --c: var(--teal); }
-  .character--troupe { --c: var(--tomato); }
-  .character .head > * { fill: var(--c); }
-  .character--troupe .head > * { stroke: var(--c); }
+  .character {
+    overflow: visible;
+    transition: transform 0.2s ease;
+    transform-origin: 50% 60%;
+  }
+  .character:hover,
+  .character.is-bowing {
+    transform: translateY(-6px) rotate(-6deg);
+  }
+  .character--human {
+    --c: var(--lilac);
+  }
+  .character--agent {
+    --c: var(--teal);
+  }
+  .character--troupe {
+    --c: var(--tomato);
+  }
+  .character .head > * {
+    fill: var(--c);
+  }
+  .character--troupe .head > * {
+    stroke: var(--c);
+  }
   /* Solid colour; the fade is one alpha mask on the group, so fill and stroke never double up. */
-  .character .reflection > * { fill: var(--c); }
-  .character--troupe .reflection > * { stroke: var(--c); }
-  .character .eye { fill: var(--eye); }
+  .character .reflection > * {
+    fill: var(--c);
+  }
+  .character--troupe .reflection > * {
+    stroke: var(--c);
+  }
+  .character .eye {
+    fill: var(--eye);
+  }
   @media (prefers-reduced-motion: reduce) {
-    .character, .character:hover, .character.is-bowing { transition: none; transform: none; }
+    .character,
+    .character:hover,
+    .character.is-bowing {
+      transition: none;
+      transform: none;
+    }
   }
 </style>

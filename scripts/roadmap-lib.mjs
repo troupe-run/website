@@ -59,7 +59,9 @@ export function readRoadmap(text, tags) {
       );
     }
     if (typeof description !== 'string' || description.trim() === '') {
-      throw new RoadmapError(`${MILESTONES}: ${title} has no description.\nFix: describe what it adds for a user, in troupe-run/infrastructure.`);
+      throw new RoadmapError(
+        `${MILESTONES}: ${title} has no description.\nFix: describe what it adds for a user, in troupe-run/infrastructure.`,
+      );
     }
     if (seen.has(title)) throw new RoadmapError(`${MILESTONES}: two milestones are titled ${title}.\n${FIX}`);
     seen.add(title);
@@ -72,7 +74,9 @@ export function readRoadmap(text, tags) {
     if (!n) continue;
     const version = n.join('.');
     if (typeof date !== 'string' || !ISO.test(date)) {
-      throw new RoadmapError(`${tag}'s date ${JSON.stringify(date)} isn't a date git wrote. Fix: re-run the build; if it persists, check the tag in troupe-run/troupe.`);
+      throw new RoadmapError(
+        `${tag}'s date ${JSON.stringify(date)} isn't a date git wrote. Fix: re-run the build; if it persists, check the tag in troupe-run/troupe.`,
+      );
     }
     released.set(version, date.slice(0, 10));
   }
@@ -149,7 +153,10 @@ export function readMilestones(env, { cacheDir, remote = INFRASTRUCTURE_REMOTE }
  * @param {{ env?: Record<string, string | undefined>, root: string, remote?: string, tags: { tag: string, date: string }[] }} options
  */
 export function syncRoadmap({ env = process.env, root, remote, tags }) {
-  const roadmap = readRoadmap(readMilestones(env, { cacheDir: join(root, '.cache', 'infrastructure.git'), remote }), tags);
+  const roadmap = readRoadmap(
+    readMilestones(env, { cacheDir: join(root, '.cache', 'infrastructure.git'), remote }),
+    tags,
+  );
   const at = join(root, 'src', 'generated', 'roadmap.json');
   mkdirSync(dirname(at), { recursive: true });
   writeFileSync(at, JSON.stringify(roadmap, null, 2) + '\n');

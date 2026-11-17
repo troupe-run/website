@@ -19,7 +19,7 @@ describe('sitePath', () => {
     ['a path starting /\\, which a browser reads as // and so as another host', '/\\troupe.run/docs/'],
     ['a path with a tab after the /, which a browser drops, leaving //', '/\t/troupe.run/docs/'],
     ['a path with a newline after the /, which a browser drops, leaving //', '/\n/troupe.run/docs/'],
-    ['a link to a host a browser can\'t parse, rather than throwing', '//[troupe.run/'],
+    ["a link to a host a browser can't parse, rather than throwing", '//[troupe.run/'],
     ['a relative path', 'docs/opening-night/install/'],
     ['an empty string', ''],
   ])('refuses %s, saying the link must be a path on this site', (_, value) => {
@@ -29,6 +29,8 @@ describe('sitePath', () => {
   });
 
   it('says what a path on this site looks like, with the install page as the example', () => {
-    expect(SITE_PATH_MESSAGE).toBe('must be a path on this site, starting with one "/", such as /docs/opening-night/install/');
+    expect(SITE_PATH_MESSAGE).toBe(
+      'must be a path on this site, starting with one "/", such as /docs/opening-night/install/',
+    );
   });
 });

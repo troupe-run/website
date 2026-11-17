@@ -27,9 +27,17 @@ function statusLine({ latest }, copy) {
 
 function releasedOn(date, copy) {
   const [before, after] = copy.releasedOn.split('{date}');
-  const time = { type: 'roadmapTime', data: { hName: 'time', hProperties: { datetime: date } }, children: [text(date)] };
+  const time = {
+    type: 'roadmapTime',
+    data: { hName: 'time', hProperties: { datetime: date } },
+    children: [text(date)],
+  };
   const children = [before && text(before), time, after && text(after)].filter(Boolean);
-  return { type: 'roadmapReleased', data: { hName: 'span', hProperties: { className: ['roadmap-released'] } }, children };
+  return {
+    type: 'roadmapReleased',
+    data: { hName: 'span', hProperties: { className: ['roadmap-released'] } },
+    children,
+  };
 }
 
 function releaseList(releases, copy) {
@@ -44,14 +52,16 @@ function releaseList(releases, copy) {
     children: releases.map((r) => ({
       type: 'listItem',
       spread: false,
-      children: [{
-        type: 'paragraph',
-        children: [
-          { type: 'strong', children: [text(r.version)] },
-          text(` ${r.description}`),
-          ...(r.released ? [text(' '), releasedOn(r.released, copy)] : []),
-        ],
-      }],
+      children: [
+        {
+          type: 'paragraph',
+          children: [
+            { type: 'strong', children: [text(r.version)] },
+            text(` ${r.description}`),
+            ...(r.released ? [text(' '), releasedOn(r.released, copy)] : []),
+          ],
+        },
+      ],
     })),
   };
 }
@@ -72,7 +82,11 @@ export function roadmapPlugin({ page, load }) {
         const marker = MARKER.exec(node.value.trim())?.[1];
         if (marker === undefined) return;
         if (!MARKERS.includes(marker)) {
-          throw new Error(`${name} has an unknown marker roadmap:${marker}: use ${MARKERS.slice(0, -1).map((m) => `roadmap:${m}`).join(', ')} or roadmap:${MARKERS.at(-1)}`);
+          throw new Error(
+            `${name} has an unknown marker roadmap:${marker}: use ${MARKERS.slice(0, -1)
+              .map((m) => `roadmap:${m}`)
+              .join(', ')} or roadmap:${MARKERS.at(-1)}`,
+          );
         }
         found[marker] += 1;
         if (marker === 'status') return ctx.replaceNode(node, statusLine(roadmap, copy));
@@ -82,7 +96,9 @@ export function roadmapPlugin({ page, load }) {
         let start = at - 1;
         while (start >= 0 && siblings[start].type !== 'heading') start -= 1;
         if (start < 0) {
-          throw new Error(`${name}'s roadmap:${marker} marker has no heading before it: put it under the heading of its section`);
+          throw new Error(
+            `${name}'s roadmap:${marker} marker has no heading before it: put it under the heading of its section`,
+          );
         }
         if (releases.length > 0) return ctx.replaceNode(node, releaseList(releases, copy));
         // Nothing to list: leave out the section, from its heading to the next heading at its level or above (D3).
@@ -93,7 +109,10 @@ export function roadmapPlugin({ page, load }) {
       },
       after: () => {
         for (const m of MARKERS) {
-          if (found[m] === 0) throw new Error(`${name} has no roadmap:${m} marker: put \`<!-- roadmap:${m} -->\` on its own line where it goes`);
+          if (found[m] === 0)
+            throw new Error(
+              `${name} has no roadmap:${m} marker: put \`<!-- roadmap:${m} -->\` on its own line where it goes`,
+            );
           if (found[m] > 1) throw new Error(`${name} has ${found[m]} roadmap:${m} markers: keep one`);
         }
       },

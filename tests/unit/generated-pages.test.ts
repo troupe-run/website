@@ -18,13 +18,18 @@ const write = (path: string, text: string) => {
   mkdirSync(join(root, path, '..'), { recursive: true });
   writeFileSync(join(root, path), text);
 };
-const roadmap = (latest: string | null) => JSON.stringify({ releases: [{ version: '0.1.0', description: 'One', released: null }], latest });
+const roadmap = (latest: string | null) =>
+  JSON.stringify({ releases: [{ version: '0.1.0', description: 'One', released: null }], latest });
 const manifest = (releases: string[], ref = 'main') => JSON.stringify({ versions: [{ ref }], protocol: { releases } });
 const copy = (section: string, words: string) => `---\nsection: ${section}\nwords: ${words}\n---\n`;
 
 function context() {
   const entries = new Map<string, { id: string; filePath?: string }>(
-    [['status', STATUS], ['protocol', PROTOCOL], ['docs/next', OTHER]].map(([id, filePath]) => [id, { id, filePath }]),
+    [
+      ['status', STATUS],
+      ['protocol', PROTOCOL],
+      ['docs/next', OTHER],
+    ].map(([id, filePath]) => [id, { id, filePath }]),
   );
   const meta = new Map<string, string>();
   const calls: string[] = [];
@@ -33,19 +38,32 @@ function context() {
     generateDigest: (data: string) => createHash('sha1').update(data).digest('hex'),
     store: {
       entries: () => [...entries.entries()],
-      delete: (id: string) => { calls.push(`delete ${id}`); entries.delete(id); },
+      delete: (id: string) => {
+        calls.push(`delete ${id}`);
+        entries.delete(id);
+      },
     },
     meta: { get: (k: string) => meta.get(k), set: (k: string, v: string) => meta.set(k, v) },
   };
   // Put the entries back, as the glob loader would after rendering them.
   const reload = () => {
-    for (const [id, filePath] of [['status', STATUS], ['protocol', PROTOCOL], ['docs/next', OTHER]]) entries.set(id, { id, filePath });
+    for (const [id, filePath] of [
+      ['status', STATUS],
+      ['protocol', PROTOCOL],
+      ['docs/next', OTHER],
+    ])
+      entries.set(id, { id, filePath });
     calls.length = 0;
   };
   return { ctx, entries, meta, calls, reload };
 }
 function wrapped(calls: string[]) {
-  return rerenderGeneratedPages({ name: 'inner', load: async () => { calls.push('load'); } });
+  return rerenderGeneratedPages({
+    name: 'inner',
+    load: async () => {
+      calls.push('load');
+    },
+  });
 }
 
 beforeEach(() => {

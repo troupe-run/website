@@ -9,14 +9,30 @@ describe('repoLink', () => {
   it.each([
     ['a file by blob', `${REPO}/blob/main/protocol/CHANGELOG.md`, { ref: 'main', path: 'protocol/CHANGELOG.md' }],
     ['a folder by tree', `${REPO}/tree/main/plugins`, { ref: 'main', path: 'plugins' }],
-    ['a file at a tag', `${REPO}/blob/troupe-v0.1.0/packages/troupe/CHANGELOG.md`, { ref: 'troupe-v0.1.0', path: 'packages/troupe/CHANGELOG.md' }],
-    ['a link with an anchor, dropping it', `${REPO}/blob/main/docs/README.md#layout`, { ref: 'main', path: 'docs/README.md' }],
-    ['a link with a query, dropping it', `${REPO}/blob/main/docs/README.md?plain=1`, { ref: 'main', path: 'docs/README.md' }],
+    [
+      'a file at a tag',
+      `${REPO}/blob/troupe-v0.1.0/packages/troupe/CHANGELOG.md`,
+      { ref: 'troupe-v0.1.0', path: 'packages/troupe/CHANGELOG.md' },
+    ],
+    [
+      'a link with an anchor, dropping it',
+      `${REPO}/blob/main/docs/README.md#layout`,
+      { ref: 'main', path: 'docs/README.md' },
+    ],
+    [
+      'a link with a query, dropping it',
+      `${REPO}/blob/main/docs/README.md?plain=1`,
+      { ref: 'main', path: 'docs/README.md' },
+    ],
     ['a percent-encoded path, decoding it', `${REPO}/blob/main/docs/a%20b.md`, { ref: 'main', path: 'docs/a b.md' }],
     ['a trailing slash, removing it', `${REPO}/tree/main/plugins/`, { ref: 'main', path: 'plugins' }],
     ['the repository root by tree', `${REPO}/tree/main`, { ref: 'main', path: '' }],
     ['the repository root with a trailing slash', `${REPO}/tree/main/`, { ref: 'main', path: '' }],
-    ['the owner and repository in another case', 'https://github.com/Troupe-Run/Troupe/blob/main/README.md', { ref: 'main', path: 'README.md' }],
+    [
+      'the owner and repository in another case',
+      'https://github.com/Troupe-Run/Troupe/blob/main/README.md',
+      { ref: 'main', path: 'README.md' },
+    ],
     ['http, not https', 'http://github.com/troupe-run/troupe/blob/main/README.md', { ref: 'main', path: 'README.md' }],
   ])('reads %s', (_, url, expected) => {
     expect(repoLink(url)).toEqual(expected);
@@ -52,7 +68,9 @@ describe('collectLinks, through the Markdown processor the site renders with', (
   });
 
   it('finds a reference definition', async () => {
-    expect(await collectLinks('See [the changelog][c].\n\n[c]: https://example.com/c\n')).toEqual(['https://example.com/c']);
+    expect(await collectLinks('See [the changelog][c].\n\n[c]: https://example.com/c\n')).toEqual([
+      'https://example.com/c',
+    ]);
   });
 
   it('finds a GFM autolink', async () => {
@@ -67,7 +85,8 @@ describe('collectLinks, through the Markdown processor the site renders with', (
   });
 
   it('finds nothing in inline code or a fenced code block', async () => {
-    const markdown = 'Write `[x](https://example.com/x)`.\n\n```md\n[y](https://example.com/y)\nhttps://example.com/z\n```\n';
+    const markdown =
+      'Write `[x](https://example.com/x)`.\n\n```md\n[y](https://example.com/y)\nhttps://example.com/z\n```\n';
     expect(await collectLinks(markdown)).toEqual([]);
   });
 });

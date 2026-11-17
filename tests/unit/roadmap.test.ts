@@ -21,7 +21,7 @@ describe('readRoadmap: order', () => {
     expect(versions(r)).toEqual(['0.1.0', '0.2.0', '0.10.0', '1.0.0']);
   });
 
-  it("keeps each description word for word, and only the version and description of each", () => {
+  it('keeps each description word for word, and only the version and description of each', () => {
     const r = readRoadmap(file([m('0.1.0', 'One real actor, safely: an actor defined in config runs')]), []);
     expect(r.releases).toEqual([
       { version: '0.1.0', description: 'One real actor, safely: an actor defined in config runs', released: null },
@@ -71,7 +71,11 @@ describe('readRoadmap: released, with the date of its tag', () => {
 
   it("marks the bundle's release, not core's, and names the bundle's as the latest when core's tag is higher", () => {
     const r = readRoadmap(plan, [tag('troupe-run-v0.2.0'), tag('troupe-v0.3.0')]);
-    expect(r.releases.map((x) => [x.version, x.released])).toEqual([['0.1.0', null], ['0.2.0', '2026-11-05'], ['0.3.0', null]]);
+    expect(r.releases.map((x) => [x.version, x.released])).toEqual([
+      ['0.1.0', null],
+      ['0.2.0', '2026-11-05'],
+      ['0.3.0', null],
+    ]);
     expect(r.latest).toBe('0.2.0');
   });
 
@@ -88,7 +92,9 @@ describe('readRoadmap: released, with the date of its tag', () => {
   });
 
   it("refuses a release tag's date that isn't an ISO date, naming the tag", () => {
-    expect(() => readRoadmap(plan, [tag('troupe-run-v0.1.0', 'yesterday')])).toThrow(/^troupe-run-v0\.1\.0's date "yesterday" isn't a date/);
+    expect(() => readRoadmap(plan, [tag('troupe-run-v0.1.0', 'yesterday')])).toThrow(
+      /^troupe-run-v0\.1\.0's date "yesterday" isn't a date/,
+    );
   });
 });
 
@@ -116,16 +122,28 @@ describe('readRoadmap: refusals name tofu/milestones.json, the milestone and the
     refuses(file([m('0.1.0'), '0.2.0']), /^tofu\/milestones\.json: milestone 2 isn't an object\.\nFix: /);
   });
 
-  it.each(['v0.3', '0.3', '0.03.0', '0.3.0-rc.1', ' 0.3.0', ''])("refuses the title %j, naming it and the form", (title) => {
-    refuses(
-      file([m('0.1.0'), m(title)]),
-      new RegExp(`^tofu/milestones\\.json: milestone 2's title ${JSON.stringify(title).replace(/[.]/g, '\\.')} isn't a version\\.\\nFix: .*MAJOR\\.MINOR\\.PATCH`, 's'),
-    );
-  });
+  it.each(['v0.3', '0.3', '0.03.0', '0.3.0-rc.1', ' 0.3.0', ''])(
+    'refuses the title %j, naming it and the form',
+    (title) => {
+      refuses(
+        file([m('0.1.0'), m(title)]),
+        new RegExp(
+          `^tofu/milestones\\.json: milestone 2's title ${JSON.stringify(title).replace(/[.]/g, '\\.')} isn't a version\\.\\nFix: .*MAJOR\\.MINOR\\.PATCH`,
+          's',
+        ),
+      );
+    },
+  );
 
   it('refuses a title that is missing or not a string', () => {
-    refuses(file([{ description: 'a: b' }]), /^tofu\/milestones\.json: milestone 1's title undefined isn't a version\./);
-    refuses(file([{ title: 3, description: 'a: b' }]), /^tofu\/milestones\.json: milestone 1's title 3 isn't a version\./);
+    refuses(
+      file([{ description: 'a: b' }]),
+      /^tofu\/milestones\.json: milestone 1's title undefined isn't a version\./,
+    );
+    refuses(
+      file([{ title: 3, description: 'a: b' }]),
+      /^tofu\/milestones\.json: milestone 1's title 3 isn't a version\./,
+    );
   });
 
   it('refuses a missing, empty or blank description, naming the milestone', () => {
@@ -135,6 +153,9 @@ describe('readRoadmap: refusals name tofu/milestones.json, the milestone and the
   });
 
   it('refuses two milestones with one title, naming it', () => {
-    refuses(file([m('0.4.0'), m('0.5.0'), m('0.4.0')]), /^tofu\/milestones\.json: two milestones are titled 0\.4\.0\.\nFix: /);
+    refuses(
+      file([m('0.4.0'), m('0.5.0'), m('0.4.0')]),
+      /^tofu\/milestones\.json: two milestones are titled 0\.4\.0\.\nFix: /,
+    );
   });
 });

@@ -25,6 +25,12 @@ try {
 }
 for (const c of COPIES) copyFileSync(resolve(root, c.from), resolve(root, c.to));
 writeFileSync(resolve(root, ICO.to), await pngToIco([readFileSync(resolve(root, ICO.from))]));
-writeFileSync(resolve(root, 'brand/out/manifest.json'),
-  JSON.stringify({ sources: hashFiles(SOURCES, root), outputs: hashFiles(outputPaths({ ASSETS, COPIES, ICO }), root) }, null, 2) + '\n');
+writeFileSync(
+  resolve(root, 'brand/out/manifest.json'),
+  JSON.stringify(
+    { sources: hashFiles(SOURCES, root), outputs: hashFiles(outputPaths({ ASSETS, COPIES, ICO }), root) },
+    null,
+    2,
+  ) + '\n',
+);
 console.log('wrote brand/out/manifest.json');

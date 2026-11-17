@@ -40,10 +40,14 @@ export function repoLink(url) {
 export function refuseOddPath(path) {
   // eslint-disable-next-line no-control-regex -- matching control characters is the point: they are refused.
   if (/[\x00-\x1f\x7f]/.test(path)) {
-    throw new TroupeDocsError(`${JSON.stringify(path)} isn't a path in troupe's repository: it has a control character`);
+    throw new TroupeDocsError(
+      `${JSON.stringify(path)} isn't a path in troupe's repository: it has a control character`,
+    );
   }
   if (path !== '' && path.split('/').some((part) => part === '' || part === '.' || part === '..')) {
-    throw new TroupeDocsError(`${JSON.stringify(path)} isn't a path in troupe's repository: it has an empty, . or .. part`);
+    throw new TroupeDocsError(
+      `${JSON.stringify(path)} isn't a path in troupe's repository: it has an empty, . or .. part`,
+    );
   }
 }
 
@@ -122,7 +126,9 @@ export async function repoLinkProblems(source, version) {
   const found = source.exists(toLookUp.map(({ ref, path }) => ({ ref, path })));
   toLookUp.forEach(({ at, url, ref, path }, i) => {
     if (!found[i]) {
-      problems.push(`${at}: the link ${url} names ${path}, which isn't at ${ref}: link it once it exists, or link a path that does`);
+      problems.push(
+        `${at}: the link ${url} names ${path}, which isn't at ${ref}: link it once it exists, or link a path that does`,
+      );
     }
   });
   return problems;

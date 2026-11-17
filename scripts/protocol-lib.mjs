@@ -21,7 +21,10 @@ export function chooseCopies(tags) {
   for (const tag of tags) {
     if (!tag.startsWith(PREFIX)) continue;
     const m = RELEASE.exec(tag);
-    if (!m) throw new TroupeDocsError(`${tag} isn't a protocol release tag troupe.run can build: use protocol-vMAJOR.MINOR.PATCH`);
+    if (!m)
+      throw new TroupeDocsError(
+        `${tag} isn't a protocol release tag troupe.run can build: use protocol-vMAJOR.MINOR.PATCH`,
+      );
     releases.push({ tag, version: tag.slice(PREFIX.length), n: m.slice(1, 4).map(Number) });
   }
   releases.sort((a, b) => b.n[0] - a.n[0] || b.n[1] - a.n[1] || b.n[2] - a.n[2]);
@@ -29,7 +32,10 @@ export function chooseCopies(tags) {
   if (releases.length === 0) {
     // Before the first release, 0/ serves main too, so the URL troupe writes into config files resolves (owner,
     // 2026-10-24).
-    return { copies: [{ prefix: '', ref: 'main', rewrite: false }, { prefix: '0/', ref: 'main', rewrite: true }, next], releases: [] };
+    return {
+      copies: [{ prefix: '', ref: 'main', rewrite: false }, { prefix: '0/', ref: 'main', rewrite: true }, next],
+      releases: [],
+    };
   }
   const majors = new Map();
   for (const r of releases) if (!majors.has(r.n[0])) majors.set(r.n[0], r);
@@ -82,8 +88,10 @@ export function checkSchemas(ref, files) {
     const top = path.split('/');
     if (top.length > 1 && COPY_NAME.test(top[0]) && !folders.has(top[0])) {
       folders.add(top[0]);
-      found.push(`protocol/schemas/${top[0]}/: a folder here can't be named next, a whole number or MAJOR.MINOR.PATCH, ` +
-        "since its files would be served at another copy's URLs; rename it");
+      found.push(
+        `protocol/schemas/${top[0]}/: a folder here can't be named next, a whole number or MAJOR.MINOR.PATCH, ` +
+          "since its files would be served at another copy's URLs; rename it",
+      );
     }
     if (!path.endsWith('.schema.json')) {
       found.push(`${at}: only .schema.json files are accepted`);
@@ -105,7 +113,8 @@ export function checkSchemas(ref, files) {
     else if (value.$id !== own) found.push(`${at}: its $id is "${value.$id}"; make it "${own}"`);
     eachKeyword(value, (key, v, pointer) => {
       if (key === '$id') {
-        if (pointer !== '') found.push(`${at}: has an $id at ${pointer}, inside the schema; troupe.run serves one $id per file`);
+        if (pointer !== '')
+          found.push(`${at}: has an $id at ${pointer}, inside the schema; troupe.run serves one $id per file`);
         return;
       }
       if (!v.startsWith(BASE)) return;
@@ -114,15 +123,21 @@ export function checkSchemas(ref, files) {
       const first = target.split('/')[0];
       const unversioned = target.split('/').slice(1).join('/');
       if (target.includes('/') && COPY_NAME.test(first) && paths.has(unversioned)) {
-        found.push(`${at}: ${key} "${v}" names a copy of the schemas; use "${BASE}${unversioned}${hash}" or a relative reference`);
+        found.push(
+          `${at}: ${key} "${v}" names a copy of the schemas; use "${BASE}${unversioned}${hash}" or a relative reference`,
+        );
       } else if (!paths.has(target)) {
-        found.push(`${at}: ${key} "${v}" names no schema in ${refName(ref)}'s protocol/schemas/; use a relative reference to one that is`);
+        found.push(
+          `${at}: ${key} "${v}" names no schema in ${refName(ref)}'s protocol/schemas/; use a relative reference to one that is`,
+        );
       }
     });
     parsed.push({ path, value });
   }
   if (found.length) {
-    throw new TroupeDocsError(`${refName(ref)} can't be built into /protocol/:\n${found.map((p) => `  - ${p}`).join('\n')}`);
+    throw new TroupeDocsError(
+      `${refName(ref)} can't be built into /protocol/:\n${found.map((p) => `  - ${p}`).join('\n')}`,
+    );
   }
   return parsed;
 }
@@ -160,7 +175,9 @@ export function buildProtocol(source) {
   const byRef = new Map();
   for (const { ref } of copies) {
     if (byRef.has(ref)) continue;
-    const files = source.listTree(ref, 'protocol/schemas').map((path) => ({ path, text: source.readFile(ref, `protocol/schemas/${path}`) }));
+    const files = source
+      .listTree(ref, 'protocol/schemas')
+      .map((path) => ({ path, text: source.readFile(ref, `protocol/schemas/${path}`) }));
     byRef.set(ref, checkSchemas(ref, files));
   }
   return { copies: copies.map((c) => ({ ...c, schemas: byRef.get(c.ref) })), releases };
@@ -175,11 +192,16 @@ export const MARKER = '.troupe-protocol';
  */
 export function writeProtocol({ copies, releases }, outDir) {
   if (existsSync(outDir) && readdirSync(outDir).length && !existsSync(join(outDir, MARKER))) {
-    throw new TroupeDocsError(`${outDir} holds files the docs sync didn't write, so it won't replace them. Fix: move them, then run it again.`);
+    throw new TroupeDocsError(
+      `${outDir} holds files the docs sync didn't write, so it won't replace them. Fix: move them, then run it again.`,
+    );
   }
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, MARKER), 'Written by npm run docs:sync from troupe-run/troupe. Everything here is replaced on each run.\n');
+  writeFileSync(
+    join(outDir, MARKER),
+    'Written by npm run docs:sync from troupe-run/troupe. Everything here is replaced on each run.\n',
+  );
   for (const { prefix, rewrite, schemas } of copies) {
     for (const { path, value } of schemas) {
       const at = join(outDir, prefix, path);
@@ -211,8 +233,10 @@ function files(dir) {
 function hasAnchor(node, name) {
   if (Array.isArray(node)) return node.some((item) => hasAnchor(item, name));
   if (!node || typeof node !== 'object') return false;
-  return Object.entries(node).some(([key, value]) =>
-    ((key === '$anchor' || key === '$dynamicAnchor') && value === name) || (!DATA.has(key) && hasAnchor(value, name)));
+  return Object.entries(node).some(
+    ([key, value]) =>
+      ((key === '$anchor' || key === '$dynamicAnchor') && value === name) || (!DATA.has(key) && hasAnchor(value, name)),
+  );
 }
 
 /** Follows a JSON Pointer, already percent-decoded, into `node`. Returns whether it leads to a value. */
@@ -233,7 +257,9 @@ function follows(node, pointer) {
  */
 export function checkReferences(dir) {
   const root = join(dir, 'protocol');
-  const docs = new Map(files(root).map((f) => [relative(root, f).split(sep).join('/'), JSON.parse(readFileSync(f, 'utf8'))]));
+  const docs = new Map(
+    files(root).map((f) => [relative(root, f).split(sep).join('/'), JSON.parse(readFileSync(f, 'utf8'))]),
+  );
   const result = { checked: 0, skipped: 0, broken: [] };
   for (const [path, schema] of [...docs].sort(([a], [b]) => (a < b ? -1 : 1))) {
     const base = typeof schema.$id === 'string' ? schema.$id : `${BASE}${path}`;
@@ -249,7 +275,8 @@ export function checkReferences(dir) {
       const at = target.slice(BASE.length);
       const fragment = decodeURIComponent(url.hash.slice(1));
       const fail = (reason) => result.broken.push({ file: `protocol/${path}`, at: `${pointer}/${key}`, ref, reason });
-      if (copyOf(at) !== copyOf(path)) return fail(`it leaves the copy at /protocol/${copyOf(path)} for the one at /protocol/${copyOf(at)}`);
+      if (copyOf(at) !== copyOf(path))
+        return fail(`it leaves the copy at /protocol/${copyOf(path)} for the one at /protocol/${copyOf(at)}`);
       if (!docs.has(at)) return fail(`protocol/${at} isn't published`);
       if (fragment === '') return;
       if (fragment.startsWith('/')) {
@@ -264,6 +291,7 @@ export function checkReferences(dir) {
 
 /** What the link check prints for a reference check's result: each broken reference, or that it checked nothing. */
 export function referenceProblems({ checked, broken }) {
-  if (checked === 0) return ['checked no schema reference under protocol/: the reference check is not checking anything'];
+  if (checked === 0)
+    return ['checked no schema reference under protocol/: the reference check is not checking anything'];
   return broken.map((b) => `${b.file} at ${b.at}: ${b.ref}: ${b.reason}`);
 }

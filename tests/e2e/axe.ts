@@ -24,7 +24,7 @@ export const ACCEPTED: readonly Accepted[] = [
     target: 'button[data-open-modal=""]',
     page: '/docs/programme/what-is-troupe/',
     why:
-      "Starlight's search button. Its visible text beyond its name, \"Search\", is the Ctrl K (or ⌘ K) shortcut hint, " +
+      'Starlight\'s search button. Its visible text beyond its name, "Search", is the Ctrl K (or ⌘ K) shortcut hint, ' +
       'which it also exposes as aria-keyshortcuts. Starlight closed this as not planned ' +
       '(https://github.com/withastro/starlight/issues/4260), and the owner accepted it on 2026-10-29 ' +
       '(troupe-run/website#67). a11y.spec.ts checks the reason still holds.',
@@ -40,7 +40,10 @@ const targetOf = (node: { target: unknown[] }) => node.target.join(' ');
 export function unaccepted(violations: readonly Violation[], accepted: readonly Accepted[] = ACCEPTED): string[] {
   return violations
     .filter((v) => v.impact === 'serious' || v.impact === 'critical')
-    .map((v) => ({ id: v.id, targets: v.nodes.map(targetOf).filter((t) => !accepted.some((a) => a.rule === v.id && a.target === t)) }))
+    .map((v) => ({
+      id: v.id,
+      targets: v.nodes.map(targetOf).filter((t) => !accepted.some((a) => a.rule === v.id && a.target === t)),
+    }))
     .filter((v) => v.targets.length > 0)
     .map((v) => `${v.id}: ${v.targets.join(', ')}`);
 }

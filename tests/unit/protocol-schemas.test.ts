@@ -44,30 +44,64 @@ describe('checkSchemas', () => {
   });
 
   const refusals: [string, Record<string, string>, string][] = [
-    ['a file not named *.schema.json', { 'runner/notes.md': '# x' },
-      'protocol/schemas/runner/notes.md: only .schema.json files are accepted'],
-    ['a file that isn\'t JSON', { 'a.schema.json': '{"a": 1,}' }, 'protocol/schemas/a.schema.json: isn\'t JSON ('],
-    ['JSON that isn\'t an object', { 'a.schema.json': '[]' }, 'protocol/schemas/a.schema.json: isn\'t a JSON object'],
-    ['a folder named next', { 'next/a.schema.json': schema('next/a.schema.json') },
-      'protocol/schemas/next/: a folder here can\'t be named next, a whole number or MAJOR.MINOR.PATCH'],
-    ['a folder named as a major version', { '0/a.schema.json': schema('0/a.schema.json') }, 'protocol/schemas/0/: a folder here'],
-    ['a folder named as a release', { '0.2.1/a.schema.json': schema('0.2.1/a.schema.json') }, 'protocol/schemas/0.2.1/: a folder here'],
-    ['a missing $id', { 'a.schema.json': '{"type": "string"}' },
-      `protocol/schemas/a.schema.json: has no $id; give it "$id": "${BASE}a.schema.json"`],
-    ['another file\'s $id', { 'runner/shutdown.schema.json': schema('runner/run-cancel.schema.json') },
-      `protocol/schemas/runner/shutdown.schema.json: its $id is "${BASE}runner/run-cancel.schema.json"; make it "${BASE}runner/shutdown.schema.json"`],
-    ['a nested $id', { 'a.schema.json': schema('a.schema.json', { $defs: { x: { $id: 'x.json' } } }) },
-      'protocol/schemas/a.schema.json: has an $id at /$defs/x, inside the schema; troupe.run serves one $id per file'],
-    ['an absolute reference to a major version', {
-      'lineage.schema.json': schema('lineage.schema.json'),
-      'a.schema.json': schema('a.schema.json', { $ref: `${BASE}0/lineage.schema.json` }),
-    }, `protocol/schemas/a.schema.json: $ref "${BASE}0/lineage.schema.json" names a copy of the schemas; use "${BASE}lineage.schema.json" or a relative reference`],
-    ['an absolute reference to next', {
-      'lineage.schema.json': schema('lineage.schema.json'),
-      'a.schema.json': schema('a.schema.json', { $dynamicRef: `${BASE}next/lineage.schema.json#x` }),
-    }, `$dynamicRef "${BASE}next/lineage.schema.json#x" names a copy of the schemas; use "${BASE}lineage.schema.json#x" or a relative reference`],
-    ['an absolute reference to a file the ref lacks', { 'a.schema.json': schema('a.schema.json', { $ref: `${BASE}gone.schema.json` }) },
-      `protocol/schemas/a.schema.json: $ref "${BASE}gone.schema.json" names no schema in troupe's main's protocol/schemas/; use a relative reference to one that is`],
+    [
+      'a file not named *.schema.json',
+      { 'runner/notes.md': '# x' },
+      'protocol/schemas/runner/notes.md: only .schema.json files are accepted',
+    ],
+    ["a file that isn't JSON", { 'a.schema.json': '{"a": 1,}' }, "protocol/schemas/a.schema.json: isn't JSON ("],
+    ["JSON that isn't an object", { 'a.schema.json': '[]' }, "protocol/schemas/a.schema.json: isn't a JSON object"],
+    [
+      'a folder named next',
+      { 'next/a.schema.json': schema('next/a.schema.json') },
+      "protocol/schemas/next/: a folder here can't be named next, a whole number or MAJOR.MINOR.PATCH",
+    ],
+    [
+      'a folder named as a major version',
+      { '0/a.schema.json': schema('0/a.schema.json') },
+      'protocol/schemas/0/: a folder here',
+    ],
+    [
+      'a folder named as a release',
+      { '0.2.1/a.schema.json': schema('0.2.1/a.schema.json') },
+      'protocol/schemas/0.2.1/: a folder here',
+    ],
+    [
+      'a missing $id',
+      { 'a.schema.json': '{"type": "string"}' },
+      `protocol/schemas/a.schema.json: has no $id; give it "$id": "${BASE}a.schema.json"`,
+    ],
+    [
+      "another file's $id",
+      { 'runner/shutdown.schema.json': schema('runner/run-cancel.schema.json') },
+      `protocol/schemas/runner/shutdown.schema.json: its $id is "${BASE}runner/run-cancel.schema.json"; make it "${BASE}runner/shutdown.schema.json"`,
+    ],
+    [
+      'a nested $id',
+      { 'a.schema.json': schema('a.schema.json', { $defs: { x: { $id: 'x.json' } } }) },
+      'protocol/schemas/a.schema.json: has an $id at /$defs/x, inside the schema; troupe.run serves one $id per file',
+    ],
+    [
+      'an absolute reference to a major version',
+      {
+        'lineage.schema.json': schema('lineage.schema.json'),
+        'a.schema.json': schema('a.schema.json', { $ref: `${BASE}0/lineage.schema.json` }),
+      },
+      `protocol/schemas/a.schema.json: $ref "${BASE}0/lineage.schema.json" names a copy of the schemas; use "${BASE}lineage.schema.json" or a relative reference`,
+    ],
+    [
+      'an absolute reference to next',
+      {
+        'lineage.schema.json': schema('lineage.schema.json'),
+        'a.schema.json': schema('a.schema.json', { $dynamicRef: `${BASE}next/lineage.schema.json#x` }),
+      },
+      `$dynamicRef "${BASE}next/lineage.schema.json#x" names a copy of the schemas; use "${BASE}lineage.schema.json#x" or a relative reference`,
+    ],
+    [
+      'an absolute reference to a file the ref lacks',
+      { 'a.schema.json': schema('a.schema.json', { $ref: `${BASE}gone.schema.json` }) },
+      `protocol/schemas/a.schema.json: $ref "${BASE}gone.schema.json" names no schema in troupe's main's protocol/schemas/; use a relative reference to one that is`,
+    ],
     ['no schemas at all', {}, 'protocol/schemas/ is missing or empty'],
   ];
   it.each(refusals)('refuses %s, naming the path and the fix', (_, entries, message) => {
@@ -86,17 +120,23 @@ describe('checkSchemas', () => {
 });
 
 describe('rewriteIds', () => {
-  const start = JSON.parse(schema('runner/run-start.schema.json', {
-    description: `Named in config files as ${BASE}0/config/actor.schema.json.`,
-    properties: {
-      a: { $ref: `${BASE}lineage.schema.json#/$defs/hash` },
-      b: { $ref: '../lineage.schema.json#/$defs/hash' },
-      c: { $dynamicRef: '#runnerOptions' },
-      d: { const: { $id: `${BASE}lineage.schema.json` } },
-      e: { enum: [{ $ref: `${BASE}lineage.schema.json` }] },
-      f: { type: 'object', examples: [{ $ref: `${BASE}lineage.schema.json` }], default: { $ref: `${BASE}lineage.schema.json` } },
-    },
-  }));
+  const start = JSON.parse(
+    schema('runner/run-start.schema.json', {
+      description: `Named in config files as ${BASE}0/config/actor.schema.json.`,
+      properties: {
+        a: { $ref: `${BASE}lineage.schema.json#/$defs/hash` },
+        b: { $ref: '../lineage.schema.json#/$defs/hash' },
+        c: { $dynamicRef: '#runnerOptions' },
+        d: { const: { $id: `${BASE}lineage.schema.json` } },
+        e: { enum: [{ $ref: `${BASE}lineage.schema.json` }] },
+        f: {
+          type: 'object',
+          examples: [{ $ref: `${BASE}lineage.schema.json` }],
+          default: { $ref: `${BASE}lineage.schema.json` },
+        },
+      },
+    }),
+  );
 
   it("moves the $id and an absolute reference, fragment kept, under the copy's prefix", () => {
     const out = rewriteIds(start, '0/');
@@ -145,11 +185,13 @@ describe('rewriteIds', () => {
     const compare = (a: unknown, b: unknown, at: string): void => {
       if (typeof a === 'string' && typeof b === 'string' && a !== b) {
         const key = at.split('/').pop();
-        const owned = ['$id', '$ref', '$dynamicRef'].includes(key!) && a.startsWith(BASE) && b === a.replace(BASE, BASE + prefix);
+        const owned =
+          ['$id', '$ref', '$dynamicRef'].includes(key!) && a.startsWith(BASE) && b === a.replace(BASE, BASE + prefix);
         if (!owned) differences.push(at);
       } else if (a && typeof a === 'object') {
         expect(Object.keys(b as object)).toEqual(Object.keys(a));
-        for (const k of Object.keys(a)) compare((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k], `${at}/${k}`);
+        for (const k of Object.keys(a))
+          compare((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k], `${at}/${k}`);
       } else expect(b).toEqual(a);
     };
     for (const { path, value } of checkSchemas('main', real)) {

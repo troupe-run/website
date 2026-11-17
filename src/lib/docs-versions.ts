@@ -11,7 +11,11 @@ export interface Version {
   ref: string;
   pages: Page[];
 }
-export interface Manifest { versions: Version[]; glossary: string; releases: { tag: string; date: string }[] }
+export interface Manifest {
+  versions: Version[];
+  glossary: string;
+  releases: { tag: string; date: string }[];
+}
 
 /** The version a docs route id (`docs/v0.1/the-company/flows`) belongs to, and the page's path under docs/. */
 export function locate(manifest: Manifest, id: string): { version: Version; path: string } | undefined {
@@ -27,12 +31,29 @@ export function locate(manifest: Manifest, id: string): { version: Version; path
 
 // Starlight's sidebar entry shapes (route data, `sidebar`).
 export interface SidebarLink {
-  type: 'link'; label: string; href: string; isCurrent: boolean; badge: undefined; attrs: Record<string, string>;
+  type: 'link';
+  label: string;
+  href: string;
+  isCurrent: boolean;
+  badge: undefined;
+  attrs: Record<string, string>;
 }
-export interface SidebarGroup { type: 'group'; label: string; entries: SidebarLink[]; collapsed: boolean; badge: undefined }
+export interface SidebarGroup {
+  type: 'group';
+  label: string;
+  entries: SidebarLink[];
+  collapsed: boolean;
+  badge: undefined;
+}
 
-const link = (label: string, href: string, isCurrent = false): SidebarLink =>
-  ({ type: 'link', label, href, isCurrent, badge: undefined, attrs: {} });
+const link = (label: string, href: string, isCurrent = false): SidebarLink => ({
+  type: 'link',
+  label,
+  href,
+  isCurrent,
+  badge: undefined,
+  attrs: {},
+});
 
 /**
  * The version's sidebar: its pages in each section's order, then the section's link to a page the website keeps.
@@ -54,7 +75,10 @@ export function sidebar(version: Version, current: string): SidebarGroup[] {
 }
 
 /** "Previous" and "Next": the neighbouring pages in the version's sidebar order, never the website's own links. */
-export function pagination(version: Version, current: string): { prev: SidebarLink | undefined; next: SidebarLink | undefined } {
+export function pagination(
+  version: Version,
+  current: string,
+): { prev: SidebarLink | undefined; next: SidebarLink | undefined } {
   const pages = ordered(version.pages).flatMap((s) => s.pages);
   const at = pages.findIndex((p) => p.path === current);
   const to = (p: Page | undefined) => (p ? link(p.title, pageUrl(version.base, p.path)) : undefined);
@@ -70,9 +94,12 @@ export function samePageIn(version: Version, path: string): string {
 /** The latest release's version (or main's, before the first release): the one at /docs/. */
 export const latest = (manifest: Manifest) => manifest.versions.find((v) => v.role === 'current')!;
 
-
 /** The words the menu and banners use (src/content/copy/versions.md). */
-export interface VersionCopy { latest: string; unreleased: string; next: string }
+export interface VersionCopy {
+  latest: string;
+  unreleased: string;
+  next: string;
+}
 
 /** A version's name in the menu: "v0.2 (latest)", "next (unreleased)", "v0.1", or "unreleased" before any release. */
 export function label(version: Version, copy: VersionCopy): string {
@@ -82,18 +109,22 @@ export function label(version: Version, copy: VersionCopy): string {
 }
 
 /** The page's source at its version's ref, for pages with no edit link (design D7). */
-export const sourceUrl = (version: Version, path: string) => `https://github.com/troupe-run/troupe/blob/${version.ref}/docs/${path}`;
+export const sourceUrl = (version: Version, path: string) =>
+  `https://github.com/troupe-run/troupe/blob/${version.ref}/docs/${path}`;
 
 /** What a docs page shows about its version: the menu's entries, and the banner for an archived or next page. */
 export function versionNotice(manifest: Manifest, version: Version, path: string) {
   const top = latest(manifest);
   const entries = manifest.versions.map((v) => ({ version: v, href: samePageIn(v, path), current: v === version }));
-  const banner = version.role === 'current' ? undefined : {
-    kind: version.role,
-    latest: `v${top.version}`,
-    href: samePageIn(top, path),
-    samePage: top.pages.some((p) => p.path === path),
-  };
+  const banner =
+    version.role === 'current'
+      ? undefined
+      : {
+          kind: version.role,
+          latest: `v${top.version}`,
+          href: samePageIn(top, path),
+          samePage: top.pages.some((p) => p.path === path),
+        };
   return { entries, banner };
 }
 

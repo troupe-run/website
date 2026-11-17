@@ -14,7 +14,11 @@ export function skipProblems(skips) {
   skips.forEach((s, i) => {
     if (typeof s?.pattern !== 'string' || !s.pattern.trim()) problems.push(`entry ${i}: no pattern`);
     if (typeof s?.reason !== 'string' || !s.reason.trim()) problems.push(`entry ${i}: no reason`);
-    try { new RegExp(s?.pattern); } catch { problems.push(`entry ${i}: pattern is not a valid regex`); }
+    try {
+      new RegExp(s?.pattern);
+    } catch {
+      problems.push(`entry ${i}: pattern is not a valid regex`);
+    }
   });
   return problems;
 }

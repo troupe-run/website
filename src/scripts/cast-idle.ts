@@ -26,8 +26,7 @@ export function createCastIdle(opts: CastIdleOptions): CastIdle {
   let visible = true;
   let stopped = false;
 
-  const state = (): CastIdleState =>
-    stopped ? 'stopped' : bows >= maxBows ? 'done' : visible ? 'running' : 'paused';
+  const state = (): CastIdleState => (stopped ? 'stopped' : bows >= maxBows ? 'done' : visible ? 'running' : 'paused');
 
   const clear = () => {
     if (timer !== undefined) clearTimeout(timer);
@@ -59,9 +58,19 @@ export function createCastIdle(opts: CastIdleOptions): CastIdle {
   schedule();
   return {
     hover: schedule,
-    setVisible(v) { visible = v; schedule(); },
-    stop() { stopped = true; clear(); },
-    get bows() { return bows; },
-    get state() { return state(); },
+    setVisible(v) {
+      visible = v;
+      schedule();
+    },
+    stop() {
+      stopped = true;
+      clear();
+    },
+    get bows() {
+      return bows;
+    },
+    get state() {
+      return state();
+    },
   };
 }

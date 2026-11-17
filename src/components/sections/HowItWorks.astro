@@ -12,19 +12,39 @@ const SCENES: { pos: 'left' | 'right' | 'centre' | 'top'; kinds: Kind[] }[] = [
 ];
 const n = copy.steps.length;
 ---
+
 <section id="how-it-works" class="how" aria-labelledby="how-title">
   <div class="curtain" aria-hidden="true"></div>
   <div class="wrap inner">
     <p class="eyebrow">{copy.eyebrow}</p>
     <h2 id="how-title">{copy.title}</h2>
     <p class="intro">{copy.intro}</p>
-    <div class="carousel" role="group" aria-roledescription="carousel" aria-label="The four steps of a run" data-carousel>
+    <div
+      class="carousel"
+      role="group"
+      aria-roledescription="carousel"
+      aria-label="The four steps of a run"
+      data-carousel
+    >
       <div class="controls" hidden data-controls>
         <div class="tabs" role="tablist" aria-label="Steps">
-          <span class="rail" aria-hidden="true"><span class="indicator" data-indicator></span><span class="indicator ghost" data-ghost hidden></span></span>
+          <span class="rail" aria-hidden="true">
+            <span class="indicator" data-indicator></span>
+            <span class="indicator ghost" data-ghost hidden></span>
+          </span>
           {copy.steps.map((s, i) => (
-            <button class="tab eyebrow" type="button" role="tab" id={`step-tab-${i}`} aria-controls={`step-panel-${i}`}
-                    aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab={i}>{s.label}</button>
+            <button
+              class="tab eyebrow"
+              type="button"
+              role="tab"
+              id={`step-tab-${i}`}
+              aria-controls={`step-panel-${i}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              data-tab={i}
+            >
+              {s.label}
+            </button>
           ))}
         </div>
         <div class="dial" aria-hidden="false">
@@ -33,22 +53,37 @@ const n = copy.steps.length;
           </svg>
           <span class="mover" data-mover aria-hidden="true"></span>
           {copy.steps.map((s, i) => (
-            <button class="dot" type="button" tabindex="-1" data-dot={i} data-pos={i}
-                    aria-label={`Go to step ${i + 1} of ${n}: ${s.label}`} aria-current={i === 0 ? 'true' : undefined}></button>
+            <button
+              class="dot"
+              type="button"
+              tabindex="-1"
+              data-dot={i}
+              data-pos={i}
+              aria-label={`Go to step ${i + 1} of ${n}: ${s.label}`}
+              aria-current={i === 0 ? 'true' : undefined}
+            ></button>
           ))}
         </div>
       </div>
       <div class="slides" aria-live="off" data-slides>
         {copy.steps.map((s, i) => (
-          <div class={`step slide${i === 0 ? ' is-current' : ''}`} role="tabpanel" id={`step-panel-${i}`}
-               aria-labelledby={`step-tab-${i}`} aria-roledescription="slide" data-slide={i}>
+          <div
+            class={`step slide${i === 0 ? ' is-current' : ''}`}
+            role="tabpanel"
+            id={`step-panel-${i}`}
+            aria-labelledby={`step-tab-${i}`}
+            aria-roledescription="slide"
+            data-slide={i}
+          >
             <div class="words">
               <p class="eyebrow">{s.label}</p>
               <h3>{s.title}</h3>
               <p class="body">{s.body}</p>
             </div>
             <div class="scene" data-troupe-pos={SCENES[i].pos} aria-hidden="true">
-              {SCENES[i].kinds.map((k) => <Character kind={k} size={44} />)}
+              {SCENES[i].kinds.map((k) => (
+                <Character kind={k} size={44} />
+              ))}
             </div>
           </div>
         ))}
@@ -115,10 +150,15 @@ const n = copy.steps.length;
         t.setAttribute('aria-selected', String(i === index));
         t.tabIndex = i === index ? 0 : -1;
       });
-      dots.forEach((d, i) => (i === index ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
+      dots.forEach((d, i) =>
+        i === index ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current'),
+      );
       root.dataset.index = String(index);
       if (index === from) return;
-      if (reduce.matches) { settle(index); return; }
+      if (reduce.matches) {
+        settle(index);
+        return;
+      }
 
       // Later steps (and the Notes -> Cast wrap) slide left, earlier ones slide right.
       const dir = cause === 'auto' || index > from ? 1 : -1;
@@ -138,7 +178,8 @@ const n = copy.steps.length;
       // The dot travels the way the slide does: forward is clockwise (Notes -> Cast continues on from 9 to 12),
       // a jump to an earlier step goes anticlockwise.
       const fromDeg = from * 90;
-      const toDeg = dir > 0 ? fromDeg + (((index - from + total) % total) * 90) : fromDeg - (((from - index + total) % total) * 90);
+      const toDeg =
+        dir > 0 ? fromDeg + ((index - from + total) % total) * 90 : fromDeg - ((from - index + total) % total) * 90;
       const frame = (p: number) => {
         const e = ease(p);
         placeMover(lerp(fromDeg, toDeg, e));
@@ -165,7 +206,8 @@ const n = copy.steps.length;
       const tick = () => {
         const p = Math.min(1, (performance.now() - start) / DURATION);
         frame(p);
-        if (p >= 1) finish(); else raf = requestAnimationFrame(tick);
+        if (p >= 1) finish();
+        else raf = requestAnimationFrame(tick);
       };
       running = { finish };
       frame(0);
@@ -185,7 +227,9 @@ const n = copy.steps.length;
     root.querySelectorAll<HTMLElement>('[data-controls]').forEach((e) => e.removeAttribute('hidden'));
     settle(0);
     show(0, 'user');
-    new ResizeObserver(() => { if (!running) settle(shownIndex); }).observe(tabsEl);
+    new ResizeObserver(() => {
+      if (!running) settle(shownIndex);
+    }).observe(tabsEl);
 
     // WCAG 2.2.2: choosing a step shows it and stops the auto-advance for the rest of the page view (as in the
     // APG carousel pattern, rotation stops once the user activates a control). There is no Play button.
@@ -195,7 +239,8 @@ const n = copy.steps.length;
     root.querySelector('[role="tablist"]')!.addEventListener('keydown', (e) => {
       const k = (e as KeyboardEvent).key;
       const cur = carousel.state.index;
-      const to = k === 'ArrowRight' ? cur + 1 : k === 'ArrowLeft' ? cur - 1 : k === 'Home' ? 0 : k === 'End' ? total - 1 : null;
+      const to =
+        k === 'ArrowRight' ? cur + 1 : k === 'ArrowLeft' ? cur - 1 : k === 'Home' ? 0 : k === 'End' ? total - 1 : null;
       if (to === null) return;
       e.preventDefault();
       carousel.activate(((to % total) + total) % total);
@@ -213,55 +258,228 @@ const n = copy.steps.length;
 
     let onScreen = true;
     const sync = () => carousel.setVisible(onScreen && !document.hidden);
-    new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; sync(); }).observe(root);
+    new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      sync();
+    }).observe(root);
     document.addEventListener('visibilitychange', sync);
-    reduce.addEventListener('change', () => { if (reduce.matches) carousel.stop(); });
+    reduce.addEventListener('change', () => {
+      if (reduce.matches) carousel.stop();
+    });
   }
 </script>
 <style>
-  .how { padding-bottom: 40px; background: var(--surface); }
-  .curtain { height: 16px; background: repeating-linear-gradient(90deg, var(--tomato) 0 14px, var(--tomato-shadow) 14px 18px); border-bottom: 3px solid var(--sunflower); }
-  .inner { padding-top: 28px; }
-  h2 { font-size: clamp(24px, 4vw, 34px); margin: 6px 0; }
-  .intro { color: var(--muted); }
-  .carousel { margin-top: 18px; }
-  .controls[hidden] { display: none; }
-  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 6px; margin-bottom: 12px; }
-  .tabs { position: relative; display: flex; flex-wrap: nowrap; gap: 2px; margin-right: auto; }
-  .tab { appearance: none; background: none; border: 0; cursor: pointer; padding: 8px 8px 10px; min-height: 24px; color: var(--muted); transition: color 500ms ease-in-out; }
-  .tab[aria-selected='true'] { color: var(--tomato-text); }
-  .tab:hover { color: var(--ink); }
-  .rail { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; overflow: hidden; background: var(--line); pointer-events: none; }
-  .indicator { position: absolute; left: 0; top: 0; height: 2px; width: 0; background: var(--tomato-text); }
-  .indicator[hidden] { display: none; }
-  @media (prefers-reduced-motion: reduce) { .tab { transition: none; } }
-  .dial { position: relative; width: 56px; height: 56px; margin-right: 6px; }
-  .ring { position: absolute; inset: 0; }
-  .dot { position: absolute; width: 24px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; margin: -12px 0 0 -12px; }
-  .dot::after { content: ''; position: absolute; inset: 7px; border-radius: 50%; background: var(--soft); }
-  .mover { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--tomato); pointer-events: none; z-index: 1; left: 28px; top: 8px; }
-  .dot[data-pos='0'] { left: 28px; top: 8px; }
-  .dot[data-pos='1'] { left: 48px; top: 28px; }
-  .dot[data-pos='2'] { left: 28px; top: 48px; }
-  .dot[data-pos='3'] { left: 8px; top: 28px; }
-  .slides { display: grid; gap: 16px; }
-  .slide { background: var(--bg); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: grid; grid-template-columns: 1fr auto; gap: 16px 24px; align-items: center; }
-  /* Enhanced: every card shares one grid cell, so the stage is as tall as the tallest card and never jumps. */
-  [data-enhanced] .slides { overflow: hidden; gap: 0; }
-  [data-enhanced] .slide { grid-area: 1 / 1; }
-  [data-enhanced] .slide:not(.is-current):not(.is-moving) { visibility: hidden; }
-  .slide h3 { font-size: 22px; margin: 4px 0; }
-  .slide .body { margin: 0; color: var(--muted); max-width: 46ch; }
-  .scene { display: flex; align-items: flex-end; gap: 12px; width: 220px; min-height: 120px; padding-bottom: 28px; }
-  .scene[data-troupe-pos='left'] { justify-content: flex-start; }
-  .scene[data-troupe-pos='right'] { justify-content: flex-end; }
-  .scene[data-troupe-pos='centre'] { justify-content: center; }
-  .scene[data-troupe-pos='top'] { justify-content: center; align-items: flex-start; }
-  @media (max-width: 599px) {
-    .slide { grid-template-columns: 1fr; }
-    .scene { width: 100%; justify-content: center; }
-    .scene[data-troupe-pos='left'] { justify-content: flex-start; }
-    .scene[data-troupe-pos='right'] { justify-content: flex-end; }
+  .how {
+    padding-bottom: 40px;
+    background: var(--surface);
   }
-  .loop { text-align: center; font-family: var(--font-mono); font-size: 13px; color: var(--teal-text); margin-top: 14px; }
+  .curtain {
+    height: 16px;
+    background: repeating-linear-gradient(90deg, var(--tomato) 0 14px, var(--tomato-shadow) 14px 18px);
+    border-bottom: 3px solid var(--sunflower);
+  }
+  .inner {
+    padding-top: 28px;
+  }
+  h2 {
+    font-size: clamp(24px, 4vw, 34px);
+    margin: 6px 0;
+  }
+  .intro {
+    color: var(--muted);
+  }
+  .carousel {
+    margin-top: 18px;
+  }
+  .controls[hidden] {
+    display: none;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 6px;
+    margin-bottom: 12px;
+  }
+  .tabs {
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 2px;
+    margin-right: auto;
+  }
+  .tab {
+    appearance: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 8px 8px 10px;
+    min-height: 24px;
+    color: var(--muted);
+    transition: color 500ms ease-in-out;
+  }
+  .tab[aria-selected='true'] {
+    color: var(--tomato-text);
+  }
+  .tab:hover {
+    color: var(--ink);
+  }
+  .rail {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    overflow: hidden;
+    background: var(--line);
+    pointer-events: none;
+  }
+  .indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 2px;
+    width: 0;
+    background: var(--tomato-text);
+  }
+  .indicator[hidden] {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tab {
+      transition: none;
+    }
+  }
+  .dial {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    margin-right: 6px;
+  }
+  .ring {
+    position: absolute;
+    inset: 0;
+  }
+  .dot {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    margin: -12px 0 0 -12px;
+  }
+  .dot::after {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    border-radius: 50%;
+    background: var(--soft);
+  }
+  .mover {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    background: var(--tomato);
+    pointer-events: none;
+    z-index: 1;
+    left: 28px;
+    top: 8px;
+  }
+  .dot[data-pos='0'] {
+    left: 28px;
+    top: 8px;
+  }
+  .dot[data-pos='1'] {
+    left: 48px;
+    top: 28px;
+  }
+  .dot[data-pos='2'] {
+    left: 28px;
+    top: 48px;
+  }
+  .dot[data-pos='3'] {
+    left: 8px;
+    top: 28px;
+  }
+  .slides {
+    display: grid;
+    gap: 16px;
+  }
+  .slide {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px 24px;
+    align-items: center;
+  }
+  /* Enhanced: every card shares one grid cell, so the stage is as tall as the tallest card and never jumps. */
+  [data-enhanced] .slides {
+    overflow: hidden;
+    gap: 0;
+  }
+  [data-enhanced] .slide {
+    grid-area: 1 / 1;
+  }
+  [data-enhanced] .slide:not(.is-current):not(.is-moving) {
+    visibility: hidden;
+  }
+  .slide h3 {
+    font-size: 22px;
+    margin: 4px 0;
+  }
+  .slide .body {
+    margin: 0;
+    color: var(--muted);
+    max-width: 46ch;
+  }
+  .scene {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    width: 220px;
+    min-height: 120px;
+    padding-bottom: 28px;
+  }
+  .scene[data-troupe-pos='left'] {
+    justify-content: flex-start;
+  }
+  .scene[data-troupe-pos='right'] {
+    justify-content: flex-end;
+  }
+  .scene[data-troupe-pos='centre'] {
+    justify-content: center;
+  }
+  .scene[data-troupe-pos='top'] {
+    justify-content: center;
+    align-items: flex-start;
+  }
+  @media (max-width: 599px) {
+    .slide {
+      grid-template-columns: 1fr;
+    }
+    .scene {
+      width: 100%;
+      justify-content: center;
+    }
+    .scene[data-troupe-pos='left'] {
+      justify-content: flex-start;
+    }
+    .scene[data-troupe-pos='right'] {
+      justify-content: flex-end;
+    }
+  }
+  .loop {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--teal-text);
+    margin-top: 14px;
+  }
 </style>

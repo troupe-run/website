@@ -15,15 +15,18 @@ const set = () => readSet(readFileSync(BRAND_GUIDE, 'utf8'));
 /** A brand guide holding only §7's table, with `rows` as its rows. */
 const guideWith = (rows: [string, string][]) =>
   `# guide\n\n## 7. Voice\n\nText.\n\n### How troupe is described\n\n| Part | Text |\n|---|---|\n` +
-  rows.map(([p, t]) => `| ${p} | ${t} |`).join('\n') + '\n\n## 8. Assets\n';
+  rows.map(([p, t]) => `| ${p} | ${t} |`).join('\n') +
+  '\n\n## 8. Assets\n';
 
 const AGREED: DescriptionSet = {
   Tagline: 'Your agents need a director.',
   Sentence: 'troupe runs your development process with a team of agents, asking only when it needs you.',
-  Paragraph: 'troupe runs your development process with a team of agents, asking only when it needs you. ' +
+  Paragraph:
+    'troupe runs your development process with a team of agents, asking only when it needs you. ' +
     'Work branches and loops, decisions go to whoever owns them, and every decision records who made it.',
   'Status line': 'Pre-alpha: you can install it with uv.',
-  'One-line description': 'Your agents need a director. ' +
+  'One-line description':
+    'Your agents need a director. ' +
     'troupe runs your development process with a team of agents, asking only when it needs you.',
   'Page title': 'troupe: your agents need a director',
 };
@@ -45,13 +48,15 @@ describe('reading and checking the set', () => {
     expect(() => readSet(guide)).toThrow('missing ["Status line"]');
   });
 
-  it('a table with a part it doesn\'t know is refused, naming the part', () => {
+  it("a table with a part it doesn't know is refused, naming the part", () => {
     const guide = guideWith([...rows(AGREED), ['Slogan', 'x']]);
     expect(() => readSet(guide)).toThrow('unknown ["Slogan"]');
   });
 
   it('a guide with no "How troupe is described" subsection in §7 is refused, naming the subsection', () => {
-    expect(() => readSet('# guide\n\n## 7. Voice\n\nText.\n')).toThrow('has no "### How troupe is described" subsection');
+    expect(() => readSet('# guide\n\n## 7. Voice\n\nText.\n')).toThrow(
+      'has no "### How troupe is described" subsection',
+    );
   });
 
   it('reading a table built from the agreed set gives the agreed set back', () => {
@@ -60,7 +65,8 @@ describe('reading and checking the set', () => {
 
   it("a paragraph that doesn't open with the sentence is named, with the sentence it should open with", () => {
     expect(setProblems({ ...AGREED, Sentence: 'troupe runs your process.' })).toContain(
-      'the paragraph doesn\'t open with the sentence "troupe runs your process."');
+      'the paragraph doesn\'t open with the sentence "troupe runs your process."',
+    );
   });
 
   it("a one-line description that isn't the tagline, then the sentence, is named, with the text it should be", () => {
@@ -71,13 +77,25 @@ describe('reading and checking the set', () => {
 
   it(`a one-line description of ${LIMIT + 1} characters is named, with its length and the limit`, () => {
     const sentence = 'x'.repeat(LIMIT - AGREED.Tagline.length);
-    const long = { ...AGREED, Sentence: sentence, Paragraph: sentence, 'One-line description': `${AGREED.Tagline} ${sentence}` };
-    expect(setProblems(long)).toEqual([`the one-line description is ${LIMIT + 1} characters, over the limit of ${LIMIT}`]);
+    const long = {
+      ...AGREED,
+      Sentence: sentence,
+      Paragraph: sentence,
+      'One-line description': `${AGREED.Tagline} ${sentence}`,
+    };
+    expect(setProblems(long)).toEqual([
+      `the one-line description is ${LIMIT + 1} characters, over the limit of ${LIMIT}`,
+    ]);
   });
 
   it(`a one-line description of exactly ${LIMIT} characters passes`, () => {
     const sentence = 'x'.repeat(LIMIT - 1 - AGREED.Tagline.length);
-    const edge = { ...AGREED, Sentence: sentence, Paragraph: sentence, 'One-line description': `${AGREED.Tagline} ${sentence}` };
+    const edge = {
+      ...AGREED,
+      Sentence: sentence,
+      Paragraph: sentence,
+      'One-line description': `${AGREED.Tagline} ${sentence}`,
+    };
     expect(setProblems(edge)).toEqual([]);
   });
 });
@@ -104,8 +122,10 @@ describe('the site describes troupe as the brand guide does', () => {
   });
 
   it("the landing page's description is the one-line description, then the status line", () => {
-    expect(landingProp('description'), `${INDEX}: description should be the one-line description, then the status line`)
-      .toBe(pageDescription(set()));
+    expect(
+      landingProp('description'),
+      `${INDEX}: description should be the one-line description, then the status line`,
+    ).toBe(pageDescription(set()));
   });
 
   it("the README banner's line under the wordmark is the tagline", () => {

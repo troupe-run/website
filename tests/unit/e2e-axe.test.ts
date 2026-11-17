@@ -7,7 +7,11 @@ import { unaccepted, type Accepted } from '../e2e/axe';
 // axe-core-4-14 design D2). These cases are the spec's scenarios on hand-made results, so none needs the site broken.
 const SEARCH = 'button[data-open-modal=""]';
 const ACCEPTED: Accepted[] = [{ rule: 'label-content-name-mismatch', target: SEARCH, page: '/docs/', why: 'test' }];
-const violation = (id: string, ...targets: string[]) => ({ id, impact: 'serious', nodes: targets.map((t) => ({ target: [t] })) });
+const violation = (id: string, ...targets: string[]) => ({
+  id,
+  impact: 'serious',
+  nodes: targets.map((t) => ({ target: [t] })),
+});
 
 describe('unaccepted() excuses one rule on one node, and nothing else', () => {
   it('drops the accepted rule on the accepted node, and the violation it leaves empty', () => {
@@ -15,7 +19,9 @@ describe('unaccepted() excuses one rule on one node, and nothing else', () => {
   });
 
   it('keeps the accepted rule on another node', () => {
-    expect(unaccepted([violation('label-content-name-mismatch', 'a.other')], ACCEPTED)).toEqual(['label-content-name-mismatch: a.other']);
+    expect(unaccepted([violation('label-content-name-mismatch', 'a.other')], ACCEPTED)).toEqual([
+      'label-content-name-mismatch: a.other',
+    ]);
   });
 
   it('keeps another rule on the accepted node', () => {
@@ -29,7 +35,9 @@ describe('unaccepted() excuses one rule on one node, and nothing else', () => {
   });
 
   it('keeps the other nodes of a violation that includes the accepted node', () => {
-    expect(unaccepted([violation('label-content-name-mismatch', SEARCH, 'a.other')], ACCEPTED)).toEqual(['label-content-name-mismatch: a.other']);
+    expect(unaccepted([violation('label-content-name-mismatch', SEARCH, 'a.other')], ACCEPTED)).toEqual([
+      'label-content-name-mismatch: a.other',
+    ]);
   });
 
   it('joins a node target inside a frame with spaces, as the axe tests always have', () => {
@@ -55,7 +63,12 @@ describe('e2e tests run axe only through tests/e2e/axe.ts', () => {
   });
 
   it(`no file under ${E2E}/ other than ${HELPER} imports @axe-core/playwright`, () => {
-    const offenders = files.filter((f) => f !== HELPER && readFileSync(join(E2E, f), 'utf8').includes('@axe-core/playwright'));
-    expect(offenders, `run axe through ./axe instead of importing @axe-core/playwright in: ${offenders.join(', ')}`).toEqual([]);
+    const offenders = files.filter(
+      (f) => f !== HELPER && readFileSync(join(E2E, f), 'utf8').includes('@axe-core/playwright'),
+    );
+    expect(
+      offenders,
+      `run axe through ./axe instead of importing @axe-core/playwright in: ${offenders.join(', ')}`,
+    ).toEqual([]);
   });
 });

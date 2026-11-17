@@ -18,12 +18,11 @@ const PLAN: Release[] = [
   { version: '0.2.0', description: 'Config by hand: edits are read back', released: null },
   { version: '0.10.0', description: 'Ten: after two', released: null },
 ];
-const STATUS = '<!-- roadmap:status (from troupe\'s release tags) -->';
+const STATUS = "<!-- roadmap:status (from troupe's release tags) -->";
 const RELEASED = '<!-- roadmap:released (from tofu/milestones.json in troupe-run/infrastructure; edit it there) -->';
 const PLANNED = '<!-- roadmap:planned (from tofu/milestones.json in troupe-run/infrastructure; edit it there) -->';
 const INTRO = 'Each milestone is a set of things you’ll be able to do.';
-const PAGE_TEXT =
-  `## Status\n\n${STATUS}\n\n## Releases\n\n${RELEASED}\n\n## Milestones\n\n${INTRO}\n\n${PLANNED}\n`;
+const PAGE_TEXT = `## Status\n\n${STATUS}\n\n## Releases\n\n${RELEASED}\n\n## Milestones\n\n${INTRO}\n\n${PLANNED}\n`;
 
 async function render(markdown: string, roadmap: { releases: Release[]; latest: string | null }, file = PAGE) {
   const plugin = roadmapPlugin({ page: PAGE, load: () => ({ roadmap, copy: COPY }) });
@@ -34,7 +33,8 @@ async function render(markdown: string, roadmap: { releases: Release[]; latest: 
 const released = (dates: (string | null)[]) => PLAN.map((r, i) => ({ ...r, released: dates[i] ?? null }));
 // The versions in each rendered list, in order: the text of each <strong> between the section's <h2> and the next.
 const section = (html: string, id: string) => html.split(/(?=<h2)/).find((s) => s.startsWith(`<h2 id="${id}"`));
-const versions = (html: string | undefined) => [...(html ?? '').matchAll(/<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
+const versions = (html: string | undefined) =>
+  [...(html ?? '').matchAll(/<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
 
 describe('roadmap plugin: the two lists', () => {
   it('lists released milestones under Releases and the rest under Milestones, each in the order given, none in both', async () => {
@@ -55,12 +55,16 @@ describe('roadmap plugin: the two lists', () => {
 
   it('shows each version in bold and its description word for word, as text, not Markdown or HTML', async () => {
     const { html } = await render(PAGE_TEXT, { releases: PLAN, latest: null });
-    expect(html).toContain('<li><strong>0.1.0</strong> One real actor, safely: an actor &lt;runs&gt; &amp; you *keep* it</li>');
+    expect(html).toContain(
+      '<li><strong>0.1.0</strong> One real actor, safely: an actor &lt;runs&gt; &amp; you *keep* it</li>',
+    );
   });
 
   it('gives a release that is out "Released" and its date in a <time>, and nothing to one that is not', async () => {
     const { html } = await render(PAGE_TEXT, { releases: released(['2026-11-05', null, null]), latest: '0.1.0' });
-    expect(section(html, 'releases')).toContain('<span class="roadmap-released">Released <time datetime="2026-11-05">2026-11-05</time></span>');
+    expect(section(html, 'releases')).toContain(
+      '<span class="roadmap-released">Released <time datetime="2026-11-05">2026-11-05</time></span>',
+    );
     expect(html.match(/roadmap-released/g)).toHaveLength(1);
     expect(html).toContain('<li><strong>0.2.0</strong> Config by hand: edits are read back</li>');
   });
@@ -83,7 +87,8 @@ describe('roadmap plugin: a section with nothing in it', () => {
 
   it('leaves out Milestones, its introduction included, when every milestone is released, keeping what comes after it', async () => {
     const { html, headings } = await render(`${PAGE_TEXT}\n## After\n\nText.\n`, {
-      releases: released(['2026-01-01', '2026-02-01', '2026-03-01']), latest: '0.10.0',
+      releases: released(['2026-01-01', '2026-02-01', '2026-03-01']),
+      latest: '0.10.0',
     });
     expect(headings).toEqual(['Status', 'Releases', 'After']);
     expect(html).not.toContain(INTRO);
@@ -95,7 +100,8 @@ describe('roadmap plugin: a section with nothing in it', () => {
 describe('roadmap plugin: Milestones last on the page', () => {
   it('leaves out Milestones to the end of the page when every milestone is released', async () => {
     const { html, headings } = await render(PAGE_TEXT, {
-      releases: released(['2026-01-01', '2026-02-01', '2026-03-01']), latest: '0.10.0',
+      releases: released(['2026-01-01', '2026-02-01', '2026-03-01']),
+      latest: '0.10.0',
     });
     expect(headings).toEqual(['Status', 'Releases']);
     expect(html).not.toContain(INTRO);
@@ -117,22 +123,44 @@ describe('roadmap plugin: the status line', () => {
 
 describe('roadmap plugin: where it runs, and its refusals', () => {
   it('leaves every other page alone, markers included', async () => {
-    const { html } = await render(PAGE_TEXT, { releases: PLAN, latest: null }, resolve('src/content/docs/blog/post.md'));
+    const { html } = await render(
+      PAGE_TEXT,
+      { releases: PLAN, latest: null },
+      resolve('src/content/docs/blog/post.md'),
+    );
     expect(html).toContain('roadmap:planned');
     expect(html).toContain('Releases</h2>');
     expect(html).not.toContain('<ol');
   });
 
   it.each([
-    ['the released marker is missing', `${STATUS}\n\n## Milestones\n\n${PLANNED}\n`, /status\.md has no roadmap:released marker/],
-    ['the planned marker is missing', `${STATUS}\n\n## Releases\n\n${RELEASED}\n`, /status\.md has no roadmap:planned marker/],
-    ['the status marker is missing', `## Releases\n\n${RELEASED}\n\n## Milestones\n\n${PLANNED}\n`, /status\.md has no roadmap:status marker/],
+    [
+      'the released marker is missing',
+      `${STATUS}\n\n## Milestones\n\n${PLANNED}\n`,
+      /status\.md has no roadmap:released marker/,
+    ],
+    [
+      'the planned marker is missing',
+      `${STATUS}\n\n## Releases\n\n${RELEASED}\n`,
+      /status\.md has no roadmap:planned marker/,
+    ],
+    [
+      'the status marker is missing',
+      `## Releases\n\n${RELEASED}\n\n## Milestones\n\n${PLANNED}\n`,
+      /status\.md has no roadmap:status marker/,
+    ],
     ['a marker is repeated', `${PAGE_TEXT}\n${PLANNED}\n`, /status\.md has 2 roadmap:planned markers/],
     ['a marker is unknown', `${PAGE_TEXT}\n<!-- roadmap:dates -->\n`, /status\.md has an unknown marker roadmap:dates/],
-    ['the old releases marker is used', `${PAGE_TEXT}\n<!-- roadmap:releases -->\n`,
-      /unknown marker roadmap:releases: use roadmap:status, roadmap:released or roadmap:planned/],
-    ['a list marker has no heading before it', `${STATUS}\n\n${RELEASED}\n\n## Milestones\n\n${PLANNED}\n`,
-      /status\.md's roadmap:released marker has no heading before it/],
+    [
+      'the old releases marker is used',
+      `${PAGE_TEXT}\n<!-- roadmap:releases -->\n`,
+      /unknown marker roadmap:releases: use roadmap:status, roadmap:released or roadmap:planned/,
+    ],
+    [
+      'a list marker has no heading before it',
+      `${STATUS}\n\n${RELEASED}\n\n## Milestones\n\n${PLANNED}\n`,
+      /status\.md's roadmap:released marker has no heading before it/,
+    ],
   ])('fails the page when %s, naming the page and the marker', async (_, markdown, message) => {
     await expect(render(markdown, { releases: PLAN, latest: null })).rejects.toThrow(message);
   });

@@ -21,8 +21,10 @@ export function readSet(guide: string): DescriptionSet {
   const missing = PARTS.filter((p) => !found.has(p));
   const unknown = [...found.keys()].filter((p) => !(PARTS as readonly string[]).includes(p));
   if (missing.length || unknown.length) {
-    throw new Error(`the brand guide's "How troupe is described" table: missing ${JSON.stringify(missing)}, ` +
-      `unknown ${JSON.stringify(unknown)}. It needs exactly ${JSON.stringify(PARTS)}`);
+    throw new Error(
+      `the brand guide's "How troupe is described" table: missing ${JSON.stringify(missing)}, ` +
+        `unknown ${JSON.stringify(unknown)}. It needs exactly ${JSON.stringify(PARTS)}`,
+    );
   }
   return Object.fromEntries(PARTS.map((p) => [p, found.get(p)!])) as DescriptionSet;
 }

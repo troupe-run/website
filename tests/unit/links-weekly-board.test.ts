@@ -8,8 +8,12 @@ import { parse } from 'yaml';
 // (openspec change add-link-issue-to-board, Migration Plan).
 type Step = { id?: string; uses?: string; run?: string; with?: Record<string, unknown>; env?: Record<string, string> };
 type Job = {
-  needs?: string | string[]; if?: string; environment?: unknown; permissions?: unknown;
-  outputs?: Record<string, string>; steps?: Step[];
+  needs?: string | string[];
+  if?: string;
+  environment?: unknown;
+  permissions?: unknown;
+  outputs?: Record<string, string>;
+  steps?: Step[];
 };
 type Trigger = { inputs: Record<string, unknown> };
 type Workflow = { on: Record<string, Trigger>; permissions?: unknown; jobs: Record<string, Job> };
@@ -59,7 +63,7 @@ describe('links-weekly.yml: the board job', () => {
     });
   });
 
-  it('checks the issue URL\'s shape and then adds it to project 1 with that token, reading both through env', () => {
+  it("checks the issue URL's shape and then adds it to project 1 with that token, reading both through env", () => {
     const token = steps(board).find((s) => s.uses?.startsWith('actions/create-github-app-token@'));
     const add = steps(board).find((s) => s.run?.includes('gh project item-add'));
     expect(add?.env).toEqual({
@@ -92,14 +96,19 @@ describe('links-weekly.yml: the links job', () => {
 
 describe('links-weekly.yml: triggers and inputs', () => {
   it('no run step expands an expression, so inputs and outputs reach the shell only through env', () => {
-    for (const job of Object.values(workflow.jobs)) for (const step of steps(job)) expect(step.run ?? '').not.toContain('${{');
+    for (const job of Object.values(workflow.jobs))
+      for (const step of steps(job)) expect(step.run ?? '').not.toContain('${{');
   });
 
   it('runs on its schedule and by hand, never on pull requests', () =>
     expect(Object.keys(workflow.on).sort()).toEqual(['schedule', 'workflow_dispatch']));
 
   it('declares extra-url only on workflow_dispatch, as an optional string that defaults to empty', () => {
-    expect(workflow.on.workflow_dispatch.inputs['extra-url']).toMatchObject({ type: 'string', required: false, default: '' });
+    expect(workflow.on.workflow_dispatch.inputs['extra-url']).toMatchObject({
+      type: 'string',
+      required: false,
+      default: '',
+    });
     expect(Object.keys(workflow.on.workflow_dispatch.inputs)).toEqual(['extra-url']);
   });
 });

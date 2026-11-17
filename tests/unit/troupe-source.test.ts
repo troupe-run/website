@@ -33,11 +33,18 @@ describe('openSource with TROUPE_DOCS unset', () => {
     expect(new Date(source.date('main', 'programme/a.md')!).toISOString()).toBe('2026-01-02T03:04:05.000Z');
   });
 
-  it("dates a lightweight tag by its commit, and an annotated one by its tagger date (spec: roadmap)", () => {
+  it('dates a lightweight tag by its commit, and an annotated one by its tagger date (spec: roadmap)', () => {
     const r = repo();
     execFileSync('git', ['tag', '-a', '-m', 'release', 'troupe-run-v0.2.0'], {
       cwd: r.path,
-      env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1', GIT_COMMITTER_NAME: 'F', GIT_COMMITTER_EMAIL: 'f@example.com', GIT_COMMITTER_DATE: '2026-03-04T05:06:07+10:00' },
+      env: {
+        ...process.env,
+        GIT_CONFIG_GLOBAL: '/dev/null',
+        GIT_CONFIG_NOSYSTEM: '1',
+        GIT_COMMITTER_NAME: 'F',
+        GIT_COMMITTER_EMAIL: 'f@example.com',
+        GIT_COMMITTER_DATE: '2026-03-04T05:06:07+10:00',
+      },
     });
     const source = openSource({}, { cacheDir: join(tempDir(), 'troupe.git'), remote: r.path });
     expect(source.tagDates()).toEqual({
@@ -62,7 +69,10 @@ describe('openSource with TROUPE_DOCS unset', () => {
     openSource({}, { cacheDir, remote: r.path });
     const gone = join(tempDir(), 'gone');
     expect(() => openSource({}, { cacheDir, remote: gone })).toThrow(
-      new RegExp(`^couldn't fetch troupe-run/troupe \\(${gone}\\): .+\\nFix: .*set TROUPE_DOCS to a local troupe checkout`, 's'),
+      new RegExp(
+        `^couldn't fetch troupe-run/troupe \\(${gone}\\): .+\\nFix: .*set TROUPE_DOCS to a local troupe checkout`,
+        's',
+      ),
     );
   });
 
@@ -74,11 +84,15 @@ describe('openSource with TROUPE_DOCS unset', () => {
   });
 });
 
-describe("the source reads any folder at a ref, as /protocol/ needs (protocol-schemas design D1)", () => {
+describe('the source reads any folder at a ref, as /protocol/ needs (protocol-schemas design D1)', () => {
   const SCHEMA = '{"$id": "https://troupe.run/protocol/a.schema.json"}\n';
   function withSchemas(): Repo {
     const r = repo();
-    r.commit({ 'protocol/schemas/a.schema.json': SCHEMA, 'protocol/schemas/runner/b.schema.json': SCHEMA }, '2026-02-01T00:00:00Z', ['protocol-v0.1.0']);
+    r.commit(
+      { 'protocol/schemas/a.schema.json': SCHEMA, 'protocol/schemas/runner/b.schema.json': SCHEMA },
+      '2026-02-01T00:00:00Z',
+      ['protocol-v0.1.0'],
+    );
     return r;
   }
 
@@ -100,14 +114,20 @@ describe("the source reads any folder at a ref, as /protocol/ needs (protocol-sc
     writeFileSync(join(r.path, 'protocol/schemas/a.schema.json'), '{"edited": true}\n');
     writeFileSync(join(r.path, 'protocol/schemas/c.schema.json'), SCHEMA);
     const source = openSource({ TROUPE_DOCS: r.path }, { cacheDir: 'unused' });
-    expect(source.listTree('main', 'protocol/schemas')).toEqual(['a.schema.json', 'c.schema.json', 'runner/b.schema.json']);
+    expect(source.listTree('main', 'protocol/schemas')).toEqual([
+      'a.schema.json',
+      'c.schema.json',
+      'runner/b.schema.json',
+    ]);
     expect(source.readFile('main', 'protocol/schemas/a.schema.json')).toBe('{"edited": true}\n');
     expect(source.readFile('protocol-v0.1.0', 'protocol/schemas/a.schema.json')).toBe(SCHEMA);
     expect(source.listTree('protocol-v0.1.0', 'protocol/schemas')).toEqual(['a.schema.json', 'runner/b.schema.json']);
   });
 
   it("lists nothing for a folder a TROUPE_DOCS checkout's working tree lacks", () => {
-    expect(openSource({ TROUPE_DOCS: repo().path }, { cacheDir: 'unused' }).listTree('main', 'protocol/schemas')).toEqual([]);
+    expect(
+      openSource({ TROUPE_DOCS: repo().path }, { cacheDir: 'unused' }).listTree('main', 'protocol/schemas'),
+    ).toEqual([]);
   });
 });
 
@@ -122,7 +142,7 @@ describe('openSource with TROUPE_DOCS set', () => {
     expect(source.read('troupe-run-v0.1.0', 'programme/a.md')).toContain("A's text.");
   });
 
-  it("takes the tags from the checkout", () => {
+  it('takes the tags from the checkout', () => {
     const r = repo();
     expect(openSource({ TROUPE_DOCS: r.path }, { cacheDir: 'unused' }).tags()).toEqual(['troupe-run-v0.1.0']);
   });
@@ -131,13 +151,31 @@ describe('openSource with TROUPE_DOCS set', () => {
     ['empty', () => '', /^TROUPE_DOCS is set to "", which is empty\. Fix: set it to a troupe checkout/],
     ['missing', () => join(tempDir(), 'nope'), /which isn't a folder\. Fix:/],
     ['without docs/', () => tempDir(), /which has no docs\/ folder\. Fix:/],
-    ['not a git working tree', () => { const d = tempDir(); mkdirSync(join(d, 'docs')); return d; }, /which isn't a git working tree\. Fix:/],
-    ['inside a working tree', () => { const r = repo(); mkdirSync(join(r.path, 'docs/programme/docs'), { recursive: true }); return join(r.path, 'docs/programme'); }, /which is inside the git working tree .*, not its top\. Fix:/],
+    [
+      'not a git working tree',
+      () => {
+        const d = tempDir();
+        mkdirSync(join(d, 'docs'));
+        return d;
+      },
+      /which isn't a git working tree\. Fix:/,
+    ],
+    [
+      'inside a working tree',
+      () => {
+        const r = repo();
+        mkdirSync(join(r.path, 'docs/programme/docs'), { recursive: true });
+        return join(r.path, 'docs/programme');
+      },
+      /which is inside the git working tree .*, not its top\. Fix:/,
+    ],
   ];
   it.each(refusals)('refuses a TROUPE_DOCS that is %s, naming the variable and its value', (_, value, message) => {
     const v = value();
     expect(() => openSource({ TROUPE_DOCS: v }, { cacheDir: 'unused' })).toThrow(message);
-    expect(() => openSource({ TROUPE_DOCS: v }, { cacheDir: 'unused' })).toThrow(`TROUPE_DOCS is set to ${JSON.stringify(v)}`);
+    expect(() => openSource({ TROUPE_DOCS: v }, { cacheDir: 'unused' })).toThrow(
+      `TROUPE_DOCS is set to ${JSON.stringify(v)}`,
+    );
   });
 });
 
@@ -182,7 +220,12 @@ describe('the source says whether a ref and a path exist, for links into the rep
       const r = linked();
       const first = r.git('rev-list', '--max-parents=0', 'main').trim();
       const source = open(r);
-      expect(source.exists([{ ref: first, path: 'docs/programme/a.md' }, { ref: first, path: 'CHANGELOG.md' }])).toEqual([true, false]);
+      expect(
+        source.exists([
+          { ref: first, path: 'docs/programme/a.md' },
+          { ref: first, path: 'CHANGELOG.md' },
+        ]),
+      ).toEqual([true, false]);
     });
 
     it('knows main, a tag and a commit, and not a branch it lacks or a made-up ref', () => {

@@ -65,11 +65,28 @@ export function createSeasonCarousel(opts: SeasonCarouselOptions): SeasonCarouse
 
   schedule();
   return {
-    activate(i) { userPaused = true; move(i, 'user'); },
-    setHovered(h) { hovered = h; schedule(); },
-    setFocused(f) { focused = f; schedule(); },
-    setVisible(v) { visible = v; schedule(); },
-    stop() { stopped = true; schedule(); },
-    get state() { return state(); },
+    activate(i) {
+      userPaused = true;
+      move(i, 'user');
+    },
+    setHovered(h) {
+      hovered = h;
+      schedule();
+    },
+    setFocused(f) {
+      focused = f;
+      schedule();
+    },
+    setVisible(v) {
+      visible = v;
+      schedule();
+    },
+    stop() {
+      stopped = true;
+      schedule();
+    },
+    get state() {
+      return state();
+    },
   };
 }
