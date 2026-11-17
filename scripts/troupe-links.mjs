@@ -42,7 +42,7 @@ export function troupeLinks(docsDir) {
       try {
         url = rewriteLink(node.url, at.page, at.base);
       } catch (error) {
-        throw new Error(`${at.rel} (troupe's docs/${at.page}): ${error.message}`);
+        throw new Error(`${at.rel} (troupe's docs/${at.page}): ${error.message}`, { cause: error });
       }
       if (url !== node.url) ctx.setProperty(node, 'url', url);
     };

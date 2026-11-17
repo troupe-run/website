@@ -18,12 +18,14 @@ types); formatting Markdown or MDX (the docs and blog prose follow the brand gui
 
 ## Decisions
 
-### D1. The lint gates run right after `npm ci`
+### D1. ESLint and Prettier run right after `npm ci`; `tsc` right after `astro check`
 
-They need only `node_modules` and take seconds, so they go before Playwright's download and `astro check`: a lint or
-format error fails fast. Order: `eslint`, `prettier`, `tsc`, each through `npx --no-install` so nothing is fetched
-that the lockfile doesn't hold. Each is also an npm script (`lint`, `format:check`, `typecheck`), so a contributor can
-run one alone.
+ESLint and Prettier need only `node_modules` and take seconds, so they go before Playwright's download and `astro
+check`: a lint or format error fails fast. `tsc` needs the types Astro generates (`.astro/types.d.ts`, the content
+collections), which `astro check` writes, so it runs right after it (a trial on 2026-11-18 found 17 errors from
+missing generated types before, none after). Each runs through `npx --no-install`, so nothing is fetched that the
+lockfile doesn't hold, and each is an npm script (`lint`, `format:check`, `typecheck`), so a contributor can run one
+alone.
 
 ### D2. ESLint: the recommended presets, flat config
 
@@ -42,10 +44,12 @@ MDX, generated and synced content (`src/content/docs/docs/`, `src/generated/`, `
 
 *Alternative:* Prettier's defaults (80 columns, double quotes): rejected, it would rewrite nearly every line.
 
-### D4. `tsc --noEmit` with the existing tsconfig
+### D4. `tsc --noEmit` with the existing tsconfig, and the declarations plain tsc lacks
 
-`tsc --noEmit -p tsconfig.json`. It can't read `.astro` files, which `astro check` keeps covering; it catches errors in
-`.ts` files with the compiler's own rules. If it reports errors `astro check` doesn't, they're fixed.
+`tsc --noEmit -p tsconfig.json`. Plain tsc doesn't understand what Astro's checker does, so `src/env.d.ts` declares
+two things it needs: `.astro` modules (as Astro component factories), and starlight-blog's virtual modules, by
+referencing the package's own `virtual.d.ts` (its shipped TypeScript imports them). `astro check` keeps checking the
+components themselves; tsc catches errors in `.ts` files with the compiler's own rules.
 
 ### D5. Dependencies pinned exactly, a week old or more
 
@@ -53,6 +57,13 @@ MDX, generated and synced content (`src/content/docs/docs/`, `src/generated/`, `
 `prettier` 3.9.10, `prettier-plugin-astro` 1.1.2: the newest at least 14 days old on 2026-11-17, past the org's
 Dependabot cooldown. Added with `npm install -D -E` after `npm ci`, and the lockfile checked by package so only these
 and their own dependencies change.
+
+### D6. Today's findings: fixed, or exempted on the line with the reason (trial, 2026-11-18)
+
+ESLint found five problems. Two are fixed: a rethrown error now carries its `cause`, and a test's `any` became the
+shape it reads. Three are exempted on the line, with the reason beside them: `document` in code Playwright runs in the
+page, a regular expression that matches control characters because refusing them is its job, and the triple-slash
+reference in `src/env.d.ts`, since an ambient declaration file has no import to use. Prettier reformats 109 files.
 
 ## Risks / Trade-offs
 
