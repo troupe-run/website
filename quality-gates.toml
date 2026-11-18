@@ -1,6 +1,7 @@
 # The merge gates' thresholds for website (troupe-run/infrastructure spec: quality-gates). scripts/quality_gates.py,
 # delivered from infrastructure, reads it strictly: an unknown key or a wrong type fails the check. It isn't delivered:
-# these are website's own. Defaults approved by the owner on 2026-11-18 (openspec/changes/quality-gates/design.md).
+# these are website's own. Defaults approved by the owner on 2026-11-18
+# (openspec/changes/archive/2026-11-18-quality-gates/design.md).
 version = 1
 
 # website measures no coverage: only the repositories troupe-run/infrastructure names do (owner, 2026-11-18,
