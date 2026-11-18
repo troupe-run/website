@@ -44,8 +44,7 @@ a module V8 coverage doesn't trace back to its source.
 
 So: the gate measures `.ts` and `.mjs`, the code Vitest can see. The `.astro` files stay covered by what already tests
 them: `astro check` and `tsc` (types), the build, the link checks, and the Playwright end-to-end and axe accessibility
-tests on every page. Logic worth a unit test belongs in `src/lib/*.ts`, where the gate sees it; the contributing guide
-says so. A follow-up issue (troupe-run/website#133) was to investigate measuring the build's server-side rendering with source maps,
+tests on every page. A follow-up issue (troupe-run/website#133) was to investigate measuring the build's server-side rendering with source maps,
 and the browser scripts through Playwright's coverage API; it was closed as not planned with the owner's decision, and
 comes back if website is ever added to infrastructure's list.
 
@@ -59,8 +58,8 @@ fetches the whole history; it sets the variable and passes the base per event.
 ### D5. The weekly report
 
 `.github/workflows/dependency-report.yml`: Mondays, `python3 scripts/quality_gates.py report`, needing only npm and
-`gh` (no install), and a `board` job using website's existing `board` environment. Its first run reports today's
-four moderate advisories.
+`gh` (no install), and a `board` job using website's existing `board` environment. Its first run reports what the lock holds then: on
+2026-11-18, picomatch's high advisory with no patched version and three moderate ones.
 
 ### D6. Sequencing
 

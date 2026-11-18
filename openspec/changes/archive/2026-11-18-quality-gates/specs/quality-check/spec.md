@@ -45,6 +45,6 @@ website SHALL audit `package-lock.json` on `main` every week and keep one "Depen
 opened, updated and closed as troupe-run/infrastructure's quality-gates spec says, and SHALL put a newly opened one on
 the troupe roadmap board.
 
-#### Scenario: Today's moderate advisories
-- **WHEN** the first weekly audit runs and `package-lock.json` still has its four moderate advisories
-- **THEN** it opens one issue listing them, and the board job adds it to the board
+#### Scenario: Advisories in the lock
+- **WHEN** the weekly audit finds advisories in `package-lock.json` and no report issue is open
+- **THEN** it opens one listing each of them, any severity, and the board job adds it to the board
