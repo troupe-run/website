@@ -11,19 +11,16 @@ its thresholds, its check and its CI. website measures no coverage or complexity
 
 ## What Changes
 
-- `quality-gates.toml` at the root: website's thresholds. Two coverage packages, `src` (`.ts`) and `scripts`
-  (`.mjs`), with baselines measured on CI's `test` job when the gate lands and an 80% floor for any new one; a
-  complexity limit of 25 for JavaScript and TypeScript, tests excluded; and the audit of `package-lock.json`, blocking
-  high and critical advisories that have a fix.
-- `scripts/check.py` runs the complexity gate on every check, local and CI, and the coverage and audit gates only on
-  CI's `test` job (`QUALITY_GATES_LEG=true` under GitHub Actions; never locally, owner, 2026-11-18). Coverage comes
-  from the unit tests' Vitest run with the V8 provider (`@vitest/coverage-v8`, a new dev dependency). lizard becomes
-  the check script's own inline dependency.
+- `quality-gates.toml` at the root: website's thresholds. A complexity limit of 25 for JavaScript and TypeScript, tests
+  excluded, and the audit of `package-lock.json`, blocking high and critical advisories that have a fix. No coverage:
+  the owner decided on 2026-11-18 that coverage and mutation testing apply only to the repositories infrastructure
+  names centrally, today troupe only (troupe-run/infrastructure#332).
+- `scripts/check.py` runs the complexity gate on every check, local and CI, and the audit gate only on CI's `test` job
+  (`QUALITY_GATES_LEG=true` under GitHub Actions; never locally). lizard becomes the check script's own inline
+  dependency.
 - `.github/workflows/ci.yml`: the `test` job sets the leg's variable and passes each event's base.
 - `.github/workflows/dependency-report.yml`: the weekly "Dependency advisories" issue, with the existing `board`
   environment's board job.
-- The `.astro` gap: components and pages run at build time and in the browser, where Vitest can't see them. The
-  design says how that code is covered (see design D3).
 
 ## Capabilities
 
@@ -33,14 +30,13 @@ None. The gates' behaviour is infrastructure's `quality-gates` spec; website's o
 
 ### Modified Capabilities
 
-- `quality-check`: the check runs the complexity gate, and CI's `test` job the coverage and audit gates, with website's
-  thresholds in `quality-gates.toml`; a weekly report covers the advisories no gate blocks on.
+- `quality-check`: the check runs the complexity gate, and CI's `test` job the audit gate, with website's thresholds in
+  `quality-gates.toml`; a weekly report covers the advisories no gate blocks on; nothing measures coverage.
 
 ## Impact
 
 - New: `quality-gates.toml`, `.github/workflows/dependency-report.yml`. Delivered (not written here):
   `scripts/quality_gates.py`.
-- Changed: `scripts/check.py` and its tests, `vitest.config.ts`, `package.json` and `package-lock.json` (one dev
-  dependency, so this pull request is itself audited), `.github/workflows/ci.yml`, `CONTRIBUTING`/docs where the check
-  is described.
+- Changed: `scripts/check.py` and its tests, `.github/workflows/ci.yml` and its test, `README.md` where the check is
+  described. No dependency changes.
 - Lands after infrastructure#328 merges and its delivery is applied.

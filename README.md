@@ -42,10 +42,8 @@ Brand: `docs/brand-guide.md`.
 - The merge gates (troupe-run/infrastructure's `docs/development-workflow.md`, "The merge gates") have their thresholds
   in `quality-gates.toml`. The complexity gate fails a TypeScript or JavaScript function the work adds or edits whose
   cyclomatic complexity is over the limit and is new or higher than before: split it first. CI's `test` job also
-  measures the unit tests' branch coverage of `src` (`.ts`) and `scripts` (`.mjs`) against their baselines, and audits
-  `package-lock.json` when it changed; neither runs locally. `.astro` files can't be measured, so put logic worth a
-  unit test in a `.ts` module under `src/lib/`. Raise a baseline in a pull request when the check says it could be
-  raised.
+  audits `package-lock.json` when it changed, which doesn't run locally. website measures no coverage: only the
+  repositories infrastructure names do (owner, 2026-11-18).
 - The fixture build (`npm run build:fixture`) builds the site into `dist-fixture/` against a throwaway troupe with
   releases, made from `tests/fixtures/troupe-docs/`, so `/docs/next/`, earlier versions, the version menu and every
   `/protocol/` copy are tested before troupe has a release. It's never published.

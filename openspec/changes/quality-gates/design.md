@@ -9,11 +9,13 @@ no project environment, which drives npm; CI runs it once, in the `test` job on 
 
 ## Goals / Non-Goals
 
-**Goals:** website's thresholds in `quality-gates.toml`; complexity on every check; coverage and the audit in CI's
-`test` job only; the weekly report; a clear account of what coverage can't see.
+**Goals:** website's thresholds in `quality-gates.toml`; complexity on every check; the audit in CI's `test` job only;
+the weekly report.
 
-**Non-goals:** measuring the end-to-end tests' coverage; refactoring today's functions; changing what the gates
-measure (infrastructure's module).
+**Non-goals:** coverage. The owner decided on 2026-11-18 that coverage and mutation testing apply only to the
+repositories infrastructure names centrally, today troupe only (troupe-run/infrastructure#332). This change first
+measured website's unit coverage too; D2 and D3 record what was found, for a later decision. Also not: refactoring
+today's functions; changing what the gates measure (infrastructure's module).
 
 ## Decisions
 
@@ -21,19 +23,17 @@ measure (infrastructure's module).
 
 - **lizard** becomes `scripts/check.py`'s inline script dependency (`# dependencies = ["lizard==1.26.1"]`), so
   `uv run` installs it beside the interpreter, where the module looks. Nothing else in the site needs Python.
-- **Coverage** comes from Vitest's V8 provider, `@vitest/coverage-v8` at Vitest's version, a new dev dependency added
-  with `npm install --save-dev --save-exact` and the lock file checked by package (only it and its dependencies
-  change). `vitest.config.ts` names the provider, what's measured (`src/**/*.ts`, `scripts/**/*.mjs`, tests excluded)
-  and the `json-summary` reporter; it stays off until the leg passes `--coverage.enabled`.
+- **No coverage tool:** `@vitest/coverage-v8` was added and then removed with the owner's decision; `package.json`,
+  `package-lock.json` and `vitest.config.ts` are main's.
 - **The audit** is `npm audit --package-lock-only --json`, no new tool.
 
-### D2. Packages
+### D2. Packages (not adopted: no coverage here)
 
 Two: `src` (the site's TypeScript: `src/lib`, `src/scripts` and the root `.ts` files) and `scripts` (the build and
 check tooling, `.mjs`). Today: `src` 79.6%, `scripts` 80.8% (2026-11-17, local); the baselines are the `test` job's
 measurement on this pull request, rounded down to 0.1, with the tolerance from a second run on the same commit.
 
-### D3. The `.astro` gap
+### D3. The `.astro` gap (for a later decision)
 
 Components, layouts and pages are `.astro`: their frontmatter runs in Node while `astro build` renders them, and
 their scripts in the browser. Vitest never loads them (`src/components` read 15.7% only through what unit tests
@@ -44,16 +44,16 @@ a module V8 coverage doesn't trace back to its source.
 So: the gate measures `.ts` and `.mjs`, the code Vitest can see. The `.astro` files stay covered by what already tests
 them: `astro check` and `tsc` (types), the build, the link checks, and the Playwright end-to-end and axe accessibility
 tests on every page. Logic worth a unit test belongs in `src/lib/*.ts`, where the gate sees it; the contributing guide
-says so. A follow-up issue (troupe-run/website#133, on the board) investigates measuring the build's server-side rendering with source maps,
-and the browser scripts through Playwright's coverage API.
+says so. A follow-up issue (troupe-run/website#133) was to investigate measuring the build's server-side rendering with source maps,
+and the browser scripts through Playwright's coverage API; it was closed as not planned with the owner's decision, and
+comes back if website is ever added to infrastructure's list.
 
 ### D4. Where each gate runs
 
 `check.py` gets `--base` (the spec's only accepted option) and the leg's variable, as infrastructure's:
 `QUALITY_GATES_LEG=true` only under GitHub Actions, else the check stops. Complexity runs on every check, before
-`npm ci`, since it needs only git and lizard. On the leg, `unit tests` runs with coverage and writes its summary to the
-runner's temporary directory, and `coverage` and `audit` run after it. CI's `test` job already fetches the whole
-history; it sets the variable and passes the base per event.
+`npm ci`, since it needs only git and lizard. On the leg, `audit` runs after the unit tests. CI's `test` job already
+fetches the whole history; it sets the variable and passes the base per event.
 
 ### D5. The weekly report
 
