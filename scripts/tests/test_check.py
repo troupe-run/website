@@ -1,6 +1,6 @@
 """Tests for scripts/check.py (spec: quality-check; design D10).
 
-Standard library only, like check.py itself. check.py runs them as its first gate:
+Standard library only. check.py, whose one dependency is lizard, runs them as its first gate:
 uv run --no-project python -m unittest discover -s scripts/tests
 """
 
