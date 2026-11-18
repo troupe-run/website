@@ -47,7 +47,7 @@ describe('ci.yml', () => {
     expect(runs[0].trim().split('\n').at(-1)!.trim()).toBe('uv run scripts/check.py --base "$BASE"');
   });
 
-  it("is the coverage leg, judging the work against each event's base (quality-gates design D4)", () => {
+  it("is the audit leg, judging the work against each event's base (quality-gates design D4)", () => {
     const check = test.steps!.find((s) => s.run !== undefined)!;
     expect(check.env).toMatchObject({
       QUALITY_GATES_LEG: 'true',

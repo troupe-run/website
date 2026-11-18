@@ -3,22 +3,18 @@
 # these are website's own. Defaults approved by the owner on 2026-11-18 (openspec/changes/quality-gates/design.md).
 version = 1
 
-# Branch coverage of what the unit tests reach, measured in CI's test job only. A package can't measure below its
-# baseline by more than the tolerance, and a package with no baseline must meet the floor. Raise a baseline by hand
-# when the check says it could be raised.
+# website measures no coverage: only the repositories troupe-run/infrastructure names do (owner, 2026-11-18,
+# infrastructure#332). Nothing here reads this table. It stays only because the delivered module requires it, and
+# goes once infrastructure#332 makes it optional.
 [coverage]
 floor = 80.0
 tolerance = 0.5
 
-# The site's TypeScript (src/lib, src/scripts and the root .ts files).
 [coverage.packages.src]
 paths = ["src"]
-baseline = 79.6
 
-# The build and check tooling.
 [coverage.packages.scripts]
 paths = ["scripts"]
-baseline = 80.8
 
 # Cyclomatic complexity (lizard) of each function a change adds or edits: above the limit, it may not be new or more
 # complex than before. lizard can't read .astro files.

@@ -135,8 +135,8 @@ class RunGates(unittest.TestCase):
 
 
 class QualityGates(unittest.TestCase):
-    """Complexity on every run; coverage and the audit in CI's test job only (spec: quality-check;
-    quality-gates design D4)."""
+    """Complexity on every run; the audit in CI's test job only; no coverage (spec: quality-check;
+    quality-gates design D4; owner, 2026-11-18)."""
 
     def setUp(self) -> None:
         self.bin = Path(self.enterContext(tempfile.TemporaryDirectory()))
@@ -151,28 +151,18 @@ class QualityGates(unittest.TestCase):
             [sys.executable, check.QUALITY_GATES, "complexity", "--base", "abc123"],
         )
 
-    def test_a_local_check_never_measures_coverage_or_audits(self) -> None:
-        steps = self.gates({})
-        labels = [label for label, _ in steps]
-        self.assertNotIn("coverage", labels)
-        self.assertNotIn("audit", labels)
-        self.assertNotIn("--coverage.enabled", dict(steps)["unit tests"])
+    def test_a_local_check_never_audits(self) -> None:
+        self.assertNotIn("audit", [label for label, _ in self.gates({})])
 
-    def test_the_leg_measures_the_unit_tests_and_audits_after_them(self) -> None:
-        env = {check.LEG: "true", "GITHUB_ACTIONS": "true", "RUNNER_TEMP": "/tmp/runner"}
+    def test_the_leg_audits_after_the_unit_tests_and_measures_no_coverage(self) -> None:
+        env = {check.LEG: "true", "GITHUB_ACTIONS": "true"}
         steps = self.gates(env, base="abc123")
         labels = [label for label, _ in steps]
-        self.assertEqual(labels[labels.index("unit tests") + 1 : labels.index("build")], ["coverage", "audit"])
+        self.assertEqual(labels[labels.index("unit tests") + 1 : labels.index("build")], ["audit"])
+        self.assertNotIn("coverage", labels)
         commands = dict(steps)
-        summary = Path("/tmp/runner") / "quality-gates-coverage"
-        self.assertEqual(
-            commands["unit tests"][-3:],
-            ["--", "--coverage.enabled", f"--coverage.reportsDirectory={summary}"],
-        )
-        self.assertEqual(
-            commands["coverage"][-3:], ["coverage", "--vitest", str(summary / "coverage-summary.json")]
-        )
         self.assertEqual(commands["audit"][-3:], ["audit", "--base", "abc123"])
+        self.assertFalse(any("coverage" in arg for arg in commands["unit tests"]))
 
     def test_the_leg_variable_outside_github_actions_stops_the_check(self) -> None:
         with self.assertRaises(SystemExit) as raised:
