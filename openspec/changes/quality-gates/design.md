@@ -29,9 +29,10 @@ today's functions; changing what the gates measure (infrastructure's module).
 
 ### D2. Packages (not adopted: no coverage here)
 
-Two: `src` (the site's TypeScript: `src/lib`, `src/scripts` and the root `.ts` files) and `scripts` (the build and
-check tooling, `.mjs`). Today: `src` 79.6%, `scripts` 80.8% (2026-11-17, local); the baselines are the `test` job's
-measurement on this pull request, rounded down to 0.1, with the tolerance from a second run on the same commit.
+Before the owner's decision, this change measured two packages: `src` (the site's TypeScript: `src/lib`, `src/scripts`
+and the root `.ts` files) at 79.6% and `scripts` (the build and check tooling, `.mjs`) at 80.8% (2026-11-17, local).
+They'd have been the baselines' starting point had website kept coverage. It didn't, so `quality-gates.toml` names no
+baselines; its `[coverage]` table is unread until the module lets it go.
 
 ### D3. The `.astro` gap (for a later decision)
 
