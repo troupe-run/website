@@ -8,19 +8,22 @@ so the two can't diverge. The guard runs it before each commit and quotes its fa
 ## Requirements
 
 ### Requirement: The check runs CI's gates in CI's order
-`uv run scripts/check.py` SHALL run, in this order: its own tests, install dependencies from the lockfile, ESLint,
-Prettier's format check, install Playwright's Chromium, `astro check`, `tsc --noEmit`, the unit tests, the build, the
-fixture build, the rebuild test, the brand-asset verification, the internal link check of both builds, and the
-end-to-end tests of both builds. It SHALL need only uv, Node, npm and git, and no Python package beyond the standard
-library.
+`uv run scripts/check.py` SHALL run, in this order: its own tests, the complexity gate, install dependencies from the
+lockfile, ESLint, Prettier's format check, install Playwright's Chromium, `astro check`, `tsc --noEmit`, the unit tests,
+the dependency audit (on CI's audit leg only), the build, the fixture build, the rebuild test, the brand-asset
+verification, the internal link check of both builds, and the end-to-end tests of both builds.
 
 #### Scenario: Every gate passes
 - **WHEN** a contributor runs `uv run scripts/check.py` on a working tree where every gate passes
 - **THEN** each gate runs once, in the order above, each is reported as passed with its time, and the command exits 0
 
-#### Scenario: No Python packages to install
+### Requirement: The check needs uv, Node, npm and git, and one Python package of its own
+`scripts/check.py` SHALL need only uv, Node, npm and git. Its one Python package, lizard, SHALL be the script's own
+inline dependency, which uv installs for it; the check SHALL need no project Python environment.
+
+#### Scenario: No project Python environment
 - **WHEN** `scripts/check.py` is run on a machine with uv, Node and npm and no project Python environment
-- **THEN** it runs without installing any Python package
+- **THEN** uv installs lizard for the script alone, and the check runs without any other Python package
 
 ### Requirement: The check stops at the first failure and names it
 When a gate fails, the check SHALL run no later gate, SHALL print `check: <gate> failed` followed by the gate's exit
@@ -50,10 +53,11 @@ gate runs, because this repository declares no scopes.
 - **THEN** the complexity gate judges the functions changed since that commit
 
 ### Requirement: CI runs the same check
-CI's `test` job SHALL run `uv run scripts/check.py`, every gate of it, for every pull request that's ready for
-review, every merge-queue commit, and every push to `main` the merge queue didn't pass. It SHALL keep the name `test`
-and run no gate as a separate step. It SHALL be skipped on a draft and on a push to `main` of a commit CI's
-merge-queue run passed, and CI's run SHALL still conclude success.
+CI's `test` job SHALL run `uv run scripts/check.py --base <commit>`, every gate of it, with `QUALITY_GATES_LEG=true`
+so the dependency audit runs there, for every pull request that's ready for review, every merge-queue commit, and every
+push to `main` the merge queue didn't pass. It SHALL keep the name `test` and run no gate as a separate step. It SHALL
+be skipped on a draft and on a push to `main` of a commit CI's merge-queue run passed, and CI's run SHALL still
+conclude success.
 
 #### Scenario: A pull request's CI
 - **WHEN** a pull request that's ready for review is opened or updated
