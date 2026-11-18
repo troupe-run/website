@@ -42,8 +42,19 @@ describe('ci.yml', () => {
   });
 
   it("test's only run step is the check, so every event that runs it runs every gate", () => {
-    const runs = test.steps!.filter((s) => s.run !== undefined).map((s) => s.run);
-    expect(runs).toEqual(['uv run scripts/check.py']);
+    const runs = test.steps!.filter((s) => s.run !== undefined).map((s) => s.run!);
+    expect(runs).toHaveLength(1);
+    expect(runs[0].trim().split('\n').at(-1)!.trim()).toBe('uv run scripts/check.py --base "$BASE"');
+  });
+
+  it("is the coverage leg, judging the work against each event's base (quality-gates design D4)", () => {
+    const check = test.steps!.find((s) => s.run !== undefined)!;
+    expect(check.env).toMatchObject({
+      QUALITY_GATES_LEG: 'true',
+      MERGE_GROUP_BASE: '${{ github.event.merge_group.base_sha }}',
+      BEFORE: '${{ github.event.before }}',
+    });
+    expect(check.run).toContain('pull_request) BASE=$(git rev-parse HEAD^1)');
   });
 });
 

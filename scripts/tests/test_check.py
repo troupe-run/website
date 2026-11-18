@@ -22,6 +22,7 @@ import check  # noqa: E402
 
 LABELS = [
     "check.py tests",
+    "complexity",
     "npm ci",
     "eslint",
     "prettier",
@@ -133,6 +134,58 @@ class RunGates(unittest.TestCase):
         self.assertRegex(lines[-1], r"^check: unit tests failed \(exit 3\) after \d+\.\ds$")
 
 
+class QualityGates(unittest.TestCase):
+    """Complexity on every run; coverage and the audit in CI's test job only (spec: quality-check;
+    quality-gates design D4)."""
+
+    def setUp(self) -> None:
+        self.bin = Path(self.enterContext(tempfile.TemporaryDirectory()))
+
+    def gates(self, env: dict[str, str], base: str | None = None) -> list[tuple[str, list[str]]]:
+        return check.gates(env={"PATH": fake_tools(self.bin), **env}, base=base)
+
+    def test_complexity_runs_before_npm_ci_and_takes_the_base(self) -> None:
+        commands = dict(self.gates({}, base="abc123"))
+        self.assertEqual(
+            commands["complexity"],
+            [sys.executable, check.QUALITY_GATES, "complexity", "--base", "abc123"],
+        )
+
+    def test_a_local_check_never_measures_coverage_or_audits(self) -> None:
+        steps = self.gates({})
+        labels = [label for label, _ in steps]
+        self.assertNotIn("coverage", labels)
+        self.assertNotIn("audit", labels)
+        self.assertNotIn("--coverage.enabled", dict(steps)["unit tests"])
+
+    def test_the_leg_measures_the_unit_tests_and_audits_after_them(self) -> None:
+        env = {check.LEG: "true", "GITHUB_ACTIONS": "true", "RUNNER_TEMP": "/tmp/runner"}
+        steps = self.gates(env, base="abc123")
+        labels = [label for label, _ in steps]
+        self.assertEqual(labels[labels.index("unit tests") + 1 : labels.index("build")], ["coverage", "audit"])
+        commands = dict(steps)
+        summary = Path("/tmp/runner") / "quality-gates-coverage"
+        self.assertEqual(
+            commands["unit tests"][-3:],
+            ["--", "--coverage.enabled", f"--coverage.reportsDirectory={summary}"],
+        )
+        self.assertEqual(
+            commands["coverage"][-3:], ["coverage", "--vitest", str(summary / "coverage-summary.json")]
+        )
+        self.assertEqual(commands["audit"][-3:], ["audit", "--base", "abc123"])
+
+    def test_the_leg_variable_outside_github_actions_stops_the_check(self) -> None:
+        with self.assertRaises(SystemExit) as raised:
+            self.gates({check.LEG: "true"})
+        self.assertIn("isn't GitHub Actions", str(raised.exception.code))
+        self.assertIn(f"unset {check.LEG}", str(raised.exception.code))
+
+    def test_a_malformed_leg_value_stops_the_check(self) -> None:
+        with self.assertRaises(SystemExit) as raised:
+            self.gates({check.LEG: "yes", "GITHUB_ACTIONS": "true"})
+        self.assertIn("QUALITY_GATES_LEG='yes' isn't valid", str(raised.exception.code))
+
+
 class Arguments(unittest.TestCase):
     def test_any_argument_is_a_usage_error_before_any_gate_runs(self) -> None:
         for argv in (["--scope", "docs"], ["docs"]):
@@ -148,6 +201,16 @@ class Arguments(unittest.TestCase):
             self.assertIn("usage:", err.getvalue())
             run_gates.assert_not_called()
             gates.assert_not_called()
+
+    def test_base_is_the_one_option_and_reaches_the_gates(self) -> None:
+        with (
+            mock.patch.object(check, "run_gates", return_value=0) as run_gates,
+            mock.patch.object(check, "gates", return_value=[]) as gates,
+            mock.patch.object(check, "activate_git_hooks", return_value=None),
+        ):
+            self.assertEqual(check.main(["--base", "abc123"]), 0)
+        gates.assert_called_once_with(base="abc123")
+        run_gates.assert_called_once()
 
 
 # The real guard defines dataclasses at import, which needs the module in sys.modules while it

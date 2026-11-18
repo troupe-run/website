@@ -44,7 +44,7 @@ a module V8 coverage doesn't trace back to its source.
 So: the gate measures `.ts` and `.mjs`, the code Vitest can see. The `.astro` files stay covered by what already tests
 them: `astro check` and `tsc` (types), the build, the link checks, and the Playwright end-to-end and axe accessibility
 tests on every page. Logic worth a unit test belongs in `src/lib/*.ts`, where the gate sees it; the contributing guide
-says so. A follow-up issue (on the board) investigates measuring the build's server-side rendering with source maps,
+says so. A follow-up issue (troupe-run/website#133, on the board) investigates measuring the build's server-side rendering with source maps,
 and the browser scripts through Playwright's coverage API.
 
 ### D4. Where each gate runs

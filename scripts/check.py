@@ -1,15 +1,21 @@
 # /// script
 # requires-python = ">=3.12"
-# dependencies = []
+# dependencies = ["lizard==1.26.1"]
 # ///
 """Run every quality gate, in order, stopping at the first failure.
 
-Usage: uv run scripts/check.py
+Usage: uv run scripts/check.py [--base REV]
 
 The same script runs locally and in CI's `test` job, so the two can't diverge (spec:
 quality-check). The development-workflow guard, delivered from troupe-run/infrastructure, runs it
-before every commit and quotes its `check: <gate> failed` line. It's Python with no dependencies so
-uv can run it without a project environment; the site's own tooling is Node.
+before every commit and quotes its `check: <gate> failed` line. It's Python whose one dependency,
+lizard, uv installs for the script itself, so uv runs it without a project environment; the site's
+own tooling is Node.
+
+Every run measures the complexity of the functions the work adds or edits since --base, or since
+where it left origin/main. Coverage and the dependency audit run only in CI's test job, which sets
+QUALITY_GATES_LEG=true; never locally (troupe-run/infrastructure spec: quality-gates; owner,
+2026-11-18). The measures are scripts/quality_gates.py, delivered from troupe-run/infrastructure.
 """
 
 import argparse
@@ -18,6 +24,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -37,9 +44,53 @@ def tool(name: str, env: Mapping[str, str]) -> str:
     return found
 
 
-def gates(env: Mapping[str, str] = os.environ) -> list[tuple[str, list[str]]]:
-    """CI's steps, in CI's order, after the check's own tests (design D2)."""
+LEG = "QUALITY_GATES_LEG"
+"""Set to `true` by CI's test job, under GitHub Actions only, to run coverage and the audit
+(quality-gates design D4)."""
+
+QUALITY_GATES = str(ROOT / "scripts" / "quality_gates.py")
+
+
+def on_leg(env: Mapping[str, str]) -> bool:
+    """Whether this run is CI's coverage leg. Set anywhere else, or to anything but `true`, the
+    variable stops the check: it is not a way to measure coverage locally."""
+    value = env.get(LEG, "")
+    if value == "":
+        return False
+    if value != "true":
+        sys.exit(f"check: {LEG}={value!r} isn't valid. Fix: unset it; CI's test job sets it to true.")
+    if env.get("GITHUB_ACTIONS") != "true":
+        sys.exit(
+            f"check: {LEG} is set, but this isn't GitHub Actions. Coverage and the dependency "
+            f"audit run in CI's test job only (quality-gates design D4). Fix: unset {LEG}."
+        )
+    return True
+
+
+def coverage_directory(env: Mapping[str, str]) -> Path:
+    """Where the leg's coverage summary goes: the runner's temporary directory."""
+    return Path(env.get("RUNNER_TEMP", tempfile.gettempdir())) / "quality-gates-coverage"
+
+
+def gates(
+    env: Mapping[str, str] = os.environ, base: str | None = None
+) -> list[tuple[str, list[str]]]:
+    """CI's steps, in CI's order, after the check's own tests (design D2), with the quality gates:
+    complexity first, and coverage and the audit after the unit tests on CI's leg only."""
     npm, npx = tool("npm", env), tool("npx", env)
+    leg = on_leg(env)
+    on_base = ["--base", base] if base else []
+    unit = [npm, "run", "test:unit"]
+    summary = coverage_directory(env)
+    if leg:
+        unit += ["--", "--coverage.enabled", f"--coverage.reportsDirectory={summary}"]
+    measured: list[tuple[str, list[str]]] = []
+    if leg:
+        report = str(summary / "coverage-summary.json")
+        measured = [
+            ("coverage", [sys.executable, QUALITY_GATES, "coverage", "--vitest", report]),
+            ("audit", [sys.executable, QUALITY_GATES, "audit", *on_base]),
+        ]
     chromium = [npx, "playwright", "install", "chromium"]
     if env.get("CI"):
         # The OS libraries Chromium needs. Installing them needs root on Linux, which a CI runner
@@ -47,6 +98,8 @@ def gates(env: Mapping[str, str] = os.environ) -> list[tuple[str, list[str]]]:
         chromium.append("--with-deps")
     return [
         ("check.py tests", [sys.executable, "-m", "unittest", "discover", "-s", "scripts/tests"]),
+        # Needs only git and lizard, so it runs before anything is installed (spec: quality-check).
+        ("complexity", [sys.executable, QUALITY_GATES, "complexity", *on_base]),
         ("npm ci", [npm, "ci"]),
         # ESLint and Prettier need only what npm ci installed, so they fail fast, before Chromium's
         # download (spec: quality-check; lint-gates design D1).
@@ -56,7 +109,8 @@ def gates(env: Mapping[str, str] = os.environ) -> list[tuple[str, list[str]]]:
         ("astro check", [npm, "run", "check"]),
         # tsc reads the types astro check generates (.astro/), so it runs after it (design D1, D4).
         ("tsc", [npm, "run", "typecheck"]),
-        ("unit tests", [npm, "run", "test:unit"]),
+        ("unit tests", unit),
+        *measured,
         ("build", [npm, "run", "build"]),
         # The site again, against a throwaway troupe with releases, so the versions are tested before troupe has
         # one (spec: quality-check). It's never published.
@@ -108,9 +162,12 @@ def run_gates(steps: list[tuple[str, list[str]]], cwd: Path) -> int:
 
 
 def main(argv: Sequence[str] | None = None, root: Path = ROOT) -> int:
-    # No options: this repository declares no scopes, so the guard never passes --scope (design D4).
-    argparse.ArgumentParser(description=(__doc__ or "").split("\n\n")[0]).parse_args(argv)
-    steps = gates()
+    # One option, --base, for the quality gates; this repository declares no scopes, so the guard
+    # never passes --scope (design D4).
+    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n\n")[0])
+    parser.add_argument("--base", help="the commit the complexity and audit gates compare with")
+    args = parser.parse_args(argv)
+    steps = gates(base=args.base)
     activated = activate_git_hooks(root)
     if activated is not None:
         print(f"check: {activated}", flush=True)
