@@ -212,13 +212,14 @@ describe('the real guide, sources and render config', () => {
         .map((f) => f.slice(0, -4))
     : [];
 
-  it("the guide's §5 lists troupe-run's eight Apps, and not dco", () => {
+  it("the guide's §5 lists troupe-run's nine Apps, and not dco", () => {
     expect(rows.map((r) => r.app).sort()).toEqual([
       'troupe-run-board',
       'troupe-run-dependabot',
       'troupe-run-dispatch',
       'troupe-run-docs',
       'troupe-run-infrastructure',
+      'troupe-run-merge',
       'troupe-run-release',
       'troupe-run-review',
       'troupe-run-test-quality',
