@@ -27,7 +27,8 @@
 
 ## 4. Before merging
 
-- [ ] 4.1 With the orchestrator's go-ahead, run `uv run scripts/check.py`, and verify it passes.
+- [x] 4.1 With the orchestrator's go-ahead, run `uv run scripts/check.py`, and verify it passes. (Passed through the
+  commit hook, 2026-11-20.)
 
 ## Workflow follow-up
 
