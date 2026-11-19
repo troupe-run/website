@@ -25,7 +25,7 @@
 
 ## 4. Integration
 
-- [ ] 4.1 Run the full `uv run scripts/check.py` (after the orchestrator grants the heavy-run slot) and verify it ends
+- [x] 4.1 Run the full `uv run scripts/check.py` (after the orchestrator grants the heavy-run slot) and verify it ends
       `check: all gates passed` with the size gate reported
 
 ## Workflow follow-up
