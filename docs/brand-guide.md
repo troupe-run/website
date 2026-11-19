@@ -219,6 +219,9 @@ product nouns: body copy uses them as plainly as any other word. The rule above 
 | actor | In use |
 | character | In use, 2026-10-22 |
 | direction | In use, 2026-10-22 |
+| runner | In use, 2026-11-19: from 0.2.0 |
+| runtime | In use, 2026-11-19: from 0.2.0 |
+| engine | In use, 2026-11-19: from 0.2.0 |
 | system | Decided 2026-10-11: the actor kind for troupe acting by itself |
 | cast | Reserved |
 | performance | In use |

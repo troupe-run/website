@@ -7,6 +7,7 @@ troupe 0.2.0 added a Stagecraft page, Runtimes (`docs/stagecraft/runtimes.md`, "
 ## What Changes
 
 - Name `runtimes` in the Stagecraft section's `pages`, after `bring-your-own-agent`: first the runners, then the services they talk to.
+- Give the brand guide's §6 a status for runner, runtime and engine, which troupe-run/troupe#460 added to troupe's glossary for 0.2.0. Without them, the vocabulary unit test fails on every build, since it reads troupe's glossary from `main`.
 
 ## Capabilities
 
@@ -18,5 +19,5 @@ None. The versioned-docs spec says named pages come first in the order given and
 
 ## Impact
 
-- `src/lib/docs-nav.ts`.
+- `src/lib/docs-nav.ts` and `docs/brand-guide.md` (§6).
 - Every docs version that has the page: `/docs/next/` now, and `/docs/` once `troupe-run-v0.2.0` is tagged. A version without the page is unaffected, since a named page a version lacks is skipped.

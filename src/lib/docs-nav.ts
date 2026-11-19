@@ -44,6 +44,7 @@ export const NAV: Section[] = [
       'route-decisions',
       'build-a-flow',
       'bring-your-own-agent',
+      'runtimes',
       'hand-edit-config',
       'write-a-guest',
       'read-the-lineage',
