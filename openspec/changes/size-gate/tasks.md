@@ -16,6 +16,8 @@
       `python3 -m unittest discover -s scripts/tests` passes
 - [x] 2.2 Update `README.md`'s description of the check to name the size gate and its limits; verify by reading it
       against `quality-gates.toml`
+- [x] 2.3 Name the size gate in `--base`'s help in `scripts/check.py` and in the quality-check requirement on
+      arguments (review of e45135d); verify `uv run scripts/check.py --help` shows it
 
 ## 3. Delivered files
 

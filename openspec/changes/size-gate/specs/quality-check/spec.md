@@ -12,6 +12,19 @@ test, the brand-asset verification, the internal link check of both builds, and 
 - **WHEN** a contributor runs `uv run scripts/check.py` on a working tree where every gate passes
 - **THEN** each gate runs once, in the order above, each is reported as passed with its time, and the command exits 0
 
+### Requirement: The check refuses arguments it doesn't take
+The check SHALL take one option, `--base <commit>`, which names what the complexity, size and audit gates judge the
+work against. Any other argument, including `--scope`, SHALL be refused with a usage error and a non-zero exit, before
+any gate runs, because this repository declares no scopes.
+
+#### Scenario: An unexpected argument
+- **WHEN** a contributor runs `uv run scripts/check.py --scope docs`
+- **THEN** it exits non-zero with a usage error and runs no gate
+
+#### Scenario: A base is named
+- **WHEN** CI runs `uv run scripts/check.py --base <sha>`
+- **THEN** the complexity gate judges the functions, and the size gate the files, changed since that commit
+
 ## ADDED Requirements
 
 ### Requirement: The check runs the size gate everywhere
