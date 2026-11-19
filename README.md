@@ -33,17 +33,18 @@ Brand: `docs/brand-guide.md`.
   release list on `/status/`. A release's wording is changed there, not here.
   - To preview a milestone edit, or to work offline, set `TROUPE_MILESTONES` to your infrastructure checkout:
     `TROUPE_MILESTONES=../infrastructure npm run dev`. Its working tree is read, uncommitted edits included.
-- `uv run scripts/check.py` runs every check CI runs, in the same order: the complexity gate, `npm ci`, ESLint,
-  Prettier's format check,
-  Playwright's browser, `astro check`, `tsc --noEmit`, the unit tests, the build, the fixture build, the rebuild test,
-  the brand-asset check, the internal link check of both builds (with the check of every reference in `/protocol/`'s
+- `uv run scripts/check.py` runs every check CI runs, in the same order: the complexity gate, the size gate,
+  `npm ci`, ESLint, Prettier's format check, Playwright's browser, `astro check`, `tsc --noEmit`, the unit tests, the
+  build, the fixture build, the rebuild test, the brand-asset check, the internal link check of both builds (with the check of every reference in `/protocol/`'s
   schemas) and the end-to-end tests. It stops at the first failure and says which one. `npm ci` reinstalls
   `node_modules`, so a dev server that's running at the time may need a restart.
 - The merge gates (troupe-run/infrastructure's `docs/development-workflow.md`, "The merge gates") have their thresholds
   in `quality-gates.toml`. The complexity gate fails a TypeScript or JavaScript function the work adds or edits whose
-  cyclomatic complexity is over the limit and is new or higher than before: split it first. CI's `test` job also
-  audits `package-lock.json` when it changed, which doesn't run locally. website measures no coverage: only the
-  repositories infrastructure names do (owner, 2026-11-18).
+  cyclomatic complexity is over the limit and is new or higher than before: split it first. The size gate fails a
+  text file the work adds or changes that's over 48 KiB and new or bigger than before, unless `[size.allow]` gives it
+  a ceiling, and notes one over 32 KiB; fixtures, archived changes, the lock file and delivered files aren't measured.
+  CI's `test` job also audits `package-lock.json` when it changed, which doesn't run locally. website measures no
+  coverage: only the repositories infrastructure names do (owner, 2026-11-18).
 - The fixture build (`npm run build:fixture`) builds the site into `dist-fixture/` against a throwaway troupe with
   releases, made from `tests/fixtures/troupe-docs/`, so `/docs/next/`, earlier versions, the version menu and every
   `/protocol/` copy are tested before troupe has a release. It's never published.

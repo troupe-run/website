@@ -18,3 +18,19 @@ exclude = ["**/tests/**", "tests/**"]
 [audit]
 lock_files = ["package-lock.json"]
 block = ["high", "critical"]
+
+# The size of each text file the work adds or changes: above block_above, it may not be new or bigger than before,
+# unless [size.allow] gives it its own ceiling; above warn_above it's noted. A review reads every changed file whole,
+# and one Read holds about 25,000 tokens. Limits set by the owner on 2026-11-19 (troupe-run/infrastructure#271,
+# openspec/changes/archive/2026-11-19-gate-files there). Fixtures, archived changes and the lock file aren't reviewed
+# as code, so they aren't measured; binary files and the files .github/guard-delivery.json lists never are.
+[size]
+block_above = 49152
+warn_above = 32768
+exclude = ["**/fixtures/**", "openspec/changes/archive/**", "package-lock.json"]
+
+# The files over block_above on 2026-11-19, each capped at its size then, rounded up to the KiB, plus 16 KiB. Each has
+# an issue to split it. Remove an entry once its file is under block_above: the check fails on an entry that's no
+# longer needed.
+[size.allow]
+"docs/superpowers/plans/2026-10-07-troupe-run-site.md" = 146432 # troupe-run/website#148
