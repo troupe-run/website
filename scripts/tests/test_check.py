@@ -23,6 +23,7 @@ import check  # noqa: E402
 LABELS = [
     "check.py tests",
     "complexity",
+    "size",
     "npm ci",
     "eslint",
     "prettier",
@@ -149,6 +150,15 @@ class QualityGates(unittest.TestCase):
         self.assertEqual(
             commands["complexity"],
             [sys.executable, check.QUALITY_GATES, "complexity", "--base", "abc123"],
+        )
+
+    def test_size_runs_after_complexity_and_takes_the_base(self) -> None:
+        steps = self.gates({}, base="abc123")
+        labels = [label for label, _ in steps]
+        self.assertEqual(labels[labels.index("complexity") + 1], "size")
+        self.assertEqual(
+            dict(steps)["size"],
+            [sys.executable, check.QUALITY_GATES, "size", "--base", "abc123"],
         )
 
     def test_a_local_check_never_audits(self) -> None:

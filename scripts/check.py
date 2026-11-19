@@ -12,8 +12,8 @@ before every commit and quotes its `check: <gate> failed` line. It's Python whos
 lizard, uv installs for the script itself, so uv runs it without a project environment; the site's
 own tooling is Node.
 
-Every run measures the complexity of the functions the work adds or edits since --base, or since
-where it left origin/main. The dependency audit runs only in CI's test job, which sets
+Every run measures the complexity of the functions, and the size of the files, the work adds or
+edits since --base, or since where it left origin/main. The dependency audit runs only in CI's test job, which sets
 QUALITY_GATES_LEG=true; never locally. website measures no coverage: only the repositories
 troupe-run/infrastructure names do (owner, 2026-11-18, infrastructure#332). The measures are
 scripts/quality_gates.py, delivered from troupe-run/infrastructure.
@@ -71,7 +71,7 @@ def gates(
     env: Mapping[str, str] = os.environ, base: str | None = None
 ) -> list[tuple[str, list[str]]]:
     """CI's steps, in CI's order, after the check's own tests (design D2), with the quality gates:
-    complexity first, and the audit after the unit tests on CI's leg only."""
+    complexity and size first, and the audit after the unit tests on CI's leg only."""
     npm, npx = tool("npm", env), tool("npx", env)
     on_base = ["--base", base] if base else []
     audit = [("audit", [sys.executable, QUALITY_GATES, "audit", *on_base])] if on_leg(env) else []
@@ -84,6 +84,9 @@ def gates(
         ("check.py tests", [sys.executable, "-m", "unittest", "discover", "-s", "scripts/tests"]),
         # Needs only git and lizard, so it runs before anything is installed (spec: quality-check).
         ("complexity", [sys.executable, QUALITY_GATES, "complexity", *on_base]),
+        # The size of each file the work adds or changes; like complexity, it needs only git, so it runs before
+        # anything is installed (spec: quality-check; troupe-run/website#149).
+        ("size", [sys.executable, QUALITY_GATES, "size", *on_base]),
         ("npm ci", [npm, "ci"]),
         # ESLint and Prettier need only what npm ci installed, so they fail fast, before Chromium's
         # download (spec: quality-check; lint-gates design D1).
