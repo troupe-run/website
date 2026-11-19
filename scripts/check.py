@@ -152,7 +152,7 @@ def main(argv: Sequence[str] | None = None, root: Path = ROOT) -> int:
     # One option, --base, for the quality gates; this repository declares no scopes, so the guard
     # never passes --scope (design D4).
     parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n\n")[0])
-    parser.add_argument("--base", help="the commit the complexity and audit gates compare with")
+    parser.add_argument("--base", help="the commit the complexity, size and audit gates compare with")
     args = parser.parse_args(argv)
     steps = gates(base=args.base)
     activated = activate_git_hooks(root)
