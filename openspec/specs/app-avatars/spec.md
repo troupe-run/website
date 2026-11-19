@@ -16,8 +16,8 @@ SHALL list the App avatars.
 #### Scenario: Reading the guide
 - **WHEN** the brand guide is read
 - **THEN** §5 lists `troupe-run-release`, `troupe-run-review`, `troupe-run-dependabot`, `troupe-run-infrastructure`,
-  `troupe-run-docs`, `troupe-run-dispatch`, `troupe-run-board` and `troupe-run-test-quality`, each with its kind,
-  head and prop, and §8 has a row for the App avatars
+  `troupe-run-docs`, `troupe-run-dispatch`, `troupe-run-board`, `troupe-run-test-quality` and `troupe-run-merge`,
+  each with its kind, head and prop, and §8 has a row for the App avatars
 
 #### Scenario: The test-quality App's exception
 - **WHEN** the guide's "GitHub Apps" subsection is read
