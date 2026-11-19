@@ -19,23 +19,23 @@ render list and the test's list of real Apps change.
 
 ## Decisions
 
-### D1. The merge symbol: two curved lines joining into one, without node circles
+### D1. The merge symbol: two curved lines from the left joining into one going right, without node circles
 
-On the 24-unit grid: two strokes start at the top (about `6,4` and `18,4`), curve in to meet at about `12,13`, and
-one stroke runs on down to about `12,20`, an upside-down Y with soft shoulders, like two lanes merging. No circles at
-the ends.
+The owner's choice of 2026-11-20, from three drawn options. On the 24-unit grid: two strokes start at the left
+(`4,6` and `4,18`), curve in to meet at `14,12`, and one stroke runs on to `20,12`, like two lanes merging. No
+circles at the ends.
 
-*Why not GitHub's git-merge octicon* (nodes as small circles joined by lines): `troupe-run-dependabot`'s prop is
-already circles and a line (a pull request), and the two would blur together at 40px. *Why not straight lines*: a
-straight Y reads as a fork or a peace sign more than a merge; the curves say the two become one. *Why not a down
-arrowhead on the stem*: it adds strokes that close up at 40px and turns the symbol into an arrow. If the owner's
-review finds the curved Y unclear, the fallbacks shown alongside are a sideways merge (two lines from the left joining
-into one going right) and the straight Y.
+*Why not an upright Y* (two lines in from the top joining into one going down, curved or straight; both were drawn):
+at 40px it reads as the letter Y more than a merge. *Why not GitHub's git-merge octicon* (nodes as small circles
+joined by lines): `troupe-run-dependabot`'s prop is already circles and a line (a pull request), and the two would
+blur together at 40px. *Why not an arrowhead on the stem*: it adds strokes that close up at 40px, and pointing right
+it would read as `troupe-run-dispatch`'s chevrons.
 
 ### D2. The owner sees it before the pull request is ready
 
 A contact sheet in the scratchpad, not committed: the new avatar at 500, 40 and 20px on light and dark backgrounds,
-beside `troupe-run-dependabot` and `troupe-run-dispatch` (the two triangle Apps whose props are closest). It's sent
+beside `troupe-run-dependabot` and `troupe-run-dispatch` (the two triangle Apps whose props are closest), with the
+other merge symbols from D1. It's sent
 to the owner through the orchestrator, and redrawn until they agree.
 
 ## Risks / Trade-offs

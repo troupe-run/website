@@ -2,6 +2,7 @@
 export const APPS = [
   'troupe-run-release', 'troupe-run-review', 'troupe-run-dependabot', 'troupe-run-infrastructure',
   'troupe-run-docs', 'troupe-run-dispatch', 'troupe-run-board', 'troupe-run-test-quality',
+  'troupe-run-merge',
 ];
 export const ASSETS = [
   { template: 'preview.html', query: 'tag=Your%20agents%20need%20a%20director.&size=76&measure=26', out: 'public/og.png', width: 1200, height: 630 },

@@ -9,7 +9,7 @@ like troupe's. This is troupe-run/website#151.
 ## What Changes
 
 - **Its character is the owner's choice of 2026-11-20** (#151): the system **triangle** head in `--tomato`, as for
-  the other infrastructure Apps, with two round white eyes, holding a **merge symbol** (two lines joining into one)
+  the other infrastructure Apps, with two round white eyes, holding a **merge symbol** (two lines joining into one; the owner picked the sideways form from three drawn options)
   in `--ink` line on the `--sunflower` badge, ringed by cream over the head's lower right, as the other eight are.
   It runs a fixed workflow, so its kind is `system`, and the triangle follows from the shape rule with no exception.
 - **The guide's App table gains a row**: `troupe-run-merge | system | triangle | a merge symbol`.

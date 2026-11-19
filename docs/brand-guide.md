@@ -199,6 +199,7 @@ recognisably ours and shows which job it does (decided with the owner on 2026-11
 | `troupe-run-dispatch` | system | triangle | forward chevrons |
 | `troupe-run-board` | system | triangle | a board with three columns |
 | `troupe-run-test-quality` | system | bug | a magnifying glass |
+| `troupe-run-merge` | system | triangle | a merge symbol |
 
 ## 6. The theatre metaphor
 

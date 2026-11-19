@@ -1,6 +1,6 @@
 {
   "sources": {
-    "scripts/assets.config.mjs": "49d1cffec728517b11db368c52742537b8d1600cdb2cf6e9bde646249f64db99",
+    "scripts/assets.config.mjs": "663a7d588e3966dbb571b491f3bf9a5aaf4f83b13d5020e24dd9497f97af4229",
     "brand/favicon.svg": "17cad59f80e2766b225da2bea942f02bda592cb5666670dd1c392b322ffd8241",
     "brand/mark.svg": "70e5e2ba8b0c939a27d9b8406af3175023fb8435f786e2a19e71ec56aa3b7a66",
     "brand/templates/base.css": "0fc3338a5f0ebc5022a24fd003575ac75b696b64f3ed9004446081a7d263bb1b",
@@ -17,7 +17,8 @@
     "brand/apps/troupe-run-docs.svg": "2b3c86ea79c35dccae3291bf0c7f2952f37b56e454a347e86a7d545b54781087",
     "brand/apps/troupe-run-dispatch.svg": "bd9ed48aa267d367a844fbe0581dad10f110ff15bab942ed7f11b797c52b1f8b",
     "brand/apps/troupe-run-board.svg": "dfc5165224cae1fceae3907ac73e8683729b17f72484eb714b79b2bd8b683292",
-    "brand/apps/troupe-run-test-quality.svg": "da596eed4262984f7e103a53eeea949d21257f1e9d70220b728aeaca7a6aaa10"
+    "brand/apps/troupe-run-test-quality.svg": "da596eed4262984f7e103a53eeea949d21257f1e9d70220b728aeaca7a6aaa10",
+    "brand/apps/troupe-run-merge.svg": "0977882c84463bb41ab68bde2edce1e4aa56d0acd2fca4beebfc22583fb1c553"
   },
   "outputs": {
     "public/og.png": "deb011a89ba69b4c897a92f7adf5e411f52362d927dc352b8a7a0eaad72da850",
@@ -36,6 +37,7 @@
     "brand/out/app-troupe-run-dispatch.png": "257808c9478ecb0a75ec92c1276e47f1198d0ecac66b203a4570f6ab13467be8",
     "brand/out/app-troupe-run-board.png": "e26bbd27c260cc697cdf6c394ef2b0626643bf35a52694e0fd19f21cbe768c71",
     "brand/out/app-troupe-run-test-quality.png": "1419f007b7cfde0edc6495a76d9f087b4697d5b05c861f69179cf89cf492981f",
+    "brand/out/app-troupe-run-merge.png": "eb58d25fbbf0d3ec54fffdb8dffd30cea7abbcb3ecdc07d8012d80ae121294ee",
     "public/favicon.svg": "17cad59f80e2766b225da2bea942f02bda592cb5666670dd1c392b322ffd8241",
     "public/favicon.ico": "cc376ecb187841e8630e09d06ffd3c0fbc8de984d65d855f9f9bd4acf2e54661"
   }
