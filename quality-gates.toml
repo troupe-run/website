@@ -4,18 +4,8 @@
 # (openspec/changes/archive/2026-11-18-quality-gates/design.md).
 version = 1
 
-# website measures no coverage: only the repositories troupe-run/infrastructure names do (owner, 2026-11-18,
-# infrastructure#332). Nothing here reads this table. It stays only because the delivered module requires it, and
-# goes once infrastructure#332 makes it optional.
-[coverage]
-floor = 80.0
-tolerance = 0.5
-
-[coverage.packages.src]
-paths = ["src"]
-
-[coverage.packages.scripts]
-paths = ["scripts"]
+# No [coverage]: website measures no coverage. Coverage and mutation testing apply only to the repositories
+# troupe-run/infrastructure's scripts/mutation.json lists (owner, 2026-11-18, infrastructure#332).
 
 # Cyclomatic complexity (lizard) of each function a change adds or edits: above the limit, it may not be new or more
 # complex than before. lizard can't read .astro files.
