@@ -34,3 +34,13 @@ None.
 - `package.json` (an `overrides` block) and `package-lock.json`.
 - Affects linkinator (the link check), typescript-eslint and eslint (lint), and the Starlight theme's CSS nesting
   (build). Lint, tests, the build and the link check prove each one still works.
+- Both overrides cross a major the parent doesn't declare, so here is what each parent calls:
+  - linkinator 8.1.0 calls only `glob(fullPath)` (`build/src/options.js`), once for each path it's given. It throws
+    when that returns nothing. `npm run linkcheck` passes `dist` through it, so the link check exercises the call.
+    glob 14 keeps the `glob` named export and its promise of a path list.
+  - typescript-estree 8.72.2 calls only `minimatch(filePath, pattern, { dot: true })`
+    (`dist/useProgramFromProjectService.js`), and only with `projectService`'s `allowDefaultProject`, which this
+    site's ESLint config doesn't set. 8.74.0 makes the identical call and declares `minimatch ^11.0.1` itself.
+- When to remove them: the minimatch override when typescript-eslint is updated to 8.74 or later, and the glob one
+  when linkinator allows glob 14. Each removal goes with that update, and the audit shows if a removal reopens an
+  advisory.
