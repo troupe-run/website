@@ -32,5 +32,6 @@
   build's generated files first.
 - [x] 2.2 Run `uv run scripts/check.py`. Verify it passes.
   Done: all gates passed, e2e included (275 passed).
-- [ ] 2.3 Open a draft pull request with `Closes #162` that links #161, using `--body-file`, and act on Claude's
+- [x] 2.3 Open a draft pull request with `Closes #162` that links #161, using `--body-file`, and act on Claude's
   review. Verify the review of the last push completed with no must-fix or decision open, and CI passes.
+  Done: #163. Claude's reviews of 567cea0 and b12b2f0 had no findings, and CI passed on b12b2f0.
